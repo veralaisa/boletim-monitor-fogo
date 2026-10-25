@@ -31,7 +31,7 @@ boletim-fogo.html
 │  │  ├─ #pg2 — Onde queima
 │  │  ├─ #pg3 — Bioma mais afetado
 │  │  └─ #pg4 — Estado mais afetado
-│  └─ #tab-explorer — Destaque dinâmico (painel interativo, em desenvolvimento)
+│  └─ #tab-explorer — Destaque dinâmico (painel interativo; estado dos filtros no hash #explorer?t=&c=&a=&i=&f=…)
 └─ <script> — lógica JavaScript
 ```
 
@@ -346,7 +346,9 @@ https://veralaisa.github.io/boletim-monitor-fogo/
 
 ## 📞 Próximas etapas
 
-- [ ] **Painel dinâmico** (Destaque dinâmico): filtros, série temporal, mapa interativo
+- [x] **Destaque dinâmico**: filtros por qualquer território, sazonalidade, acumulado, calendário, mapas (subdivisão, cicatrizes, calor, dois anos lado a lado, GIF), ranking, cobertura, comparação, tabela, CSV/PNG/PDF
+  - Notas da API: `landCover` só aceita classes de nível 2 (ex.: 3, 15); a classe 1 volta `null`. O ranking `/raw` lista todos os territórios do tipo (com código e UF), e é usado para montar a busca. Totais do Brasil usam o agrupamento `biome`.
+  - Teste do PDF do painel: hash `#explorer?…&px=1`.
 - [ ] **Fonte customizada**: quando arquivo .ttf/.woff2 chegar, atualizar @font-face
 - [ ] **Mais integrações**: considerar copiar para prod do MapBiomas
 

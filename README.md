@@ -11,7 +11,11 @@ Relatório visual com dados ao vivo sobre área queimada no Brasil, exportável 
   - Onde queima: rankings de estados e municípios
   - Informações por bioma e cobertura do solo
 
-- **Destaque Dinâmico** (painel interativo em desenvolvimento)
+- **Destaque Dinâmico** (painel interativo, versão de teste)
+  - Qualquer recorte da API: Brasil, bioma, estado, município, terra indígena, UC, quilombo, bacias e outros
+  - Período livre (ano, mês inicial e final) e filtro por classe de cobertura
+  - Sazonalidade, acumulado contra a média, série anual, calendário do fogo, mapas, rankings e comparação entre territórios
+  - Download de cada gráfico em PNG e dos dados em CSV, PDF do painel e link com os filtros
 
 ## 🚀 Acesso
 

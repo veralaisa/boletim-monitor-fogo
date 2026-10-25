@@ -20,7 +20,7 @@
     --red-l: #F7BBB5;
     --ink: #1F1F1F;
     --ink2: #4F4F4F;
-    --muted: #8A8A8A;
+    --muted: #6B6B6B;
     --line: #E6E6E6;
     --soft: #F6F5F4;
     --good: #2E7D4F;
@@ -203,7 +203,32 @@
 
   .x-filtros { display: grid; gap: 12px; }
   .x-frow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 14px; }
-  .x-campo { display: flex; flex-direction: column; gap: 5px; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); }
+  .x-campo { display: flex; flex-direction: column; gap: 5px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink2); }
+  .xpane .fn { font-size: 11.5px; line-height: 1.4; color: var(--ink2); }
+  .xpane .leg { font-size: 11.5px; color: var(--ink2); }
+  .xpane .eyebrow { font-size: 11px; }
+  .x-sec { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px 16px; margin-top: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--red); }
+  .x-sec h3 { margin: 0; font-size: 19px; font-weight: 800; color: var(--ink); }
+  .x-sec p { margin: 3px 0 0; max-width: 80ch; font-size: 13px; color: var(--ink2); }
+  .x-sec-a { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; }
+  .x-ou { align-self: flex-end; padding-bottom: 8px; font-size: 12px; color: var(--ink2); }
+  .x-per .x-tiles { margin-top: 14px; }
+  .x-per .x-frow { margin-top: 12px; }
+  .x-uso-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); }
+  .lc-w { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 18px; align-items: center; margin-top: 12px; }
+  .lc-d { position: relative; height: 190px; }
+  .lc-l { display: grid; gap: 0; max-height: 280px; overflow: auto; margin: 0; padding: 0 4px 0 0; list-style: none; }
+  .lc-l li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto 46px; gap: 8px; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--ink); }
+  .lc-l i { width: 12px; height: 12px; border-radius: 3px; }
+  .lc-l .h { color: var(--ink2); font-variant-numeric: tabular-nums; }
+  .lc-l .p { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .lc-res { display: flex; gap: 10px; margin-top: 12px; }
+  .lc-res div { flex: 1; padding: 8px 10px; border-radius: 8px; background: var(--soft); font-size: 12px; color: var(--ink2); }
+  .lc-res b { display: block; font-size: 18px; color: var(--ink); }
+  .x-ctx { position: fixed; z-index: 1100; left: 50%; bottom: 16px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 32px); padding: 6px 6px 6px 16px; background: #fff; border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 6px 20px rgba(0, 0, 0, .14); font-size: 13px; color: var(--ink2); }
+  .x-ctx[hidden] { display: none; }
+  .x-ctx span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .x-ctx b { color: var(--ink); }
   .combo { position: relative; }
   .combo input { width: 300px; font: inherit; font-size: 13px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
   .combo input:disabled { background: var(--soft); color: var(--ink2); }
@@ -231,8 +256,10 @@
   .x-resumo { font-size: 13px; color: var(--ink2); }
   .x-resumo b { color: var(--ink); }
   .x-tiles { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .x-tiles .tl { background: #fff; border: 1px solid var(--line); padding: 12px 14px; }
+  .x-tiles .tl { background: var(--soft); padding: 12px 14px; }
+  .x-tiles .tl-l { font-size: 11px; }
   .x-tiles .tl-v { font-size: 24px; }
+  .x-tiles .tl-s { font-size: 11.5px; }
   .x-tiles .st { border-radius: 10px; }
   .x-anos { margin-top: 10px; }
   .ch { position: relative; height: 300px; margin-top: 10px; }
@@ -279,7 +306,7 @@
 
   /* Painel no modo PDF: largura de uma folha A4 deitada, sem os controles. */
   html.px .xpane { width: 277mm; max-width: none; margin: 0 auto; padding: 0; }
-  html.px :is(.x-filtros, .c-a, .x-mopts, .x-anos, .tbl-tools, .pg, .x-gif, #x-mapa-n, .leaflet-control-zoom) { display: none !important; }
+  html.px :is(.x-filtros, .c-a, .x-mopts, .x-anos, .tbl-tools, .pg, .x-gif, #x-mapa-n, .leaflet-control-zoom, .x-perrow, .x-sec .x-campo, .x-sec-a, .x-ctx, .x-per .sub) { display: none !important; }
   html.px .x-print-head { display: flex; align-items: center; gap: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--red); }
   html.px .x-print-head img { height: 34px; }
   html.px .x-print-head .x-ph-desc { margin-left: auto; font-size: 12px; font-weight: 700; }
@@ -310,6 +337,11 @@
     html:not(.px) .leaf { height: 360px; }
     html:not(.px) .c-h, html:not(.px) .x-linha { flex-wrap: wrap; }
     html:not(.px) .x-tiles .tl-v { font-size: 20px; }
+    html:not(.px) .x-uso-row, html:not(.px) .lc-w { grid-template-columns: 1fr; }
+    html:not(.px) .lc-d { width: 190px; margin: 0 auto; }
+    html:not(.px) .x-ou { display: none; }
+    html:not(.px) .x-perrow > .x-campo:first-child { flex-basis: 100%; }
+    html:not(.px) .x-perrow > label { flex: 1 1 30%; }
   }
   /* No modo impressão a folha mantém o tamanho A4 mesmo em janelas estreitas. */
   html.pm .doc { padding: 0; }
@@ -525,7 +557,11 @@
     <span class="x-ph-desc" id="x-ph-desc"></span>
   </header>
 
-  <section class="card x-filtros" aria-label="Filtros do painel">
+  <section class="card x-filtros" id="x-filtros" aria-label="Território do painel">
+    <div class="c-h">
+      <div><p class="eyebrow">Território</p><h2>Escolha o recorte e o território</h2><p class="sub">Vale para todo o painel.</p></div>
+      <div class="c-a"><button class="btn-s" id="x-link" title="Copia o endereço desta página com os filtros escolhidos">Copiar link</button></div>
+    </div>
     <div class="x-frow">
       <label class="x-campo">Recorte <select id="x-tipo"></select></label>
       <div class="x-campo">
@@ -535,37 +571,41 @@
           <ul class="combo-l" id="x-terr-lista" role="listbox" hidden></ul>
         </div>
       </div>
-      <label class="x-campo">Dividir por <select id="x-div"></select></label>
       <label class="x-campo">Cobertura <select id="x-cob"><option value="">Todas as classes</option></select></label>
     </div>
-    <div class="x-frow">
-      <div class="x-campo"><span>Período</span>
+  </section>
+
+  <section class="card x-per" id="x-per">
+    <div class="c-h">
+      <div><p class="eyebrow">Destaques do período</p><h2 id="x-per-t">—</h2>
+        <p class="sub">O período vale para os destaques, o uso e cobertura, o mapa e os rankings. Os gráficos do histórico mostram todos os anos e marcam estes meses.</p></div>
+      <div class="c-a"><button class="mini" data-csv="x-kpi" title="Baixar os destaques em CSV">CSV</button></div>
+    </div>
+    <div class="x-frow x-perrow">
+      <div class="x-campo"><span>Atalhos</span>
         <div class="chips" id="x-atalhos">
-          <button class="chip" data-at="mes">Mês de referência</button>
-          <button class="chip" data-at="acum">Acumulado do ano</button>
+          <button class="chip" data-at="mes" id="x-at-mes">Mês mais recente</button>
+          <button class="chip" data-at="acum" id="x-at-acum">Ano até agora</button>
           <button class="chip" data-at="seca">Estação seca (jun–out)</button>
-          <button class="chip" data-at="ano">Ano inteiro</button>
         </div>
       </div>
+      <span class="x-ou">ou escolha</span>
       <label class="x-campo">Ano <select id="x-ano"></select></label>
       <label class="x-campo">De <select id="x-ini"></select></label>
       <label class="x-campo">Até <select id="x-fim"></select></label>
-      <div class="x-acts"><button class="btn-s" id="x-link" title="Copia o endereço desta página com os filtros escolhidos">Copiar link</button></div>
     </div>
     <p class="x-aviso" id="x-aviso" hidden></p>
+    <div class="x-tiles" id="x-kpi">
+      <div class="st"></div>
+      <article class="tl"><p class="tl-l" id="xk1-l">Área queimada</p><p class="tl-v" id="xk1-v">—</p><p class="tl-s" id="xk1-s"></p></article>
+      <article class="tl"><p class="tl-l" id="xk2-l">Contra o ano anterior</p><p class="tl-v" id="xk2-v">—</p><p class="tl-s" id="xk2-s"></p></article>
+      <article class="tl"><p class="tl-l" id="xk3-l">Contra a média histórica</p><p class="tl-v" id="xk3-v">—</p><p class="tl-s" id="xk3-s"></p></article>
+      <article class="tl"><p class="tl-l" id="xk4-l">Mês com mais fogo</p><p class="tl-v" id="xk4-v">—</p><p class="tl-s" id="xk4-s"></p></article>
+    </div>
   </section>
 
-  <div class="x-linha">
-    <p class="x-resumo" id="x-resumo"></p>
-    <div class="c-a"><button class="mini" data-csv="x-kpi" title="Baixar o resumo em CSV">CSV</button></div>
-  </div>
-
-  <div class="x-tiles" id="x-kpi">
-    <div class="st"></div>
-    <article class="tl"><p class="tl-l" id="xk1-l">Área queimada</p><p class="tl-v" id="xk1-v">—</p><p class="tl-s" id="xk1-s"></p></article>
-    <article class="tl"><p class="tl-l" id="xk2-l">Contra o ano anterior</p><p class="tl-v" id="xk2-v">—</p><p class="tl-s" id="xk2-s"></p></article>
-    <article class="tl"><p class="tl-l" id="xk3-l">Contra a média histórica</p><p class="tl-v" id="xk3-v">—</p><p class="tl-s" id="xk3-s"></p></article>
-    <article class="tl"><p class="tl-l" id="xk4-l">Mês com mais fogo</p><p class="tl-v" id="xk4-v">—</p><p class="tl-s" id="xk4-s"></p></article>
+  <div class="x-sec">
+    <div><h3>Histórico</h3><p>Todos os anos de <b data-x-nome></b>, mês a mês. Os anos escolhidos em “Comparar com” aparecem nas mesmas cores nos três primeiros gráficos.</p></div>
   </div>
 
   <section class="card" id="x-saz">
@@ -607,6 +647,49 @@
     <div class="cal-leg" id="x-cal-leg"></div>
   </section>
 
+  <div class="x-sec">
+    <div><h3>Uso e cobertura</h3><p>O que queimou em <b data-x-nome></b>, pelas classes de uso e cobertura do MapBiomas.</p></div>
+    <div class="x-campo"><span>Nível da legenda</span>
+      <div class="chips" id="x-nivel">
+        <button class="chip" data-nv="1">Nível 1</button>
+        <button class="chip" data-nv="2">Nível 2</button>
+        <button class="chip" data-nv="3">Nível 3</button>
+        <button class="chip" data-nv="4">Nível 4</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="xrow x-uso-row">
+    <section class="card" id="x-uso">
+      <div class="st"></div>
+      <div class="c-h">
+        <div><p class="eyebrow">No período</p><h2 id="x-uso-t">O que queimou</h2><p class="sub" id="x-uso-s"></p></div>
+        <div class="c-a"><button class="mini" data-png="x-uso">PNG</button><button class="mini" data-csv="x-uso">CSV</button></div>
+      </div>
+      <div class="lc-w">
+        <div class="lc-d"><canvas id="xc-uso" role="img" aria-label="Gráfico de rosca com a área queimada por classe de uso e cobertura"></canvas></div>
+        <ul class="lc-l" id="x-uso-l"></ul>
+      </div>
+      <div class="lc-res" id="x-uso-res"></div>
+    </section>
+    <section class="card" id="x-usoano">
+      <div class="st"></div>
+      <div class="c-h">
+        <div><p class="eyebrow">Ano a ano</p><h2 id="x-usoano-t">O que queimou em cada ano</h2><p class="sub" id="x-usoano-s"></p></div>
+        <div class="c-a"><button class="mini" data-png="x-usoano">PNG</button><button class="mini" data-csv="x-usoano">CSV</button></div>
+      </div>
+      <div class="ch alto"><canvas id="xc-usoano" role="img" aria-label="Barras empilhadas com a área queimada por classe de uso e cobertura em cada ano"></canvas></div>
+    </section>
+  </div>
+
+  <div class="x-sec" id="x-sec-ter">
+    <div><h3>Territórios</h3><p id="x-ter-ctx"></p></div>
+    <div class="x-sec-a">
+      <label class="x-campo">Dividir por <select id="x-div"></select></label>
+      <button class="btn-s" data-ir-filtros>Mudar recorte ou território</button>
+    </div>
+  </div>
+
   <section class="card" id="x-mapa">
     <div class="st"></div>
     <div class="c-h">
@@ -636,38 +719,19 @@
     <div class="x-gif" id="x-gif"></div>
   </section>
 
-  <div class="xrow">
-    <section class="card" id="x-rank">
-      <div class="st"></div>
-      <div class="c-h">
-        <div><p class="eyebrow">Ranking</p><h2 id="x-rank-t">Mais afetados</h2><p class="sub" id="x-rank-s"></p></div>
-        <div class="c-a"><button class="mini" data-png="x-rank">PNG</button><button class="mini" data-csv="x-rank">CSV</button></div>
-      </div>
-      <div class="ch" id="x-rank-ch"><canvas id="xc-rank" role="img" aria-label="Barras com os territórios de maior área queimada no período e no mesmo período do ano anterior"></canvas></div>
-    </section>
-    <section class="card" id="x-uso">
-      <div class="st"></div>
-      <div class="c-h">
-        <div><p class="eyebrow">Uso e cobertura</p><h2>O que queimou no período</h2><p class="sub" id="x-uso-s"></p></div>
-        <div class="c-a"><button class="mini" data-png="x-uso">PNG</button><button class="mini" data-csv="x-uso">CSV</button></div>
-      </div>
-      <div class="ch" id="x-uso-ch"><canvas id="xc-uso" role="img" aria-label="Barras com a área queimada por classe de uso e cobertura"></canvas></div>
-    </section>
-  </div>
-
-  <section class="card" id="x-usoano">
+  <section class="card" id="x-rank">
     <div class="st"></div>
     <div class="c-h">
-      <div><p class="eyebrow">Uso e cobertura por ano</p><h2 id="x-usoano-t">O que queimou em cada ano</h2><p class="sub" id="x-usoano-s"></p></div>
-      <div class="c-a"><button class="mini" data-png="x-usoano">PNG</button><button class="mini" data-csv="x-usoano">CSV</button></div>
+      <div><p class="eyebrow">Ranking</p><h2 id="x-rank-t">Mais afetados</h2><p class="sub" id="x-rank-s"></p></div>
+      <div class="c-a"><button class="mini" data-png="x-rank">PNG</button><button class="mini" data-csv="x-rank">CSV</button></div>
     </div>
-    <div class="ch alto"><canvas id="xc-usoano" role="img" aria-label="Barras empilhadas com a área queimada por classe de uso e cobertura em cada ano"></canvas></div>
+    <div class="ch" id="x-rank-ch"><canvas id="xc-rank" role="img" aria-label="Barras com os territórios de maior área queimada no período e no mesmo período do ano anterior"></canvas></div>
   </section>
 
   <section class="card" id="x-cmp">
     <div class="st"></div>
     <div class="c-h">
-      <div><p class="eyebrow">Comparar territórios</p><h2 id="x-cmp-t">Comparação entre territórios</h2><p class="sub">Adicione até 3 territórios de qualquer tipo para comparar com o recorte escolhido.</p></div>
+      <div><p class="eyebrow">Comparar territórios</p><h2 id="x-cmp-t">Comparação entre territórios</h2><p class="sub">Adicione até 3 territórios de qualquer tipo para comparar com <b data-x-nome></b>.</p></div>
       <div class="c-a"><button class="mini" data-png="x-cmp">PNG</button><button class="mini" data-csv="x-cmp">CSV</button></div>
     </div>
     <div class="x-mopts">
@@ -707,6 +771,8 @@
     </div>
   </section>
 
+  <div class="x-ctx" id="x-ctx" hidden><span id="x-ctx-t"></span><button class="btn-s" data-ir-filtros>Mudar território</button></div>
+
   <p class="foot">Fonte: <a href="https://plataforma.monitorfogo.mapbiomas.org" target="_blank" rel="noopener">MapBiomas Monitor do Fogo</a>. Os valores são de área queimada (cicatrizes de fogo), não de focos de calor. Mapa base © Esri.</p>
 </main>
 
@@ -723,7 +789,7 @@ const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out
 const MES_L = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto',
   'setembro', 'outubro', 'novembro', 'dezembro'];
 
-const C = { red: '#E94030', redD: '#B42A1C', redL: '#F7BBB5', ink: '#1F1F1F', ink2: '#4F4F4F', muted: '#8A8A8A', line: '#E6E6E6', good: '#2E7D4F' };
+const C = { red: '#E94030', redD: '#B42A1C', redL: '#F7BBB5', ink: '#1F1F1F', ink2: '#4F4F4F', muted: '#6B6B6B', line: '#E6E6E6', good: '#2E7D4F' };
 
 const UF = [
   [11, 'RO', 'Rondônia'], [12, 'AC', 'Acre'], [13, 'AM', 'Amazonas'], [14, 'RR', 'Roraima'],
@@ -1417,8 +1483,10 @@ async function p4Mun(D) {
 /* ==========================================================
    DESTAQUE DINÂMICO
    ========================================================== */
-// Paleta categórica validada (daltonismo e contraste): vermelho MapBiomas Fogo, azul, ocre e roxo.
-const SER = ['#E94030', '#1F7FB8', '#B8860B', '#6F4FB0'];
+// Vermelho MapBiomas Fogo para o ano escolhido; verde-azulado, ocre e marrom (tons da legenda MapBiomas)
+// para os comparados. Quatro tons terrosos não se separam bem para daltônicos, por isso o traço também muda.
+const SER = ['#E94030', '#2A9D8F', '#C79A1E', '#7A5900'];
+const DASH = [[], [], [7, 4], [2, 3]];
 const BANDA = 'rgba(138, 138, 138, .18)';
 const CAL_RAMP = ['#FFF3F1', '#F8B1AA', '#F06A61', '#E94030', '#A82416'];
 // Divergente para variação: queda em verde, alta em vermelho, estável em cinza.
@@ -1444,7 +1512,7 @@ const COB_GRUPOS = [
 ];
 const NATIVAS = new Set([3, 4, 5, 6, 49, 11, 12, 32, 29, 50]);
 
-const X = { ready: false, req: 0, f: null, jobs: {}, dl: {}, resumo: '', m1: null, m2: null, mapKey: '', sync: false,
+const X = { ready: false, req: 0, f: null, jobs: {}, dl: {}, leg: {}, resumo: '', m1: null, m2: null, mapKey: '', sync: false,
   tab: { rows: [], k: 'v', dir: -1, q: '', page: 1, uf: false, ano: 0 } };
 
 const JC = {};
@@ -1550,7 +1618,8 @@ function lerHash() {
     modo: ['sub', 'fogo', 'calor'].includes(h.get('mp')) ? h.get('mp') : '',
     metrica: h.get('m') === 'var' ? 'var' : 'area',
     ano2: P.anos.includes(int('m2')) ? int('m2') : '',
-    cmpModo: h.get('cm') === 'ano' ? 'ano' : 'mes'
+    cmpModo: h.get('cm') === 'ano' ? 'ano' : 'mes',
+    nivel: [1, 2, 3, 4].includes(int('nv')) ? int('nv') : 2
   };
 }
 function salvarHash() {
@@ -1563,6 +1632,7 @@ function salvarHash() {
   if (f.metrica === 'var') p.set('m', 'var');
   if (f.ano2) p.set('m2', f.ano2);
   if (f.cmpModo === 'ano') p.set('cm', 'ano');
+  if (f.nivel !== 2) p.set('nv', f.nivel);
   history.replaceState(null, '', `#explorer?${p}`);
 }
 
@@ -1614,10 +1684,19 @@ function ligarEventos() {
     if (b.dataset.at === 'mes') { x.ano = P.Y; x.ini = x.fim = P.M; }
     if (b.dataset.at === 'acum') { x.ini = 1; x.fim = ult; }
     if (b.dataset.at === 'seca') { x.ini = 6; x.fim = 10; }
-    if (b.dataset.at === 'ano') { x.ini = 1; x.fim = 12; }
     x.anosCmp = x.anosCmp.filter(y => y !== x.ano);
     xRun();
   });
+  $('x-nivel').addEventListener('click', e => { const b = e.target.closest('[data-nv]'); if (b) { f().nivel = +b.dataset.nv; refazer('x-uso', 'x-usoano'); } });
+  document.querySelectorAll('[data-ir-filtros]').forEach(b => b.addEventListener('click', () => {
+    $('x-filtros').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => ($('x-terr').disabled ? $('x-tipo') : $('x-terr')).focus({ preventScroll: true }), 450);
+  }));
+  // Lembrete fixo do território escolhido quando os filtros saem da tela.
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([en]) => { $('x-ctx').hidden = en.isIntersecting || $('tab-explorer').hidden; })
+      .observe($('x-filtros'));
+  }
   $('x-anos-cmp').addEventListener('click', e => {
     const b = e.target.closest('[data-ano]');
     if (!b) return;
@@ -1722,10 +1801,19 @@ function atualizarControles() {
   $('x-fim').value = f.fim;
   $('x-cob').value = f.cob;
   const at = f.ano === P.Y && f.ini === P.M && f.fim === P.M ? 'mes'
-    : f.ini === 1 && f.fim === 12 ? 'ano'
     : f.ini === 1 && f.fim === ult ? 'acum'
     : f.ini === 6 && f.fim === 10 ? 'seca' : '';
+  // "Ano até agora" vira "Ano inteiro" quando o ano escolhido já está completo.
+  $('x-at-mes').textContent = `Mês mais recente (${MES[P.M - 1]}/${P.Y})`;
+  $('x-at-acum').textContent = f.ano === P.Y ? `Ano até agora (jan–${MES[P.M - 1]})` : `Ano inteiro (jan–dez de ${f.ano})`;
   document.querySelectorAll('#x-atalhos [data-at]').forEach(b => { b.classList.toggle('on', b.dataset.at === at); b.setAttribute('aria-pressed', String(b.dataset.at === at)); });
+  document.querySelectorAll('#x-nivel [data-nv]').forEach(b => { const on = +b.dataset.nv === f.nivel; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  document.querySelectorAll('[data-x-nome]').forEach(s => { s.textContent = f.label; });
+  const div = (TIPO_NOME[f.div] || '').toLowerCase();
+  $('x-ter-ctx').innerHTML = `Mostrando <b>${esc(f.label)}</b> (${esc(TIPO_NOME[f.tipo].toLowerCase())})`
+    + (temSub(f) ? `, dividido por ${esc(div)}` : ', que não tem subdivisões na API')
+    + `, em ${esc(mesesTxt(f))}. Para outro recorte, use o botão ao lado ou o filtro no topo.`;
+  $('x-ctx-t').innerHTML = `<b>${esc(f.label)}</b> · ${esc(abrevP(f))} ${f.ano}${f.cob ? ` · ${esc(cobNome(f))}` : ''}`;
   const parcial = f.ano === P.Y && f.fim > P.M;
   $('x-aviso').hidden = !parcial;
   $('x-aviso').textContent = parcial
@@ -1733,7 +1821,7 @@ function atualizarControles() {
     : '';
   const cob = f.cob ? `só ${cobNome(f).toLowerCase()}` : 'todas as classes de cobertura';
   X.resumo = `${f.label} · ${mesesTxt(f)} · ${cob}`;
-  $('x-resumo').innerHTML = `<b>${esc(f.label)}</b> · ${esc(mesesTxt(f))} · ${esc(cob)}`;
+  $('x-per-t').textContent = `${f.label}: ${mesesTxt(f)}`;
   $('x-ph-desc').textContent = X.resumo;
 }
 
@@ -1800,12 +1888,15 @@ function xRun() {
       if (vivo()) xRank(cur, prev, f);
     }),
     'x-uso': job('x-uso', async () => {
-      const [lc, tr] = await Promise.all([gj(`/api/statistics/land-cover/${tot}${qs({ year: f.ano, monthStart: f.ini, monthEnd: f.fim, level: 2 })}`), lcTrans()]);
+      const [lc, tr] = await Promise.all([gj(`/api/statistics/land-cover/${tot}${qs({ year: f.ano, monthStart: f.ini, monthEnd: f.fim, level: f.nivel })}`), lcTrans()]);
       if (vivo()) xUso(lc, tr, f);
     }),
     'x-usoano': job('x-usoano', async () => {
-      const lcs = await Promise.all(P.anos.map(y => gj(`/api/statistics/land-cover/${tot}${qs({ year: y, monthStart: f.ini, monthEnd: f.fim, level: 2 })}`)));
-      if (vivo()) xUsoAno(lcs, f);
+      const [lcs, tr] = await Promise.all([
+        Promise.all(P.anos.map(y => gj(`/api/statistics/land-cover/${tot}${qs({ year: y, monthStart: f.ini, monthEnd: f.fim, level: f.nivel })}`))),
+        lcTrans()
+      ]);
+      if (vivo()) xUsoAno(lcs, tr, f);
     }),
     'x-cmp': job('x-cmp', () => xCmp(f, vivo)),
     'x-tab': job('x-tab', async () => {
@@ -1867,12 +1958,14 @@ function estat(series, f) {
   });
 }
 const corAno = (f, y) => y === f.ano ? SER[0] : f.anosCmp.includes(y) ? SER[1 + f.anosCmp.indexOf(y)] : null;
-const linhaAno = (label, data, cor, w) => ({ label, data, borderColor: cor, backgroundColor: cor, borderWidth: w, pointRadius: w > 2 ? 3 : 2, pointHoverRadius: 5, tension: .25 });
+const linhaAno = (label, data, cor, w, dash = []) => ({ label, data, borderColor: cor, backgroundColor: cor, borderWidth: w, borderDash: dash, pointRadius: w > 2 ? 3 : 2, pointHoverRadius: 5, tension: .25 });
+const linhasCmp = (f, S) => f.anosCmp.map((y, i) => linhaAno(String(y), S[y], SER[1 + i], 2, DASH[1 + i]));
+const axT = text => ({ display: true, text, color: C.ink2, font: { size: 11, weight: '600' }, padding: { top: 4, bottom: 2 } });
 function dsReferencia(st) {
   return [
     { label: '_min', data: st.map(s => s?.min ?? null), borderWidth: 0, pointRadius: 0, pointHoverRadius: 0, fill: false },
     { label: 'Faixa dos demais anos (mín.–máx.)', data: st.map(s => s?.max ?? null), borderWidth: 0, pointRadius: 0, pointHoverRadius: 0, backgroundColor: BANDA, borderColor: BANDA, fill: '-1' },
-    { label: 'Média dos demais anos', data: st.map(s => s?.avg ?? null), borderColor: C.ink, backgroundColor: 'transparent', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 3 }
+    { label: 'Média dos demais anos', data: st.map(s => s?.avg ?? null), borderColor: '#8C8C8C', backgroundColor: 'transparent', borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 3 }
   ];
 }
 // Faixa clara atrás dos meses do período escolhido.
@@ -1899,7 +1992,16 @@ function opLinha(yT, xT, st, extraPlugins = {}) {
     interaction: { mode: 'index', intersect: false },
     layout: { padding: { top: 4 } },
     plugins: {
-      legend: { position: 'top', align: 'start', labels: { boxWidth: 22, boxHeight: 6, font: { size: 11 }, color: C.ink2, filter: i => !i.text.startsWith('_') } },
+      // Legenda com amostra de linha (com o mesmo tracejado do gráfico); a faixa aparece como bloco.
+      legend: {
+        position: 'top', align: 'start',
+        labels: {
+          usePointStyle: true, pointStyleWidth: 30, boxHeight: 8, font: { size: 11.5 }, color: C.ink2, filter: i => !i.text.startsWith('_'),
+          generateLabels: ch => Chart.defaults.plugins.legend.labels.generateLabels(ch).map(i => i.text.startsWith('Faixa')
+            ? { ...i, pointStyle: 'rect', lineWidth: 0 }
+            : { ...i, pointStyle: 'line', lineWidth: Math.max(2, i.lineWidth || 0) })
+        }
+      },
       tooltip: {
         filter: i => !i.dataset.label.startsWith('_') && !i.dataset.label.startsWith('Faixa'),
         callbacks: {
@@ -1910,8 +2012,8 @@ function opLinha(yT, xT, st, extraPlugins = {}) {
       ...extraPlugins
     },
     scales: {
-      x: { grid: { display: false }, border: { color: C.line }, ticks: { font: { size: 10 } }, title: axTitle(xT) },
-      y: yAxis({ ticks: { callback: v => cmp(v, 1), font: { size: 10 }, maxTicksLimit: 6 }, title: axTitle(yT) })
+      x: { grid: { display: false }, border: { color: C.line }, ticks: { font: { size: 11 } }, title: axT(xT) },
+      y: yAxis({ ticks: { callback: v => cmp(v, 1), font: { size: 11 }, maxTicksLimit: 6 }, title: axT(yT) })
     }
   };
 }
@@ -1919,14 +2021,15 @@ function opLinha(yT, xT, st, extraPlugins = {}) {
 function chipsAnos(f) {
   $('x-anos-cmp').innerHTML = '<span class="x-lab">Comparar com</span>' + P.anos.filter(y => y !== f.ano).map(y => {
     const i = f.anosCmp.indexOf(y);
-    return `<button class="chip${i >= 0 ? ' sel' : ''}" data-ano="${y}" aria-pressed="${i >= 0}">${i >= 0 ? `<i style="background:${SER[1 + i]}"></i>` : ''}${y}</button>`;
+    const traco = ['solid', 'dashed', 'dotted'][i];
+    return `<button class="chip${i >= 0 ? ' sel' : ''}" data-ano="${y}" aria-pressed="${i >= 0}">${i >= 0 ? `<i style="height:0;background:none;border-top:3px ${traco} ${SER[1 + i]}"></i>` : ''}${y}</button>`;
   }).join('') + `<span class="fn">Até 3 anos. Em vermelho, ${f.ano}.</span>`;
 }
 
 function xSaz(M, f) {
   chipsAnos(f);
   const st = estat(M, f);
-  const ds = [...dsReferencia(st), ...f.anosCmp.map(y => linhaAno(String(y), M[y], corAno(f, y), 2)), linhaAno(String(f.ano), M[f.ano], SER[0], 3)];
+  const ds = [...dsReferencia(st), ...linhasCmp(f, M), linhaAno(String(f.ano), M[f.ano], SER[0], 3)];
   const outros = P.anos.filter(y => y !== f.ano);
   $('x-saz-s').textContent = `Cada linha é um ano. A faixa cinza vai do menor ao maior valor de cada mês nos demais anos (${outros[0]}–${outros[outros.length - 1]}).`;
   mkChart('x-saz', 'xc-saz', {
@@ -1953,7 +2056,7 @@ function xAcu(M, f) {
     $('x-acu-s').textContent = `Até ${MES_L[a + k - 1]}, ${f.ano} soma ${haC(S[f.ano][k])}`
       + (d == null ? '.' : `, ${Math.abs(Math.round(d))}% ${d >= 0 ? 'acima' : 'abaixo'} da média dos demais anos.`);
   } else $('x-acu-s').textContent = 'Sem dado para o período.';
-  const ds = [...dsReferencia(st), ...f.anosCmp.map(y => linhaAno(String(y), S[y], corAno(f, y), 2)), linhaAno(String(f.ano), S[f.ano], SER[0], 3)];
+  const ds = [...dsReferencia(st), ...linhasCmp(f, S), linhaAno(String(f.ano), S[f.ano], SER[0], 3)];
   mkChart('x-acu', 'xc-acu', { type: 'line', data: { labels, datasets: ds }, options: opLinha('Área queimada acumulada (ha)', 'Mês', st) });
   setDl('x-acu', {
     nome: 'acumulado', cols: ['mes', ...P.anos.map(String), 'media_demais_anos', 'minimo_demais_anos', 'maximo_demais_anos'],
@@ -1977,8 +2080,8 @@ function xAnual(M, f) {
       maintainAspectRatio: false, layout: { padding: { top: 16 } },
       plugins: { legend: { display: false }, topLabels: { indices: vals.map((_, i) => i), fmt: v => cmp(v, 1) }, tooltip: { callbacks: { label: c => ` ${haC(c.raw)}` } } },
       scales: {
-        x: { grid: { display: false }, border: { color: C.line }, ticks: { font: { size: 10 }, color: c => anos[c.index] === f.ano ? C.redD : C.muted }, title: axTitle('Ano') },
-        y: yAxis({ ticks: { callback: v => cmp(v, 1), font: { size: 10 }, maxTicksLimit: 5 }, title: axTitle('Área queimada (ha)') })
+        x: { grid: { display: false }, border: { color: C.line }, ticks: { font: { size: 11 }, color: c => anos[c.index] === f.ano ? C.redD : C.muted }, title: axT('Ano') },
+        y: yAxis({ ticks: { callback: v => cmp(v, 1), font: { size: 11 }, maxTicksLimit: 5 }, title: axT('Área queimada (ha)') })
       }
     }
   });
@@ -2249,8 +2352,8 @@ function xRank(cur, prev, f) {
         }
       },
       scales: {
-        x: yAxis({ ticks: { callback: v => cmp(v, 1), font: { size: 10 }, maxTicksLimit: 5 }, title: axTitle('Área queimada (ha)') }),
-        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10.5 }, color: C.ink } }
+        x: yAxis({ ticks: { callback: v => cmp(v, 1), font: { size: 11 }, maxTicksLimit: 5 }, title: axT('Área queimada (ha)') }),
+        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 11 }, color: C.ink } }
       }
     }
   });
@@ -2261,42 +2364,61 @@ function xRank(cur, prev, f) {
   });
 }
 
+// Vegetação nativa em qualquer nível da legenda (no nível 1: Floresta e Vegetação herbácea e arbustiva).
+const NAT_ANY = new Set([...NATIVAS, 1, 10]);
+// Classes muito claras (Mosaico de usos, Pastagem) ganham contorno para não sumirem no fundo branco.
+const claro = c => { try { return d3.hsl(c).l > .82; } catch { return false; } };
+const BORDA_CLARA = '#C9B98A';
+
 function xUso(lc, tr, f) {
   const cor = Object.fromEntries(tr.map(t => [t.id, t.color]));
   const it = lc.filter(i => i.areaHa > 0).sort((a, b) => b.areaHa - a.areaHa);
-  const tot = it.reduce((s, i) => s + i.areaHa, 0);
+  const tot = it.reduce((s, i) => s + i.areaHa, 0) || 1;
   const soma = set => it.filter(i => set.has(i.id)).reduce((s, i) => s + i.areaHa, 0);
-  $('x-uso-s').textContent = (tot
-    ? `${fmtP(soma(NATIVAS) / tot * 100)} em vegetação nativa e ${fmtP(soma(ANTROPICAS) / tot * 100)} em área antrópica. Classes de nível 2 do MapBiomas.`
-    : 'Nenhuma área queimada no período.') + (f.cob ? ' O filtro de cobertura não se aplica a este gráfico.' : '');
-  $('x-uso-ch').style.height = `${Math.max(200, it.length * 26 + 50)}px`;
+  const cores = it.map(i => cor[i.id] || '#B5B5B5');
+  $('x-uso-t').textContent = `O que queimou em ${mesesTxt(f)}`;
+  $('x-uso-s').textContent = `Nível ${f.nivel} da legenda MapBiomas.${f.cob ? ' O filtro de cobertura não se aplica aqui.' : ''}`;
+  $('x-uso-l').innerHTML = it.map((i, k) => `<li><i style="background:${cores[k]}${claro(cores[k]) ? `;box-shadow:inset 0 0 0 1px ${BORDA_CLARA}` : ''}"></i>`
+    + `<span>${esc(i.namePt)}</span><span class="h">${haC(i.areaHa)}</span><span class="p">${fmtP(i.areaHa / tot * 100)}</span></li>`).join('')
+    || '<li><span></span><span>Nenhuma área queimada no período.</span></li>';
+  $('x-uso-res').innerHTML = it.length
+    ? `<div>Vegetação nativa<b>${fmtP(soma(NAT_ANY) / tot * 100)}</b></div><div>Área antrópica<b>${fmtP(soma(ANTROPICAS) / tot * 100)}</b></div>`
+    : '';
   mkChart('x-uso', 'xc-uso', {
-    type: 'bar',
-    data: { labels: it.map(i => i.namePt), datasets: [{ data: it.map(i => i.areaHa), backgroundColor: it.map(i => cor[i.id] || '#B5B5B5'), borderColor: 'rgba(0, 0, 0, .18)', borderWidth: 1, borderRadius: 3 }] },
-    plugins: [rotulos],
+    type: 'doughnut',
+    data: { labels: it.map(i => i.namePt), datasets: [{ data: it.map(i => i.areaHa), backgroundColor: cores, borderColor: cores.map(c => claro(c) ? BORDA_CLARA : '#FFFFFF'), borderWidth: cores.map(c => claro(c) ? 1 : 2) }] },
     options: {
-      indexAxis: 'y', maintainAspectRatio: false, layout: { padding: { right: 40 } },
-      plugins: { legend: { display: false }, rotulos: { fmt: v => fmtP(v / tot * 100) }, tooltip: { callbacks: { label: c => ` ${haC(c.raw)} · ${fmtP(c.raw / tot * 100)}` } } },
-      scales: {
-        x: yAxis({ ticks: { callback: v => cmp(v, 1), font: { size: 10 }, maxTicksLimit: 5 }, title: axTitle('Área queimada (ha)') }),
-        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10.5 }, color: C.ink } }
-      }
+      maintainAspectRatio: false, cutout: '58%',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.label}: ${haC(c.raw)} (${fmtP(c.raw / tot * 100)})` } } }
     }
   });
+  X.leg['x-uso'] = it.map((i, k) => ({ cor: cores[k], txt: `${i.namePt}: ${fmtP(i.areaHa / tot * 100)} (${haC(i.areaHa)})` }));
   setDl('x-uso', {
-    nome: 'uso-e-cobertura', cols: ['classe_id', 'classe', 'area_queimada_ha', 'percentual', 'grupo'],
-    rows: it.map(i => [i.id, i.namePt, i.areaHa, i.areaHa / tot * 100, NATIVAS.has(i.id) ? 'vegetação nativa' : ANTROPICAS.has(i.id) ? 'área antrópica' : 'outras'])
+    nome: `uso-e-cobertura-nivel-${f.nivel}`, cols: ['classe_id', 'classe', 'area_queimada_ha', 'percentual', 'grupo'],
+    rows: it.map(i => [i.id, i.namePt, i.areaHa, i.areaHa / tot * 100, NAT_ANY.has(i.id) ? 'vegetação nativa' : ANTROPICAS.has(i.id) ? 'área antrópica' : 'outras'])
   });
 }
 
-function xUsoAno(lcs, f) {
-  const g = lcs.map(agrupar);
+function xUsoAno(lcs, tr, f) {
+  const cor = Object.fromEntries(tr.map(t => [t.id, t.color]));
   const anos = P.anos;
-  const ds = CLS.map((c, k) => ({
-    label: c.nome, data: g.map(x => x.cls[k].ha), backgroundColor: c.cor, borderColor: c.borda || '#FFFFFF', borderWidth: 1, stack: 's'
-  })).filter(d => d.data.some(v => v > 0));
+  const classes = new Map();
+  lcs.forEach(l => l.forEach(i => {
+    if (!(i.areaHa > 0)) return;
+    const o = classes.get(i.id) || { nome: i.namePt, t: 0 };
+    o.t += i.areaHa;
+    classes.set(i.id, o);
+  }));
+  const ordem = [...classes.entries()].sort((a, b) => b[1].t - a[1].t);
+  const val = (k, id) => lcs[k].find(i => i.id === id)?.areaHa || 0;
+  const tots = lcs.map(l => l.reduce((s, i) => s + (i.areaHa || 0), 0));
+  const ds = ordem.map(([id, o]) => {
+    const c = cor[id] || '#B5B5B5';
+    return { label: o.nome, data: anos.map((_, k) => val(k, id)), backgroundColor: c, borderColor: claro(c) ? BORDA_CLARA : '#FFFFFF', borderWidth: 1, stack: 's' };
+  });
   $('x-usoano-t').textContent = f.ini === f.fim ? `O que queimou em ${MES_L[f.ini - 1]}, por ano` : `O que queimou de ${MES_L[f.ini - 1]} a ${MES_L[f.fim - 1]}, por ano`;
-  $('x-usoano-s').textContent = `Classes agrupadas com as cores da legenda MapBiomas.${f.cob ? ' O filtro de cobertura não se aplica a este gráfico.' : ''}`;
+  $('x-usoano-s').textContent = `Nível ${f.nivel} da legenda MapBiomas, nas cores oficiais.${f.cob ? ' O filtro de cobertura não se aplica aqui.' : ''}`;
+  $('xc-usoano').parentElement.style.height = `${300 + Math.ceil(ds.length / 4) * 20}px`;
   mkChart('x-usoano', 'xc-usoano', {
     type: 'bar',
     data: { labels: anos.map(String), datasets: ds },
@@ -2304,24 +2426,24 @@ function xUsoAno(lcs, f) {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { position: 'top', align: 'start', labels: { boxWidth: 12, boxHeight: 10, font: { size: 11 }, color: C.ink2 } },
+        legend: { position: 'bottom', align: 'start', labels: { boxWidth: 12, boxHeight: 10, font: { size: 11 }, color: C.ink2 } },
         tooltip: {
           filter: i => i.raw > 0,
           callbacks: {
-            label: c => ` ${c.dataset.label}: ${haC(c.raw)} (${fmtP(c.raw / (g[c.dataIndex].tot || 1) * 100)})`,
-            footer: items => `Total: ${haC(g[items[0].dataIndex].tot)}`
+            label: c => ` ${c.dataset.label}: ${haC(c.raw)} (${fmtP(c.raw / (tots[c.dataIndex] || 1) * 100)})`,
+            footer: items => `Total: ${haC(tots[items[0].dataIndex])}`
           }
         }
       },
       scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: c => anos[c.index] === f.ano ? C.redD : C.muted }, title: axTitle('Ano') },
-        y: yAxis({ stacked: true, ticks: { callback: v => cmp(v, 1), font: { size: 10 }, maxTicksLimit: 6 }, title: axTitle('Área queimada (ha)') })
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: c => anos[c.index] === f.ano ? C.redD : C.ink2 }, title: axT('Ano') },
+        y: yAxis({ stacked: true, ticks: { callback: v => cmp(v, 1), font: { size: 11 }, maxTicksLimit: 6 }, title: axT('Área queimada (ha)') })
       }
     }
   });
   setDl('x-usoano', {
-    nome: 'uso-e-cobertura-por-ano', cols: ['ano', ...CLS.map(c => c.nome), 'total_ha', 'vegetacao_nativa_pct', 'area_antropica_pct'],
-    rows: anos.map((y, i) => [y, ...g[i].cls.map(c => c.ha), g[i].tot, g[i].nat, g[i].antr])
+    nome: `uso-e-cobertura-por-ano-nivel-${f.nivel}`, cols: ['ano', ...ordem.map(([, o]) => o.nome), 'total_ha'],
+    rows: anos.map((y, k) => [y, ...ordem.map(([id]) => val(k, id)), tots[k]])
   });
 }
 
@@ -2340,7 +2462,8 @@ async function xCmp(f, vivo) {
   const ters = [{ tipo: f.tipo, code: f.code, label: f.label }, ...f.extras];
   await Promise.all(f.extras.map(rotuloTerr));
   if (!vivo()) return;
-  $('x-cmp-ters').innerHTML = ters.map((t, i) => `<span class="chip sel"><i style="background:${SER[i]}"></i>${esc(t.label)}`
+  const traco = ['solid', 'solid', 'dashed', 'dotted'];
+  $('x-cmp-ters').innerHTML = ters.map((t, i) => `<span class="chip sel"><i style="height:0;background:none;border-top:3px ${traco[i]} ${SER[i]}"></i>${esc(t.label)}`
     + (i ? `<button class="mini" style="margin-left:6px;padding:0 6px" data-rm="${i - 1}" aria-label="Remover ${esc(t.label)}">×</button>` : '') + '</span>').join('')
     + (f.extras.length ? '' : '<span class="fn">Use a busca acima para adicionar territórios.</span>');
   const Ms = await Promise.all(ters.map(t => tsTerr(t, f)));
@@ -2351,7 +2474,7 @@ async function xCmp(f, vivo) {
   $('x-cmp-t').textContent = porAno ? `Área queimada de ${abrevP(f).toLowerCase()} em cada ano` : `Área queimada mês a mês em ${f.ano}`;
   mkChart('x-cmp', 'xc-cmp', {
     type: 'line',
-    data: { labels, datasets: ters.map((t, i) => linhaAno(t.label, serie(Ms[i]), SER[i], i ? 2 : 3)) },
+    data: { labels, datasets: ters.map((t, i) => linhaAno(t.label, serie(Ms[i]), SER[i], i ? 2 : 3, DASH[i])) },
     options: opLinha('Área queimada (ha)', porAno ? 'Ano' : 'Mês', null)
   });
   const linhas = ters.map((t, i) => {
@@ -2445,9 +2568,12 @@ function baixarPNG(id) {
   const card = $(id), cv = card?.querySelector('canvas');
   if (!cv || !X.dl[id]) return;
   const s = cv.width / cv.clientWidth, pad = 18 * s, head = 62 * s, foot = 30 * s;
+  // Gráficos com legenda em HTML (a rosca) levam a lista de classes desenhada ao lado.
+  const leg = X.leg[id], linhaL = 18 * s, legW = leg ? 360 * s : 0;
+  const corpoH = Math.max(cv.height, leg ? leg.length * linhaL : 0);
   const out = document.createElement('canvas');
-  out.width = cv.width + pad * 2;
-  out.height = head + cv.height + foot;
+  out.width = Math.max(cv.width + legW, 720 * s) + pad * 2;
+  out.height = head + corpoH + foot;
   const c = out.getContext('2d');
   c.fillStyle = '#FFFFFF';
   c.fillRect(0, 0, out.width, out.height);
@@ -2466,6 +2592,20 @@ function baixarPNG(id) {
   c.fillText('MAPBIOMAS FOGO · MONITOR DO FOGO', out.width - pad, pad + 15 * s);
   c.textAlign = 'left';
   c.drawImage(cv, pad, head);
+  if (leg) {
+    const x0 = pad + cv.width + 24 * s;
+    c.font = `500 ${11 * s}px Montserrat, sans-serif`;
+    c.textBaseline = 'middle';
+    leg.forEach((l, i) => {
+      const y = head + i * linhaL + linhaL / 2;
+      c.fillStyle = l.cor;
+      c.fillRect(x0, y - 5 * s, 10 * s, 10 * s);
+      if (claro(l.cor)) { c.strokeStyle = BORDA_CLARA; c.lineWidth = s; c.strokeRect(x0, y - 5 * s, 10 * s, 10 * s); }
+      c.fillStyle = C.ink;
+      c.fillText(l.txt, x0 + 16 * s, y);
+    });
+    c.textBaseline = 'alphabetic';
+  }
   c.fillStyle = C.muted;
   c.font = `500 ${9.5 * s}px Montserrat, sans-serif`;
   c.fillText('Fonte: MapBiomas Monitor do Fogo (plataforma.monitorfogo.mapbiomas.org). Área queimada, não focos de calor.', pad, out.height - 11 * s);
@@ -2506,7 +2646,10 @@ function abrirAba(nome) {
   if (nome === 'explorer') {
     if (X.ready && X.f) salvarHash();
     initPainel().catch(console.error);
-  } else if (location.hash.startsWith('#explorer')) history.replaceState(null, '', location.pathname + location.search);
+  } else {
+    $('x-ctx').hidden = true;
+    if (location.hash.startsWith('#explorer')) history.replaceState(null, '', location.pathname + location.search);
+  }
   setTimeout(() => {
     Object.values(CHS).forEach(c => c.resize());
     reajustarMapas();

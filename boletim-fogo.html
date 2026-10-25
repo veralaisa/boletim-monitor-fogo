@@ -1,0 +1,1518 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boletim do Monitor do Fogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.min.js"></script>
+<style>
+  :root {
+    /* Vermelhos da logo MapBiomas Fogo (Monitor_PT.png) */
+    --red: #E94030;
+    --red-d: #B42A1C;
+    --red-l: #F7BBB5;
+    --ink: #1F1F1F;
+    --ink2: #4F4F4F;
+    --muted: #8A8A8A;
+    --line: #E6E6E6;
+    --soft: #F6F5F4;
+    --good: #2E7D4F;
+    --viewer: #E7E6E4;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--viewer);
+    color: var(--ink);
+    font: 13px/1.45 Montserrat, system-ui, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, p { margin: 0; }
+  button { font: inherit; cursor: pointer; }
+
+  /* Barra do aplicativo (não vai para o PDF) */
+  .top {
+    position: sticky; top: 0; z-index: 1000;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px;
+    padding: 10px 20px;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; margin-right: auto; font-size: 12px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: .05em; }
+  .brand img { display: block; height: 30px; width: auto; }
+  .tabs { display: flex; gap: 4px; background: var(--soft); padding: 4px; border-radius: 999px; }
+  .tab { border: 0; background: none; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink2); }
+  .tab.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .1); }
+  .pill { border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; border: 0; background: var(--red); color: #fff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; }
+  .btn:hover { background: var(--red-d); }
+
+  /* ===== Boletim: folhas A4 ===== */
+  .doc { padding: 24px 12px 40px; }
+  .doc[hidden] { display: none; }
+  .sheet {
+    position: relative;
+    width: 210mm; min-height: 297mm;
+    margin: 0 auto 24px;
+    padding: 9mm 10mm 7mm;
+    background: #fff;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, .08);
+    display: flex; flex-direction: column; gap: 12px;
+    font-size: 12px;
+  }
+
+  .sh { display: flex; align-items: center; gap: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--red); }
+  .sh-logo { display: block; height: 42px; width: auto; }
+  .sh-sep { width: 1.5px; align-self: stretch; background: var(--red); }
+  .sh-d { font-size: 18px; font-weight: 800; letter-spacing: .03em; color: var(--red); text-transform: uppercase; }
+  .sh-p { margin-left: auto; font-size: 14px; font-weight: 800; text-transform: uppercase; }
+
+  .ptit { display: flex; align-items: center; gap: 16px; }
+  .eyebrow { margin-bottom: 3px; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); }
+  .ptit h1 { font-size: 20px; line-height: 1.2; font-weight: 700; }
+  .lead { margin-top: 4px; max-width: 72ch; font-size: 12px; color: var(--ink2); }
+  .losango {
+    position: relative; flex: none;
+    width: 96px; height: 96px;
+    display: grid; place-items: center;
+    color: #fff; font-size: 11px; font-weight: 800; line-height: 1.15; text-align: center; text-transform: uppercase;
+  }
+  .losango::before { content: ""; position: absolute; inset: 14px; background: var(--red); border-radius: 4px; transform: rotate(45deg); }
+  .losango span { position: relative; max-width: 64px; }
+
+  .blk { position: relative; min-width: 0; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .g21 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; }
+  .gmap { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; }
+  .gmap.half { grid-template-columns: 1fr 1fr; }
+  .span2 { grid-column: span 2; }
+  /* Sem isto, um canvas largo empurra a coluna e o gráfico invade a vizinha. */
+  :is(.g2, .g3, .g21, .gmap) > * { min-width: 0; }
+  .cv canvas { max-width: 100%; }
+
+  .kpi { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .k-l { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink2); }
+  .k-v { margin-top: 2px; font-size: 28px; font-weight: 800; letter-spacing: -.01em; line-height: 1.1; }
+  .k-v small { font-size: 15px; font-weight: 700; }
+  .k-s { margin-top: 2px; font-size: 11px; color: var(--ink2); }
+  .dl { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 4px; }
+  .dl li { display: flex; align-items: baseline; gap: 8px; font-size: 11px; color: var(--ink2); }
+  .dl b { flex: none; min-width: 50px; font-weight: 800; }
+  .dl .down b { color: var(--good); }
+  .dl .up b { color: var(--red-d); }
+
+  .tiles4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .tl { background: var(--soft); border-radius: 10px; padding: 9px 11px; }
+  .tl-l { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink2); }
+  .tl-v { margin-top: 2px; font-size: 20px; font-weight: 800; }
+  .tl-v.up { color: var(--red-d); }
+  .tl-v.down { color: var(--good); }
+  .tl-s { margin-top: 1px; font-size: 10px; line-height: 1.35; color: var(--ink2); }
+
+  .ct { margin-bottom: 2px; font-size: 12px; font-weight: 700; }
+  .ct .per { display: block; font-size: 9.5px; font-weight: 500; color: var(--muted); }
+  .cs { margin-bottom: 4px; font-size: 11px; color: var(--ink2); }
+  .cv { position: relative; }
+  .cv-y { height: 170px; }
+  #pg4 .cv-y { height: 150px; }
+  .cv-m { height: 220px; }
+  .fn { margin-top: 4px; font-size: 9.5px; line-height: 1.35; color: var(--muted); }
+
+  .leg { display: flex; flex-wrap: wrap; gap: 3px 10px; margin: 4px 0; font-size: 10px; color: var(--ink2); }
+  .leg i { display: inline-block; width: 9px; height: 9px; margin-right: 4px; border-radius: 2px; vertical-align: -1px; }
+  .leg i.avg { width: 12px; height: 0; border-top: 2px solid var(--ink); border-radius: 0; vertical-align: 2px; }
+  .leg i.wk { width: 1px; height: 10px; margin: 0 6px 0 3px; background: var(--muted); border-radius: 0; }
+  .sw { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 2px; vertical-align: -1px; }
+
+  .cbars { display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 5px 8px; margin: 6px 0 8px; font-size: 10px; font-weight: 700; color: var(--ink2); }
+  .stack { display: flex; gap: 1px; height: 12px; border-radius: 2px; overflow: hidden; }
+  .stack span { min-width: 2px; }
+  .ctab { width: 100%; border-collapse: collapse; font-size: 10.5px; font-variant-numeric: tabular-nums; }
+  .ctab th, .ctab td { padding: 2px 4px; border-bottom: 1px solid var(--line); text-align: right; }
+  .ctab th { font-size: 9.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .ctab .l { text-align: left; }
+  .ctab tfoot td { border-bottom: 0; padding-top: 5px; }
+
+  .rk { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .rk li { display: grid; grid-template-columns: 20px minmax(0, 1.3fr) minmax(30px, 1fr) 62px; align-items: center; gap: 6px; font-size: 11px; }
+  .rk-n { font-size: 9.5px; font-weight: 700; color: var(--muted); }
+  .rk-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rk-tr { height: 8px; }
+  .rk-tr span { display: block; height: 100%; border-radius: 1px; }
+  .rk-v { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* Variante para colunas estreitas: nome inteiro em cima, barra e valor embaixo. */
+  .rk.c { gap: 6px; }
+  .rk.c { gap: 5px; }
+  .rk.c li { grid-template-columns: 14px minmax(0, 1fr) 66px; grid-template-areas: "n nm nm" ". tr v"; gap: 1px 6px; font-size: 10.5px; }
+  .rk.c .rk-n { grid-area: n; }
+  .rk.c .rk-nm { grid-area: nm; white-space: normal; line-height: 1.25; }
+  .rk.c .rk-tr { grid-area: tr; height: 6px; }
+  .rk.c .rk-v { grid-area: v; font-size: 10px; white-space: nowrap; }
+
+  .lmap { height: 340px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #F2F2F2; }
+  .lmap .leaflet-control-attribution { font-size: 8px; }
+  /* O VectorGrid desenha os polígonos, mas às vezes não marca o tile como carregado,
+     e o Leaflet deixa o tile oculto. Os tiles vetoriais podem aparecer assim que desenhados. */
+  .lmap svg.leaflet-tile { visibility: visible; }
+  .map-svg { display: block; width: 100%; height: auto; }
+  .ml-s { font: 700 11px Montserrat, sans-serif; }
+  .ml-v { font: 500 9px Montserrat, sans-serif; }
+
+  .sf { margin-top: auto; display: flex; justify-content: space-between; gap: 12px; padding-top: 6px; border-top: 1px solid var(--line); font-size: 9px; color: var(--muted); }
+
+  /* Carregamento e erro */
+  .st {
+    position: absolute; inset: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px; text-align: center; border-radius: 8px;
+    background: rgba(255, 255, 255, .88); color: var(--muted); font-size: 12px;
+  }
+  .st[hidden] { display: none; }
+  .st.err { background: rgba(255, 255, 255, .97); color: var(--red-d); }
+  .spin { flex: none; width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--red); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .tip { position: fixed; z-index: 2000; pointer-events: none; max-width: 240px; padding: 6px 9px; border-radius: 6px; background: var(--ink); color: #fff; font-size: 12px; line-height: 1.35; }
+  .tip[hidden] { display: none; }
+
+  /* ===== Destaque dinâmico ===== */
+  .xpane { max-width: 1200px; margin: 0 auto; padding: 20px 20px 40px; display: grid; gap: 14px; }
+  .xpane[hidden] { display: none; }
+  .card { position: relative; min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .card h2 { font-size: 18px; line-height: 1.25; font-weight: 700; }
+  .card .sub { margin-top: 4px; color: var(--ink2); }
+  .card .st { border-radius: 12px; }
+  .xrow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+  .filters label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--ink2); }
+  select { font: inherit; font-size: 13px; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-width: 130px; }
+  select:disabled { background: var(--soft); color: var(--muted); }
+  .tiles { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .tile { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .tile-l { font-size: 12px; font-weight: 600; color: var(--ink2); }
+  .tile-v { margin-top: 4px; font-size: 26px; font-weight: 800; line-height: 1.1; }
+  .tile-v.up { color: var(--red-d); }
+  .tile-v.down { color: var(--good); }
+  .tile-s { margin-top: 4px; font-size: 11px; color: var(--muted); }
+  .ch { position: relative; height: 300px; margin-top: 12px; }
+  .leaf { height: 440px; margin-top: 12px; border-radius: 10px; overflow: hidden; background: #F2F2F2; }
+  .tbl-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px; }
+  .pg { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .pg button, .sortbtn { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 4px 10px; color: var(--ink); }
+  .pg button:disabled { opacity: .4; cursor: default; }
+  .sortbtn { font-size: 12px; font-weight: 600; }
+  .tbl { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .tbl th, .tbl td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+  .tbl th { font-size: 12px; font-weight: 600; color: var(--ink2); }
+  .tbl .l { text-align: left; }
+  .rel { height: 8px; background: var(--soft); border-radius: 2px; }
+  .rel span { display: block; height: 100%; background: var(--red); opacity: .6; border-radius: 2px; }
+  .foot { font-size: 12px; color: var(--muted); text-align: center; }
+  .foot a { color: inherit; }
+
+  /* Telas estreitas: as folhas viram fluxo contínuo de uma coluna.
+     html.pm (modo impressão) desliga isso para os gráficos se redesenharem no tamanho da folha. */
+  @media screen and (max-width: 820px) {
+    html:not(.pm) .top { padding: 10px 14px; }
+    html:not(.pm) .doc { padding: 0; }
+    html:not(.pm) .sheet { width: auto; min-height: 0; margin: 0 0 10px; padding: 18px 16px; box-shadow: none; }
+    html:not(.pm) :is(.g2, .g3, .g21, .gmap, .xrow) { grid-template-columns: 1fr; }
+    html:not(.pm) .span2 { grid-column: auto; }
+    html:not(.pm) .tiles4 { grid-template-columns: 1fr 1fr; }
+    html:not(.pm) .tiles { grid-template-columns: 1fr; }
+    html:not(.pm) .sh { flex-wrap: wrap; gap: 8px 12px; }
+    html:not(.pm) .sh-sep { display: none; }
+    html:not(.pm) .sh-p { margin-left: 0; }
+    html:not(.pm) .ptit { align-items: flex-start; }
+    html:not(.pm) .losango { width: 72px; height: 72px; font-size: 9px; }
+    html:not(.pm) .losango::before { inset: 11px; }
+    html:not(.pm) .losango span { max-width: 48px; }
+    html:not(.pm) .lmap { height: 300px !important; }
+    html:not(.pm) .xpane { padding: 14px; }
+    html:not(.pm) .filters label { flex: 1 1 140px; }
+    html:not(.pm) select { min-width: 0; width: 100%; }
+  }
+  /* No modo impressão a folha mantém o tamanho A4 mesmo em janelas estreitas. */
+  html.pm .doc { padding: 0; }
+  html.pm .sheet { margin: 0 auto; box-shadow: none; }
+
+  @media print {
+    @page { size: A4; margin: 0; }
+    body { background: #fff; }
+    .top, .xpane, .no-print { display: none !important; }
+    #tab-boletim { display: block !important; padding: 0; }
+    .sheet { width: 210mm; height: 297mm; min-height: 0; margin: 0; box-shadow: none; overflow: hidden; break-after: page; }
+    .sheet:last-of-type { break-after: auto; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <img src="Monitor_PT.png" alt="MapBiomas Fogo · Monitor do Fogo">
+    <span>Boletim mensal</span>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab on" role="tab" aria-selected="true" data-tab="boletim">Boletim do mês</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="explorer">Destaque dinâmico</button>
+  </nav>
+  <span class="pill" id="periodo">Carregando…</span>
+  <button class="btn" id="btn-print" title="Gera o PDF do boletim do mês">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>
+    Exportar PDF
+  </button>
+</header>
+
+<!-- ================= BOLETIM DO MÊS ================= -->
+<main class="doc" id="tab-boletim">
+
+  <!-- Página 1: Brasil -->
+  <section class="sheet" id="pg1">
+    <header class="sh"></header>
+    <div class="ptit">
+      <div>
+        <p class="eyebrow">Brasil</p>
+        <h1 id="p1-t">Destaques do fogo no Brasil</h1>
+        <p class="lead" id="p1-lead"></p>
+      </div>
+    </div>
+    <div class="blk g2" id="p1-kpi">
+      <div class="st"></div>
+      <div class="kpi" id="p1-k1"></div>
+      <div class="kpi" id="p1-k2"></div>
+    </div>
+    <div class="blk tiles4" id="p1-tiles">
+      <div class="st"></div>
+      <div class="tl"><p class="tl-l">Pico do ano</p><p class="tl-v" id="p1-t1v">—</p><p class="tl-s" id="p1-t1s"></p></div>
+      <div class="tl"><p class="tl-l">Vegetação nativa</p><p class="tl-v" id="p1-t2v">—</p><p class="tl-s" id="p1-t2s"></p></div>
+      <div class="tl"><p class="tl-l" id="p1-t3l">Contra a média</p><p class="tl-v" id="p1-t3v">—</p><p class="tl-s" id="p1-t3s"></p></div>
+      <div class="tl"><p class="tl-l" id="p1-t4l">Contra o mês anterior</p><p class="tl-v" id="p1-t4v">—</p><p class="tl-s" id="p1-t4s"></p></div>
+    </div>
+    <div class="blk g2" id="p1-anos">
+      <div class="st"></div>
+      <div><p class="ct" id="p1-a1-t"></p><div class="cv cv-y"><canvas id="p1-a1"></canvas></div></div>
+      <div><p class="ct" id="p1-a2-t"></p><div class="cv cv-y"><canvas id="p1-a2"></canvas></div></div>
+    </div>
+    <div class="g21">
+      <div class="blk" id="p1-mes">
+        <div class="st"></div>
+        <p class="ct" id="p1-mes-t">Área queimada por mês</p>
+        <p class="cs" id="p1-mes-s"></p>
+        <div class="leg" id="p1-mes-leg"></div>
+        <div class="cv cv-m"><canvas id="p1-mesc"></canvas></div>
+        <p class="fn" id="p1-mes-n"></p>
+      </div>
+      <div class="blk" id="p1-cob">
+        <div class="st"></div>
+        <p class="ct">O que queimou</p>
+        <p class="cs">Classes de uso e cobertura do MapBiomas</p>
+        <div id="p1-cobc"></div>
+      </div>
+    </div>
+    <p class="fn">Classes do MapBiomas (nível 2): Floresta reúne formação florestal, floresta alagável, mangue e restinga arbórea; Campo reúne formação campestre, afloramento rochoso, apicum e restinga herbácea; Agricultura reúne lavouras temporárias e perenes; Outras reúne silvicultura, áreas não vegetadas e água.</p>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span></span><span>1/4</span></footer>
+  </section>
+
+  <!-- Página 2: Onde queima -->
+  <section class="sheet" id="pg2">
+    <header class="sh"></header>
+    <div class="ptit">
+      <div>
+        <p class="eyebrow">Onde queima</p>
+        <h1 id="p2-t">Onde o fogo queimou</h1>
+        <p class="lead" id="p2-lead"></p>
+      </div>
+    </div>
+    <div class="blk gmap half" id="p2-mapa">
+      <div class="st"></div>
+      <div>
+        <p class="ct" id="p2-map-t">Área queimada por estado</p>
+        <div id="p2-map"></div>
+        <div class="leg" id="p2-leg"></div>
+        <p class="fn">Estados pequenos têm o valor ao lado, ligado por uma linha.</p>
+      </div>
+      <div>
+        <p class="ct">Estados <span class="per" data-per></span></p>
+        <ol class="rk" id="p2-uf"></ol>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="blk" id="p2-bio"><div class="st"></div><p class="ct">Biomas <span class="per" data-per></span></p><ol class="rk c" id="p2-biol"></ol></div>
+      <div class="blk" id="p2-mun"><div class="st"></div><p class="ct">Municípios <span class="per" data-per></span></p><ol class="rk c" id="p2-munl"></ol></div>
+      <div class="blk" id="p2-uc"><div class="st"></div><p class="ct">Unidades de conservação <span class="per" data-per></span></p><ol class="rk c" id="p2-ucl"></ol></div>
+    </div>
+    <div class="g3">
+      <div class="blk" id="p2-ti"><div class="st"></div><p class="ct">Terras indígenas <span class="per" data-per></span></p><ol class="rk c" id="p2-til"></ol></div>
+      <div class="blk" id="p2-qui"><div class="st"></div><p class="ct">Territórios quilombolas <span class="per" data-per></span></p><ol class="rk c" id="p2-quil"></ol></div>
+      <div class="blk" id="p2-out"><div class="st"></div><p class="ct">Outros recortes <span class="per" data-per></span></p><ol class="rk c" id="p2-outl"></ol><p class="fn" id="p2-out-n"></p></div>
+    </div>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Contornos estaduais: base IBGE.</span><span>2/4</span></footer>
+  </section>
+
+  <!-- Página 3: Bioma mais afetado -->
+  <section class="sheet" id="pg3">
+    <header class="sh"></header>
+    <div class="ptit">
+      <div class="losango"><span id="p3-los">—</span></div>
+      <div>
+        <p class="eyebrow">Bioma mais afetado</p>
+        <h1 id="p3-t">—</h1>
+        <p class="lead" id="p3-lead"></p>
+      </div>
+    </div>
+    <div class="blk g2" id="p3-kpi">
+      <div class="st"></div>
+      <div class="kpi" id="p3-k1"></div>
+      <div class="kpi" id="p3-k2"></div>
+    </div>
+    <div class="gmap">
+      <div class="blk" id="p3-mapa">
+        <div class="st"></div>
+        <p class="ct" id="p3-map-t">Cicatrizes de fogo no mês</p>
+        <div class="lmap" id="p3-map"></div>
+        <p class="fn">Em vermelho, a área queimada no mês mapeada pelo Monitor do Fogo, recortada pelo limite do bioma.</p>
+      </div>
+      <div class="blk" id="p3-cob">
+        <div class="st"></div>
+        <p class="ct">O que queimou no bioma</p>
+        <p class="cs">Classes de uso e cobertura do MapBiomas</p>
+        <div id="p3-cobc"></div>
+      </div>
+    </div>
+    <div class="blk g2" id="p3-anos">
+      <div class="st"></div>
+      <div><p class="ct" id="p3-a1-t"></p><div class="cv cv-y"><canvas id="p3-a1"></canvas></div></div>
+      <div><p class="ct" id="p3-a2-t"></p><div class="cv cv-y"><canvas id="p3-a2"></canvas></div></div>
+    </div>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>3/4</span></footer>
+  </section>
+
+  <!-- Página 4: Estado mais afetado -->
+  <section class="sheet" id="pg4">
+    <header class="sh"></header>
+    <div class="ptit">
+      <div class="losango"><span id="p4-los">—</span></div>
+      <div>
+        <p class="eyebrow">Estado mais afetado</p>
+        <h1 id="p4-t">—</h1>
+        <p class="lead" id="p4-lead"></p>
+      </div>
+    </div>
+    <div class="blk g2" id="p4-kpi">
+      <div class="st"></div>
+      <div class="kpi" id="p4-k1"></div>
+      <div class="kpi" id="p4-k2"></div>
+    </div>
+    <div class="gmap">
+      <div class="blk" id="p4-mapa">
+        <div class="st"></div>
+        <p class="ct" id="p4-map-t">Área queimada por município</p>
+        <div class="lmap" id="p4-map" style="height:420px"></div>
+        <div class="leg" id="p4-leg"></div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="blk" id="p4-mun">
+          <div class="st"></div>
+          <p class="ct" id="p4-mun-t">Municípios mais afetados</p>
+          <ol class="rk" id="p4-munl"></ol>
+        </div>
+        <div class="blk" id="p4-cob">
+          <div class="st"></div>
+          <p class="ct">O que queimou no estado</p>
+          <div id="p4-cobc"></div>
+        </div>
+      </div>
+    </div>
+    <div class="blk g2" id="p4-anos">
+      <div class="st"></div>
+      <div><p class="ct" id="p4-a1-t"></p><div class="cv cv-y"><canvas id="p4-a1"></canvas></div></div>
+      <div><p class="ct" id="p4-a2-t"></p><div class="cv cv-y"><canvas id="p4-a2"></canvas></div></div>
+    </div>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>4/4</span></footer>
+  </section>
+</main>
+
+<!-- ================= PAINEL EXPLORATÓRIO ================= -->
+<main class="xpane" id="tab-explorer" hidden>
+  <section class="card filters">
+    <label>Recorte
+      <select id="e-tipo">
+        <option value="country">Brasil</option>
+        <option value="biome">Bioma</option>
+        <option value="state">Estado</option>
+      </select>
+    </label>
+    <label>Território <select id="e-terr"></select></label>
+    <label>Ano <select id="e-ano"></select></label>
+    <label>Mês inicial <select id="e-ini"></select></label>
+    <label>Mês final <select id="e-fim"></select></label>
+    <label>Cobertura <select id="e-cob"><option value="">Todas</option></select></label>
+  </section>
+
+  <div class="tiles" id="e-tiles">
+    <div class="st"></div>
+    <article class="tile"><p class="tile-l">Área queimada no período</p><p class="tile-v" id="et1-v">—</p><p class="tile-s" id="et1-s"></p></article>
+    <article class="tile"><p class="tile-l" id="et2-l">Contra o ano anterior</p><p class="tile-v" id="et2-v">—</p><p class="tile-s" id="et2-s"></p></article>
+    <article class="tile"><p class="tile-l">Contra a média histórica</p><p class="tile-v" id="et3-v">—</p><p class="tile-s" id="et3-s"></p></article>
+  </div>
+
+  <section class="card" id="e-serie">
+    <div class="st"></div>
+    <p class="eyebrow">Série histórica</p>
+    <h2>Área queimada mês a mês</h2>
+    <p class="sub">Meses do intervalo escolhido, em todos os anos. Em destaque, o ano selecionado.</p>
+    <div class="ch"><canvas id="ec-serie"></canvas></div>
+  </section>
+
+  <div class="xrow">
+    <section class="card" id="e-rank">
+      <div class="st"></div>
+      <p class="eyebrow">Ranking</p>
+      <h2>Territórios mais afetados</h2>
+      <p class="sub" id="e-rank-sub"></p>
+      <div class="ch"><canvas id="ec-rank"></canvas></div>
+    </section>
+    <section class="card" id="e-uso">
+      <div class="st"></div>
+      <p class="eyebrow">Cobertura</p>
+      <h2>Uso e cobertura do solo afetado</h2>
+      <p class="sub">Classes de nível 1 do MapBiomas.</p>
+      <div class="ch"><canvas id="ec-uso"></canvas></div>
+    </section>
+  </div>
+
+  <section class="card" id="e-mapa">
+    <div class="st"></div>
+    <p class="eyebrow">Mapa</p>
+    <h2>Área queimada por estado no período</h2>
+    <p class="sub" id="e-mapa-sub">Use a roda do mouse ou os botões para aproximar.</p>
+    <div class="leaf" id="e-map"></div>
+  </section>
+
+  <section class="card" id="e-tab">
+    <div class="st"></div>
+    <div class="tbl-head">
+      <div>
+        <p class="eyebrow">Tabela</p>
+        <h2>Ranking completo</h2>
+        <p class="sub" id="e-tab-sub"></p>
+      </div>
+      <div class="pg">
+        <button id="e-prev" aria-label="Página anterior">‹</button>
+        <span id="e-pg">1 / 1</span>
+        <button id="e-next" aria-label="Próxima página">›</button>
+      </div>
+    </div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th class="l">#</th>
+          <th class="l">Território</th>
+          <th><button class="sortbtn" id="e-sort" title="Inverter a ordem">Área queimada (ha) ↓</button></th>
+          <th class="l" style="width:30%">Relativo à página</th>
+        </tr>
+      </thead>
+      <tbody id="e-tbody"></tbody>
+    </table>
+  </section>
+
+  <p class="foot">Fonte: <a href="https://plataforma.monitorfogo.mapbiomas.org" target="_blank" rel="noopener">MapBiomas Monitor do Fogo</a>. Mapa base © Esri.</p>
+</main>
+
+<div class="tip" id="tip" hidden></div>
+
+<script>
+'use strict';
+
+const API = 'https://plataforma.monitorfogo.mapbiomas.org';
+const GEO_URL = 'https://cdn.jsdelivr.net/gh/codeforamerica/click_that_hood@master/public/data/brazil-states.geojson';
+const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+
+const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const MES_L = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto',
+  'setembro', 'outubro', 'novembro', 'dezembro'];
+
+const C = { red: '#E94030', redD: '#B42A1C', redL: '#F7BBB5', ink: '#1F1F1F', ink2: '#4F4F4F', muted: '#8A8A8A', line: '#E6E6E6', good: '#2E7D4F' };
+
+const UF = [
+  [11, 'RO', 'Rondônia'], [12, 'AC', 'Acre'], [13, 'AM', 'Amazonas'], [14, 'RR', 'Roraima'],
+  [15, 'PA', 'Pará'], [16, 'AP', 'Amapá'], [17, 'TO', 'Tocantins'], [21, 'MA', 'Maranhão'],
+  [22, 'PI', 'Piauí'], [23, 'CE', 'Ceará'], [24, 'RN', 'Rio Grande do Norte'], [25, 'PB', 'Paraíba'],
+  [26, 'PE', 'Pernambuco'], [27, 'AL', 'Alagoas'], [28, 'SE', 'Sergipe'], [29, 'BA', 'Bahia'],
+  [31, 'MG', 'Minas Gerais'], [32, 'ES', 'Espírito Santo'], [33, 'RJ', 'Rio de Janeiro'],
+  [35, 'SP', 'São Paulo'], [41, 'PR', 'Paraná'], [42, 'SC', 'Santa Catarina'],
+  [43, 'RS', 'Rio Grande do Sul'], [50, 'MS', 'Mato Grosso do Sul'], [51, 'MT', 'Mato Grosso'],
+  [52, 'GO', 'Goiás'], [53, 'DF', 'Distrito Federal']
+].map(([code, sigla, nome]) => ({ code, sigla, nome }));
+const UF_BY_NAME = Object.fromEntries(UF.map(u => [u.nome, u]));
+const UF_BY_CODE = Object.fromEntries(UF.map(u => [u.code, u]));
+
+const BIOMAS = [
+  { code: 1, nome: 'Amazônia', art: 'a' },
+  { code: 2, nome: 'Caatinga', art: 'a' },
+  { code: 3, nome: 'Cerrado', art: 'o' },
+  { code: 4, nome: 'Mata Atlântica', art: 'a' },
+  { code: 5, nome: 'Pampa', art: 'o' },
+  { code: 6, nome: 'Pantanal', art: 'o' }
+];
+const BIO_BY_NAME = Object.fromEntries(BIOMAS.map(b => [b.nome, b]));
+
+const TERRITORIOS = { country: [{ code: 0, nome: 'Brasil' }], biome: BIOMAS, state: UF };
+const PADRAO = { country: 0, biome: 1, state: 15 };
+// Subdivisão preferida por tipo de território; só é usada se /groupings a listar.
+const PREF = { country: ['state'], biome: ['biome'], state: ['city'] };
+
+// Classes de nível 2 da legenda do MapBiomas, com as cores oficiais.
+const CLS = [
+  { nome: 'Floresta', cor: '#1f8d49', nat: true, ids: [1, 3, 5, 6, 49] },
+  { nome: 'Savana', cor: '#7dc975', nat: true, ids: [4] },
+  { nome: 'Campo alagado', cor: '#519799', nat: true, ids: [11] },
+  { nome: 'Campo', cor: '#d6bc74', nat: true, ids: [10, 12, 29, 32, 50] },
+  { nome: 'Pastagem', cor: '#edde8e', ids: [15] },
+  { nome: 'Agricultura', cor: '#E974ED', ids: [18, 19, 20, 35, 36, 39, 40, 41, 46, 47, 48, 62] },
+  { nome: 'Mosaico de usos', cor: '#ffefc3', borda: '#D8C58C', ids: [14, 21] },
+  { nome: 'Outras', cor: '#B5B5B5', ids: [] }
+];
+// Usos antrópicos: agropecuária, silvicultura, área urbanizada, mineração, aquicultura e usina fotovoltaica.
+const ANTROPICAS = new Set([9, 14, 15, 18, 19, 20, 21, 24, 30, 31, 35, 36, 39, 40, 41, 46, 47, 48, 62, 75]);
+
+// Escala sequencial de fogo em 5 classes (quantis), como nos mapas do boletim oficial.
+const RAMP5 = ['#FDE3E0', '#F8B1AA', '#F06A61', '#E94030', '#A82416'];
+const SEM_DADO = '#EFEFEF';
+
+/* ---------- utilitários ---------- */
+const $ = id => document.getElementById(id);
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const range = (a, b) => Array.from({ length: Math.max(0, b - a + 1) }, (_, i) => a + i);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const nf0 = v => Math.round(v).toLocaleString('pt-BR');
+const cmp = (v, d = 2) => {
+  const a = Math.abs(v);
+  if (a >= 1e6) return (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: d }) + ' mi';
+  if (a >= 1e3) return Math.round(v / 1e3).toLocaleString('pt-BR') + ' mil';
+  return Math.round(v).toLocaleString('pt-BR');
+};
+const haC = v => v == null ? '—' : `${cmp(v)} ha`;
+const pctTxt = p => p == null ? '—' : `${p > 0 ? '+' : p < 0 ? '−' : ''}${Math.abs(Math.round(p))}%`;
+const fmtP = p => p > 0 && p < 1 ? '<1%' : `${Math.round(p)}%`;
+const fmtP0 = p => p === 0 ? '–' : fmtP(p);
+const tone = p => p > 0 ? 'up' : p < 0 ? 'down' : '';
+const sumTs = (ts, y, a, b) => ts.monthly
+  .filter(p => p.year === y && p.month >= a && p.month <= b)
+  .reduce((s, p) => s + (p.areaHa || 0), 0);
+const lista = a => a.length <= 1 ? (a[0] || '') : `${a.slice(0, -1).join(', ')} e ${a[a.length - 1]}`;
+const MINUSC = new Set(['da', 'de', 'do', 'das', 'dos', 'e', 'em']);
+// Nomes de UC e quilombo chegam em caixa alta e com o código do CNUC; deixa legível.
+const limparNome = s => s.replace(/\s*\(\d{4}\.\d{2}\.\d{4}\)\s*$/, '').toLowerCase().split(' ')
+  .map((w, i) => i > 0 && MINUSC.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+function niceCeil(v) { const p = Math.pow(10, Math.floor(Math.log10(v))); return Math.ceil(v / p * 2) / 2 * p; }
+
+function classes(values, n = 5) {
+  const v = values.filter(x => x > 0).sort((a, b) => a - b);
+  if (!v.length) return { cor: () => SEM_DADO, idx: () => -1, leg: [] };
+  const br = [...new Set(range(1, n - 1).map(i => v[Math.floor(i * v.length / n)]))];
+  const pal = RAMP5.slice(RAMP5.length - (br.length + 1));
+  const idx = x => { let i = 0; while (i < br.length && x > br[i]) i++; return i; };
+  const leg = pal.map((c, i) => ({ c, de: i === 0 ? v[0] : br[i - 1], ate: i < br.length ? br[i] : v[v.length - 1] }));
+  return { cor: x => x > 0 ? pal[idx(x)] : SEM_DADO, idx: x => x > 0 ? idx(x) + (RAMP5.length - pal.length) : -1, leg };
+}
+const fmtLeg = v => v >= 1e4 ? cmp(v, 1) : nf0(v);
+const legHTML = cls => cls.leg.map(l => `<span><i style="background:${l.c}"></i>${fmtLeg(l.de)} – ${fmtLeg(l.ate)}</span>`).join('')
+  + `<span><i style="background:${SEM_DADO}"></i>sem área queimada</span><span>(ha)</span>`;
+
+/* ---------- API ---------- */
+async function getJSON(path) {
+  const r = await fetch(API + path);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+const gCache = {};
+function groupings(type, code) {
+  const k = `${type}/${code}`;
+  return gCache[k] ||= getJSON(`/api/territories/${k}/groupings`).catch(e => { delete gCache[k]; throw e; });
+}
+// Valida o grouping em /groupings antes de qualquer estatística (evita HTTP 500).
+async function pickGroup(type, code, want) {
+  const g = await groupings(type, code);
+  const key = [want, ...(PREF[type] || [])].filter(Boolean).find(x => x in g) || Object.keys(g)[0];
+  if (!key) throw new Error('nenhuma subdivisão válida');
+  return { key, nome: g[key].pt };
+}
+async function st(kind, type, code, params = {}, want) {
+  const g = await pickGroup(type, code, want);
+  const q = new URLSearchParams(Object.entries(params).filter(([, v]) => v != null && v !== '')).toString();
+  return getJSON(`/api/statistics/${kind}/${type}/${code}/${g.key}${q ? '?' + q : ''}`);
+}
+async function rankingAll(type, code, params, want) {
+  const p1 = await st('ranking', type, code, { ...params, page: 1, order: 'desc' }, want);
+  const n = p1.pageAmount || 1;
+  const rest = await Promise.all(range(2, n).map(p => st('ranking', type, code, { ...params, page: p, order: 'desc' }, want)));
+  const all = [p1, ...rest];
+  return { nomes: all.flatMap(r => r.x), valores: all.flatMap(r => r.series[0].data) };
+}
+let geoP, trP;
+const loadGeo = () => geoP ||= fetch(GEO_URL)
+  .then(r => { if (!r.ok) throw new Error(`contornos: HTTP ${r.status}`); return r.json(); })
+  .catch(e => { geoP = null; throw e; });
+const lcTrans = () => trP ||= getJSON('/api/land-covers/translations').catch(e => { trP = null; throw e; });
+
+/* ---------- estados de carregamento ---------- */
+function status(id, msg = '', err = false) {
+  const el = document.querySelector(`#${id} > .st`);
+  if (!el) return;
+  el.hidden = !msg;
+  el.classList.toggle('err', err);
+  el.innerHTML = msg ? `${err ? '' : '<span class="spin"></span>'}<span>${msg}</span>` : '';
+}
+async function secao(id, fn) {
+  status(id, 'Carregando…');
+  try { await fn(); status(id); }
+  catch (e) { console.error(id, e); status(id, `Não foi possível carregar este bloco (${e.message}).`, true); }
+}
+
+const tip = $('tip');
+function showTip(ev, html) {
+  tip.innerHTML = html; tip.hidden = false;
+  tip.style.left = `${Math.min(ev.clientX + 14, window.innerWidth - 250)}px`;
+  tip.style.top = `${ev.clientY + 14}px`;
+}
+const hideTip = () => { tip.hidden = true; };
+
+/* ---------- Chart.js ---------- */
+const CHS = {};
+function mkChart(key, canvasId, cfg) {
+  if (!window.Chart) throw new Error('biblioteca de gráficos não carregou');
+  CHS[key]?.destroy();
+  // Desenha o canvas em 3x a resolução de tela: os gráficos continuam nítidos com zoom no PDF.
+  cfg.options = { ...cfg.options, devicePixelRatio: Math.max(3, window.devicePixelRatio || 1) };
+  CHS[key] = new Chart($(canvasId), cfg);
+}
+const topLabels = {
+  id: 'topLabels',
+  afterDatasetsDraw(chart, _a, o) {
+    if (!o.indices) return;
+    const { ctx } = chart, meta = chart.getDatasetMeta(0);
+    ctx.save();
+    ctx.font = '700 9.5px Montserrat, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = C.ink2;
+    o.indices.forEach(i => {
+      const el = meta.data[i], v = chart.data.datasets[0].data[i];
+      if (el && v) ctx.fillText(o.fmt(v), el.x, el.y - 5);
+    });
+    ctx.restore();
+  }
+};
+// Média histórica (traço) e menor/maior valor (haste) de cada mês.
+const whiskers = {
+  id: 'whiskers',
+  afterDatasetsDraw(chart, _a, o) {
+    if (!o.stats) return;
+    const { ctx, chartArea: area, scales: { x, y } } = chart;
+    const py = v => Math.max(area.top, y.getPixelForValue(v));
+    const hw = Math.min(14, (area.right - area.left) / o.stats.length * .32);
+    ctx.save();
+    o.stats.forEach((s, i) => {
+      if (!s) return;
+      const cx = x.getPixelForValue(i);
+      ctx.strokeStyle = C.muted; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx, py(s.min)); ctx.lineTo(cx, py(s.max)); ctx.stroke();
+      [s.min, s.max].forEach(v => {
+        if (y.getPixelForValue(v) < area.top) return;
+        ctx.beginPath(); ctx.moveTo(cx - 3, py(v)); ctx.lineTo(cx + 3, py(v)); ctx.stroke();
+      });
+      if (y.getPixelForValue(s.max) < area.top) {
+        ctx.fillStyle = C.muted; ctx.font = '500 9px Montserrat, sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(`${cmp(s.max, 1)} em ${s.maxYear}`, cx, area.top - 3);
+      }
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(cx - hw, py(s.avg)); ctx.lineTo(cx + hw, py(s.avg)); ctx.stroke();
+    });
+    ctx.restore();
+  }
+};
+const yAxis = extra => ({ beginAtZero: true, border: { display: false }, grid: { color: '#EFEFEF' }, ticks: { callback: v => cmp(v, 1) }, ...extra });
+const axTitle = text => ({ display: true, text, color: C.ink2, font: { size: 9.5, weight: '600' }, padding: { top: 2, bottom: 2 } });
+
+/* ---------- mapas ---------- */
+const MAPS = {};
+function mapaEstatico(id, bounds) {
+  if (!window.L) throw new Error('biblioteca de mapas não carregou');
+  MAPS[id]?.m.remove();
+  // Mapa estático: sem interação e sem animações. A animação de zoom faz os vector tiles
+  // sumirem no Leaflet 1.9 e deixa a impressão sem os tiles do enquadramento novo.
+  const m = L.map(id, {
+    zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false,
+    boxZoom: false, keyboard: false, touchZoom: false, zoomSnap: .1, attributionControl: true,
+    zoomAnimation: false, fadeAnimation: false, markerZoomAnimation: false, inertia: false
+  });
+  m.attributionControl.setPrefix(false);
+  L.tileLayer(ESRI, { attribution: 'Mapa base © Esri', zIndex: 1 }).addTo(m);
+  const bb = L.geoJSON(bounds).getBounds();
+  m.fitBounds(bb, { padding: [14, 14], animate: false });
+  MAPS[id] = { m, bb, tam: m.getSize().toString() };
+  return m;
+}
+// Só reenquadra quando o tamanho do mapa mudou; reenquadrar à toa descarta os tiles já carregados.
+function reajustarMapas() {
+  Object.values(MAPS).forEach(item => {
+    item.m.invalidateSize({ pan: false });
+    const tam = item.m.getSize().toString();
+    if (tam === item.tam) return;
+    item.tam = tam;
+    item.m.fitBounds(item.bb, { padding: [14, 14], animate: false });
+  });
+}
+function mvt(path, style, zIndex) {
+  if (!L.vectorGrid) throw new Error('biblioteca de vetores não carregou');
+  return L.vectorGrid.protobuf(`${API}${path}/{z}/{x}/{y}.mvt`, {
+    vectorTileLayerStyles: { default: style }, interactive: false, zIndex, maxNativeZoom: 14
+  });
+}
+
+function drawStates(el, geo, vals, total, cls) {
+  if (!window.d3) throw new Error('biblioteca de mapas não carregou');
+  const W = 640, H = 600, R = 100;
+  const proj = d3.geoIdentity().reflectY(true).fitExtent([[6, 6], [W - R, H - 6]], geo);
+  const path = d3.geoPath(proj);
+  const svg = d3.select(el).html('').append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`).attr('class', 'map-svg')
+    .attr('role', 'img').attr('aria-label', 'Mapa do Brasil com a área queimada por estado');
+  svg.append('g').selectAll('path').data(geo.features).join('path')
+    .attr('d', path)
+    .attr('fill', f => cls.cor(vals[f.properties.name] || 0))
+    .attr('stroke', '#FFFFFF').attr('stroke-width', 1)
+    .on('mousemove', (ev, f) => {
+      const v = vals[f.properties.name];
+      showTip(ev, `<b>${f.properties.name}</b><br>${v != null ? `${nf0(v)} ha · ${fmtP(v / total * 100)} do país` : 'sem dados'}`);
+    })
+    .on('mouseleave', hideTip);
+
+  const SMALL = new Set(['RN', 'PB', 'PE', 'AL', 'SE', 'DF', 'ES', 'RJ']);
+  const lab = svg.append('g').style('pointer-events', 'none');
+  const fora = [];
+  geo.features.forEach(f => {
+    const s = f.properties.sigla, v = vals[f.properties.name], c = path.centroid(f);
+    if (!isFinite(c[0])) return;
+    if (SMALL.has(s)) { fora.push({ s, v, c }); return; }
+    const t = lab.append('text').attr('text-anchor', 'middle').attr('fill', cls.idx(v || 0) >= 3 ? '#FFFFFF' : C.ink);
+    t.append('tspan').attr('class', 'ml-s').attr('x', c[0]).attr('y', c[1]).text(s);
+    if (v != null) t.append('tspan').attr('class', 'ml-v').attr('x', c[0]).attr('dy', '1.2em').text(cmp(v, 1));
+  });
+  fora.sort((a, b) => a.c[1] - b.c[1]);
+  let ultimo = -Infinity;
+  const xL = W - R + 16;
+  fora.forEach(o => {
+    const y = Math.max(o.c[1], ultimo + 18);
+    ultimo = y;
+    lab.append('line').attr('x1', o.c[0]).attr('y1', o.c[1]).attr('x2', xL - 4).attr('y2', y).attr('stroke', C.ink2).attr('stroke-width', .7);
+    lab.append('circle').attr('cx', o.c[0]).attr('cy', o.c[1]).attr('r', 1.8).attr('fill', C.ink);
+    const t = lab.append('text').attr('x', xL).attr('y', y).attr('dy', '.35em').attr('fill', C.ink);
+    t.append('tspan').attr('class', 'ml-s').text(o.s);
+    t.append('tspan').attr('class', 'ml-v').attr('dx', 4).attr('fill', C.ink2).text(o.v != null ? cmp(o.v, 1) : '—');
+  });
+}
+
+/* ---------- componentes do boletim ---------- */
+function varLine(v, ref) {
+  if (!v || v.percentage == null) return '';
+  const up = v.percentage > 0;
+  return `<li class="${up ? 'up' : 'down'}"><b>${up ? '▲' : '▼'} ${Math.abs(Math.round(v.percentage))}%</b>`
+    + `<span>${up ? '+' : '−'}${nf0(Math.abs(v.areaHa))} ha ${ref}</span></li>`;
+}
+function kpiHTML(rotulo, valor, sub, linhas) {
+  return `<p class="k-l">${rotulo}</p><p class="k-v">${nf0(valor)}<small> ha</small></p>`
+    + (sub ? `<p class="k-s">${sub}</p>` : '') + `<ul class="dl">${linhas.join('')}</ul>`;
+}
+// Os dois cartões de valor (mês e acumulado) usados nas páginas 1, 3 e 4.
+function renderKpis(prefix, d, nacional) {
+  const { Y, M } = P, mes = MES_L[M - 1], Y0 = P.anos[0], ab = MES[M - 1];
+  const share = (a, b) => fmtP(a / b * 100);
+  $(`${prefix}-k1`).innerHTML = kpiHTML(`Área queimada em ${mes} de ${Y}`, d.mes.areaHa,
+    nacional ? `${share(d.mes.areaHa, nacional.mes)} da área queimada no Brasil no mês` : '',
+    [varLine(d.mes.previousYearVariation, `vs. ${mes} de ${Y - 1}`),
+      varLine(d.mes.averageVariation, `vs. média de ${mes} (${Y0}–${Y - 1})`)]);
+  $(`${prefix}-k2`).innerHTML = kpiHTML(M === 1 ? `Acumulado em janeiro de ${Y}` : `Acumulado de janeiro a ${mes} de ${Y}`, d.acum.areaHa,
+    nacional
+      ? `${share(d.acum.areaHa, nacional.acum)} da área queimada no Brasil no ano`
+      : `${cap(mes)} respondeu por ${share(d.mes.areaHa, d.acum.areaHa)} desse total`,
+    [varLine(d.acum.previousYearVariation, `vs. jan–${ab} de ${Y - 1}`),
+      varLine(d.acum.averageVariation, `vs. média de jan–${ab} (${Y0}–${Y - 1})`)]);
+}
+function yearChart(id, anos, vals, Y) {
+  mkChart(id, id, {
+    type: 'bar',
+    data: {
+      labels: anos.map(String),
+      datasets: [{ data: vals, backgroundColor: anos.map(y => y === Y ? C.red : C.redL), borderRadius: 3, barPercentage: .78, categoryPercentage: .9 }]
+    },
+    plugins: [topLabels],
+    options: {
+      maintainAspectRatio: false,
+      layout: { padding: { top: 14 } },
+      plugins: {
+        legend: { display: false },
+        topLabels: { indices: vals.map((_, i) => i), fmt: v => cmp(v, 1) },
+        tooltip: { callbacks: { label: c => haC(c.raw) } }
+      },
+      scales: {
+        x: {
+          grid: { display: false }, border: { color: C.line },
+          ticks: { font: { size: 9.5 }, color: c => anos[c.index] === Y ? C.redD : C.muted },
+          title: axTitle('Ano')
+        },
+        y: yAxis({ ticks: { callback: v => cmp(v, 1), font: { size: 9 }, maxTicksLimit: 4 }, title: axTitle('Área queimada (ha)') })
+      }
+    }
+  });
+}
+// Mesmos dois gráficos (acumulado por ano e só o mês por ano) em todas as páginas.
+function anosCharts(prefix, ts) {
+  const { Y, M, anos } = P;
+  $(`${prefix}-a1-t`).textContent = M === 1 ? 'Área queimada em janeiro, por ano' : `Área queimada de janeiro a ${MES_L[M - 1]}, por ano`;
+  $(`${prefix}-a2-t`).textContent = `Área queimada só em ${MES_L[M - 1]}, por ano`;
+  yearChart(`${prefix}-a1`, anos, anos.map(y => sumTs(ts, y, 1, M)), Y);
+  yearChart(`${prefix}-a2`, anos, anos.map(y => sumTs(ts, y, M, M)), Y);
+}
+function agrupar(lista) {
+  const out = CLS.map(c => ({ ...c, ha: 0 }));
+  const outras = out[out.length - 1];
+  lista.forEach(i => { (out.find(c => c.ids.includes(i.id)) || outras).ha += i.areaHa || 0; });
+  const tot = out.reduce((s, c) => s + c.ha, 0);
+  out.forEach(c => { c.p = tot ? c.ha / tot * 100 : 0; });
+  const antr = lista.filter(i => ANTROPICAS.has(i.id)).reduce((s, i) => s + (i.areaHa || 0), 0);
+  const nat = out.filter(c => c.nat).reduce((s, c) => s + c.p, 0);
+  const antrP = tot ? antr / tot * 100 : 0;
+  return { cls: out, tot, nat, antr: antrP, resto: Math.max(0, 100 - nat - antrP) };
+}
+const swatch = c => `background:${c.cor}${c.borda ? `;box-shadow:inset 0 0 0 1px ${c.borda}` : ''}`;
+// Cobertura do mês e do acumulado lado a lado, com a mesma legenda e as mesmas cores.
+function coverHTML(lcMes, lcAcum) {
+  const a = agrupar(lcMes), b = agrupar(lcAcum);
+  const { M } = P;
+  const lm = cap(MES[M - 1]), la = M === 1 ? 'Jan' : `Jan–${MES[M - 1]}`;
+  const bar = g => `<div class="stack">${g.cls.filter(c => c.ha > 0)
+    .map(c => `<span style="flex:${c.ha};${swatch(c)}" title="${c.nome}: ${fmtP(c.p)}"></span>`).join('')}</div>`;
+  const rows = CLS.map((c, i) => ({ c, m: a.cls[i], y: b.cls[i] })).filter(r => r.m.ha > 0 || r.y.ha > 0);
+  return `<div class="cbars"><span>${lm}</span>${bar(a)}<span>${la}</span>${bar(b)}</div>
+    <table class="ctab">
+      <thead><tr><th class="l">Classe</th><th>${lm}</th><th>${la}</th></tr></thead>
+      <tbody>${rows.map(r => `<tr><td class="l"><i class="sw" style="${swatch(r.c)}"></i>${r.c.nome}</td><td>${fmtP0(r.m.p)}</td><td>${fmtP0(r.y.p)}</td></tr>`).join('')}</tbody>
+      <tfoot>
+        <tr><td class="l"><b>Vegetação nativa</b></td><td><b>${fmtP(a.nat)}</b></td><td><b>${fmtP(b.nat)}</b></td></tr>
+        <tr><td class="l"><b>Área antrópica</b></td><td><b>${fmtP(a.antr)}</b></td><td><b>${fmtP(b.antr)}</b></td></tr>
+        ${a.resto >= 1 || b.resto >= 1 ? `<tr><td class="l">Água e áreas não vegetadas</td><td>${fmtP0(Math.round(a.resto * 10) / 10)}</td><td>${fmtP0(Math.round(b.resto * 10) / 10)}</td></tr>` : ''}
+      </tfoot>
+    </table>`;
+}
+function rankHTML(items, cor = C.red) {
+  const max = Math.max(...items.map(i => i.v), 1);
+  return items.map((i, k) => `<li>
+    <span class="rk-n">${i.tag ?? k + 1}</span>
+    <span class="rk-nm" title="${esc(i.nome)}">${esc(i.nome)}</span>
+    <span class="rk-tr"><span style="width:${(i.v / max * 100).toFixed(1)}%;background:${cor}"></span></span>
+    <span class="rk-v">${haC(i.v)}</span>
+  </li>`).join('');
+}
+// Logo oficial (Monitor_PT.png, na pasta do projeto) em todas as páginas do boletim.
+const cabecalho = per => `
+  <img class="sh-logo" src="Monitor_PT.png" alt="MapBiomas Fogo · Monitor do Fogo">
+  <span class="sh-sep"></span><div class="sh-d">Destaques</div>
+  <span class="sh-sep"></span><div class="sh-p">${per}</div>`;
+
+/* ==========================================================
+   BOLETIM DO MÊS
+   ========================================================== */
+const P = {};
+
+async function detectarPeriodo() {
+  const anos = await getJSON('/api/statistics/years');
+  for (const y of [...anos].reverse().slice(0, 2)) {
+    const meses = await getJSON(`/api/statistics/${y}/months`);
+    for (const m of [...meses].reverse()) {
+      const a = await st('area', 'country', 0, { year: y, monthStart: m, monthEnd: m }, 'biome');
+      if (a.areaHa > 0) { P.Y = y; P.M = m; P.anos = anos.filter(x => x <= y); return; }
+    }
+  }
+  throw new Error('nenhum mês com dados');
+}
+
+// Área do mês, acumulado, série e cobertura de um território (bioma ou estado líder).
+async function dadosTerritorio(type, code, want) {
+  const { Y, M } = P;
+  const q = { year: Y, monthStart: M, monthEnd: M }, qa = { year: Y, monthStart: 1, monthEnd: M };
+  const [mes, acum, ts, lcMes, lcAcum] = await Promise.all([
+    st('area', type, code, q, want),
+    st('area', type, code, qa, want),
+    st('time-series', type, code, { monthStart: 1, monthEnd: 12 }, want),
+    st('land-cover', type, code, { ...q, level: 2 }, want),
+    st('land-cover', type, code, { ...qa, level: 2 }, want)
+  ]);
+  return { mes, acum, ts, lcMes, lcAcum };
+}
+
+async function initBoletim() {
+  const blocos = [...document.querySelectorAll('#tab-boletim .blk')].map(b => b.id);
+  blocos.forEach(id => status(id, 'Carregando…'));
+  try { await periodoP; }
+  catch (e) {
+    blocos.forEach(id => status(id, `Não foi possível identificar o mês mais recente (${e.message}).`, true));
+    $('periodo').textContent = 'Sem dados';
+    return;
+  }
+  const { Y, M } = P, mes = MES_L[M - 1];
+  $('periodo').textContent = `${mes} ${Y}`;
+  document.title = `Boletim do Monitor do Fogo · ${cap(mes)} ${Y}`;
+  document.querySelectorAll('.sh').forEach(h => { h.innerHTML = cabecalho(`${mes} ${Y}`); });
+  document.querySelectorAll('[data-atual]').forEach(s => { s.textContent = `dados até ${mes} de ${Y}`; });
+  // Todos os rankings da página 2 são do mês de referência; cada lista diz isso.
+  document.querySelectorAll('[data-per]').forEach(s => { s.textContent = `Área queimada em ${mes} de ${Y}`; });
+
+  const q = { year: Y, monthStart: M, monthEnd: M }, qa = { year: Y, monthStart: 1, monthEnd: M };
+  const D = {
+    ts: st('time-series', 'country', 0, { monthStart: 1, monthEnd: 12 }),
+    // Totais nacionais com grouping=biome: é o recorte que reproduz os números do boletim oficial.
+    mes: st('area', 'country', 0, q, 'biome'),
+    acum: st('area', 'country', 0, qa, 'biome'),
+    lcMes: st('land-cover', 'country', 0, { ...q, level: 2 }),
+    lcAcum: st('land-cover', 'country', 0, { ...qa, level: 2 }),
+    lcMeses: Promise.all(range(1, M).map(m => st('land-cover', 'country', 0, { year: Y, monthStart: m, monthEnd: m, level: 2 }))),
+    rankUF: rankingAll('country', 0, q, 'state'),
+    rankBio: st('ranking', 'country', 0, { ...q, page: 1, order: 'desc' }, 'biome'),
+    geo: loadGeo()
+  };
+  D.bioma = D.rankBio.then(r => { const b = BIO_BY_NAME[r.x[0]]; if (!b) throw new Error(`bioma não reconhecido: ${r.x[0]}`); return b; });
+  D.uf = D.rankUF.then(r => { const u = UF_BY_NAME[r.nomes[0]]; if (!u) throw new Error(`estado não reconhecido: ${r.nomes[0]}`); return u; });
+  D.dBio = D.bioma.then(b => dadosTerritorio('biome', b.code, 'biome'));
+  D.dUF = D.uf.then(u => dadosTerritorio('state', u.code, 'city'));
+  D.munUF = D.uf.then(u => rankingAll('state', u.code, q, 'city'));
+  Object.values(D).forEach(p => p.catch(() => {}));
+
+  await Promise.all([
+    secao('p1-kpi', () => p1Kpi(D)),
+    secao('p1-tiles', () => p1Tiles(D)),
+    secao('p1-anos', async () => anosCharts('p1', await D.ts)),
+    secao('p1-mes', () => p1Mes(D)),
+    secao('p1-cob', async () => { const [a, b] = await Promise.all([D.lcMes, D.lcAcum]); $('p1-cobc').innerHTML = coverHTML(a, b); }),
+    secao('p2-mapa', () => p2Mapa(D)),
+    secao('p2-bio', () => p2Bio(D)),
+    secao('p2-mun', () => p2Lista('city', 'p2-munl', 6)),
+    secao('p2-uc', () => p2Lista('uc', 'p2-ucl', 5, limparNome)),
+    secao('p2-ti', () => p2Lista('indigenousLand', 'p2-til', 5)),
+    secao('p2-qui', () => p2Lista('quilombo', 'p2-quil', 5, limparNome)),
+    secao('p2-out', () => p2Outros(D)),
+    secao('p3-kpi', () => p3Kpi(D)),
+    secao('p3-mapa', () => p3Mapa(D)),
+    secao('p3-cob', async () => { const d = await D.dBio; $('p3-cobc').innerHTML = coverHTML(d.lcMes, d.lcAcum); }),
+    secao('p3-anos', async () => anosCharts('p3', (await D.dBio).ts)),
+    secao('p4-kpi', () => p4Kpi(D)),
+    secao('p4-mapa', () => p4Mapa(D)),
+    secao('p4-mun', () => p4Mun(D)),
+    secao('p4-anos', async () => anosCharts('p4', (await D.dUF).ts)),
+    secao('p4-cob', async () => { const d = await D.dUF; $('p4-cobc').innerHTML = coverHTML(d.lcMes, d.lcAcum); })
+  ]);
+}
+
+/* ----- Página 1: Brasil ----- */
+async function p1Kpi(D) {
+  const [mesA, acum] = await Promise.all([D.mes, D.acum]);
+  const { Y, M } = P, mes = MES_L[M - 1];
+  const py = mesA.previousYearVariation, av = mesA.averageVariation;
+  $('p1-t').textContent = `Destaques do fogo no Brasil em ${mes} de ${Y}`;
+  $('p1-lead').textContent = `O fogo atingiu ${haC(mesA.areaHa)} no Brasil em ${mes}`
+    + (py && av ? `, ${Math.abs(Math.round(py.percentage))}% ${py.percentage < 0 ? 'menos' : 'mais'} que em ${mes} de ${Y - 1} e ${Math.abs(Math.round(av.percentage))}% ${av.percentage < 0 ? 'abaixo' : 'acima'} da média do mês` : '')
+    + `. No acumulado do ano, são ${haC(acum.areaHa)}.`;
+  renderKpis('p1', { mes: mesA, acum }, null);
+}
+
+async function p1Tiles(D) {
+  const [ts, mesA, acum, lcMes, lcAcum] = await Promise.all([D.ts, D.mes, D.acum, D.lcMes, D.lcAcum]);
+  const { Y, M } = P, mes = MES_L[M - 1], Y0 = P.anos[0], ab = MES[M - 1];
+
+  const meses = range(1, M).map(m => ({ m, v: sumTs(ts, Y, m, m) }));
+  const pico = meses.reduce((a, b) => (b.v > a.v ? b : a));
+  const totAno = meses.reduce((s, x) => s + x.v, 0);
+  $('p1-t1v').textContent = cap(MES_L[pico.m - 1]);
+  $('p1-t1s').textContent = `Mês mais queimado do ano: ${haC(pico.v)}, ${fmtP(pico.v / totAno * 100)} do total`;
+
+  const gm = agrupar(lcMes);
+  $('p1-t2v').textContent = fmtP(gm.nat);
+  $('p1-t2s').textContent = `do que queimou em ${mes} era floresta, savana ou campo; ${fmtP(gm.antr)} foi em área antrópica (${fmtP(agrupar(lcAcum).nat)} nativa no ano)`;
+
+  const av = acum.averageVariation;
+  $('p1-t3l').textContent = M === 1 ? 'Contra a média de janeiro' : `Contra a média de jan–${ab}`;
+  $('p1-t3v').textContent = pctTxt(av?.percentage);
+  $('p1-t3v').className = `tl-v ${tone(av?.percentage)}`;
+  $('p1-t3s').textContent = av ? `${haC(acum.areaHa)} em ${Y} vs. ${haC(acum.areaHa - av.areaHa)} na média de ${Y0} a ${Y - 1}` : '';
+
+  const pm = mesA.previousMonthVariation;
+  $('p1-t4l').textContent = pm ? `Contra ${MES_L[pm.month - 1]}` : 'Contra o mês anterior';
+  $('p1-t4v').textContent = pctTxt(pm?.percentage);
+  $('p1-t4v').className = `tl-v ${tone(pm?.percentage)}`;
+  $('p1-t4s').textContent = pm ? `${haC(mesA.areaHa - pm.areaHa)} em ${MES_L[pm.month - 1]} → ${haC(mesA.areaHa)} em ${mes}` : '';
+}
+
+async function p1Mes(D) {
+  const [ts, lcMeses] = await Promise.all([D.ts, D.lcMeses]);
+  const { Y, M } = P, Y0 = P.anos[0];
+  const stats = range(1, 12).map(m => {
+    const h = ts.monthly.filter(p => p.year < Y && p.month === m && p.areaHa != null);
+    if (!h.length) return null;
+    const vs = h.map(p => p.areaHa);
+    const top = h.reduce((a, b) => (b.areaHa > a.areaHa ? b : a));
+    return { avg: vs.reduce((s, v) => s + v, 0) / vs.length, min: Math.min(...vs), max: top.areaHa, maxYear: top.year };
+  });
+  const porMes = lcMeses.map(l => agrupar(l).cls);
+  const totais = range(1, 12).map(m => m <= M ? sumTs(ts, Y, m, m) : null);
+  const topo = Math.max(...totais.filter(v => v != null), ...stats.filter(Boolean).map(s => s.avg));
+  const acima = range(1, M).filter(m => stats[m - 1] && totais[m - 1] > stats[m - 1].avg).map(m => MES_L[m - 1]);
+  const iPico = totais.indexOf(Math.max(...totais.filter(v => v != null)));
+
+  $('p1-mes-t').textContent = `Área queimada por mês e por uso e cobertura em ${Y}`;
+  $('p1-mes-s').textContent = (acima.length
+    ? `${cap(lista(acima))} ${acima.length > 1 ? 'ficaram' : 'ficou'} acima da média de ${Y0} a ${Y - 1}.`
+    : `Nenhum mês de ${Y} ficou acima da média de ${Y0} a ${Y - 1}.`)
+    + ` O pico foi em ${MES_L[iPico]}, com ${haC(totais[iPico])}.`;
+  $('p1-mes-leg').innerHTML = CLS.map(c => `<span><i style="${swatch(c)}"></i>${c.nome}</span>`).join('')
+    + `<span><i class="avg"></i>Média ${Y0}–${Y - 1}</span><span><i class="wk"></i>Menor e maior valor</span>`;
+  $('p1-mes-n').textContent = M < 12 ? `De ${MES_L[M]} em diante, os dados ainda não foram publicados.` : '';
+
+  mkChart('p1-mesc', 'p1-mesc', {
+    type: 'bar',
+    data: {
+      labels: MES,
+      datasets: CLS.map((c, ci) => ({
+        label: c.nome,
+        data: range(1, 12).map(m => m <= M ? porMes[m - 1][ci].ha : null),
+        backgroundColor: c.cor,
+        borderColor: c.borda || '#FFFFFF',
+        borderWidth: c.borda ? .8 : { top: 1 },
+        borderSkipped: c.borda ? false : 'bottom',
+        barPercentage: .62, categoryPercentage: .9
+      }))
+    },
+    plugins: [whiskers],
+    options: {
+      maintainAspectRatio: false,
+      layout: { padding: { top: 12 } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        whiskers: { stats },
+        tooltip: {
+          filter: i => i.raw > 0,
+          callbacks: {
+            title: i => `${cap(MES_L[i[0].dataIndex])} de ${Y}`,
+            label: c => ` ${c.dataset.label}: ${haC(c.raw)}`,
+            footer: items => {
+              if (!items.length) return '';
+              const i = items[0].dataIndex, s = stats[i];
+              return [`Total: ${haC(totais[i])}`, s ? `Média ${Y0}–${Y - 1}: ${haC(s.avg)}` : ''];
+            }
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, border: { color: C.line }, ticks: { font: { size: 9.5 } }, title: axTitle(`Mês de ${Y}`) },
+        y: yAxis({ stacked: true, max: niceCeil(topo * 1.35), ticks: { callback: v => cmp(v, 1), font: { size: 9 } }, title: axTitle('Área queimada (ha)') })
+      }
+    }
+  });
+}
+
+/* ----- Página 2: Onde queima ----- */
+async function p2Mapa(D) {
+  const [r, geo, mesA] = await Promise.all([D.rankUF, D.geo, D.mes]);
+  const { Y, M } = P, mes = MES_L[M - 1];
+  const vals = Object.fromEntries(r.nomes.map((n, i) => [n, r.valores[i]]));
+  const total = mesA.areaHa;
+  $('p2-t').textContent = `Onde o fogo queimou em ${mes} de ${Y}`;
+  let lead = `${r.nomes[0]} e ${r.nomes[1]} concentraram ${fmtP((r.valores[0] + r.valores[1]) / total * 100)} da área queimada do país.`;
+  try {
+    const rb = await D.rankBio, b = BIO_BY_NAME[rb.x[0]];
+    if (b) lead += ` Entre os biomas, ${b.art} ${b.nome} respondeu por ${fmtP(rb.series[0].data[0] / total * 100)}.`;
+  } catch { /* a frase dos biomas é opcional */ }
+  $('p2-lead').textContent = lead;
+  $('p2-map-t').textContent = `Área queimada por estado em ${mes}`;
+  const cls = classes(r.valores);
+  drawStates($('p2-map'), geo, vals, total, cls);
+  $('p2-leg').innerHTML = legHTML(cls);
+  $('p2-uf').innerHTML = rankHTML(r.nomes.slice(0, 10).map((n, i) => ({ tag: UF_BY_NAME[n]?.sigla, nome: n, v: r.valores[i] })));
+}
+
+async function p2Bio(D) {
+  const [r, mesA] = await Promise.all([D.rankBio, D.mes]);
+  $('p2-biol').innerHTML = rankHTML(r.x.map((n, i) => ({
+    nome: `${n} · ${fmtP(r.series[0].data[i] / mesA.areaHa * 100)}`, v: r.series[0].data[i]
+  })));
+}
+
+async function p2Lista(want, el, n, limpar) {
+  const { Y, M } = P;
+  const r = await st('ranking', 'country', 0, { year: Y, monthStart: M, monthEnd: M, page: 1, order: 'desc' }, want);
+  $(el).innerHTML = rankHTML(r.x.slice(0, n).map((x, i) => ({ nome: limpar ? limpar(x) : x, v: r.series[0].data[i] })));
+}
+
+async function p2Outros(D) {
+  const { Y, M } = P;
+  const q = { year: Y, monthStart: M, monthEnd: M, page: 1, order: 'desc' };
+  const recortes = ['legalAmazon', 'matopiba', 'amacro'];
+  const [mesA, ...rs] = await Promise.all([D.mes, ...recortes.map(w => st('ranking', 'country', 0, q, w).catch(() => null))]);
+  const itens = rs.filter(r => r && r.x.length).map(r => ({ nome: `${r.x[0]} · ${fmtP(r.series[0].data[0] / mesA.areaHa * 100)}`, v: r.series[0].data[0] }));
+  if (!itens.length) throw new Error('sem dados');
+  $('p2-outl').innerHTML = rankHTML(itens.map(i => ({ ...i, tag: '' })));
+  $('p2-out-n').textContent = 'Percentual em relação à área queimada no Brasil no mês. Os recortes se sobrepõem.';
+}
+
+/* ----- Página 3: Bioma mais afetado ----- */
+async function p3Kpi(D) {
+  const [b, d, mesA, acum] = await Promise.all([D.bioma, D.dBio, D.mes, D.acum]);
+  const { M } = P, mes = MES_L[M - 1];
+  $('p3-los').textContent = b.nome;
+  $('p3-t').textContent = `${cap(b.art)} ${b.nome} foi o bioma mais afetado pelo fogo em ${mes}`;
+  $('p3-lead').textContent = `${fmtP(agrupar(d.lcMes).nat)} do que queimou no bioma em ${mes} era vegetação nativa.`;
+  renderKpis('p3', d, { mes: mesA.areaHa, acum: acum.areaHa });
+}
+
+async function p3Mapa(D) {
+  const b = await D.bioma;
+  const { Y, M } = P;
+  const [fire, bounds] = await Promise.all([
+    getJSON(`/api/maps/fire/monthly?territoryType=biome&territoryCode=${b.code}&year=${Y}&monthStart=${M}&monthEnd=${M}`),
+    getJSON(`/api/territories/biome/${b.code}/bounds`)
+  ]);
+  $('p3-map-t').textContent = `Cicatrizes de fogo em ${MES_L[M - 1]} de ${Y}`;
+  const m = mapaEstatico('p3-map', bounds);
+  mvt(`/api/territories/shape/tiles/biome/${b.code}/biome`, { fill: true, fillColor: '#FFFFFF', fillOpacity: .65, stroke: false }, 2).addTo(m);
+  L.tileLayer(fire.url, { zIndex: 3 }).addTo(m);
+  mvt(`/api/territories/grouping/tiles/biome/${b.code}/biome`, { fill: false, color: C.redD, weight: 1.2 }, 4).addTo(m);
+}
+
+/* ----- Página 4: Estado mais afetado ----- */
+async function p4Kpi(D) {
+  const [u, d, mesA, acum, mun] = await Promise.all([D.uf, D.dUF, D.mes, D.acum, D.munUF]);
+  const { M } = P, mes = MES_L[M - 1];
+  $('p4-los').textContent = u.nome;
+  $('p4-t').textContent = `${u.nome} foi o estado mais afetado pelo fogo em ${mes}`;
+  $('p4-lead').textContent = `${mun.nomes[0].replace(/\s*\([A-Z]{2}\)$/, '')} liderou entre os municípios, com ${haC(mun.valores[0])}. `
+    + `${fmtP(agrupar(d.lcMes).nat)} do que queimou no estado em ${mes} era vegetação nativa.`;
+  renderKpis('p4', d, { mes: mesA.areaHa, acum: acum.areaHa });
+}
+
+async function p4Mapa(D) {
+  const [u, mun] = await Promise.all([D.uf, D.munUF]);
+  const { Y, M } = P;
+  const bounds = await getJSON(`/api/territories/state/${u.code}/bounds`);
+  const vals = Object.fromEntries(mun.nomes.map((n, i) => [n, mun.valores[i]]));
+  const cls = classes(mun.valores);
+  $('p4-map-t').textContent = `Área queimada por município em ${MES_L[M - 1]} de ${Y}`;
+  const m = mapaEstatico('p4-map', bounds);
+  // O ranking identifica o município como "Nome (UF)"; o tile traz name e uf separados.
+  mvt(`/api/territories/grouping/tiles/state/${u.code}/city`, p => ({
+    fill: true, fillColor: cls.cor(vals[`${p.name} (${p.uf})`] || 0), fillOpacity: 1, color: '#FFFFFF', weight: .5
+  }), 2).addTo(m);
+  $('p4-leg').innerHTML = legHTML(cls);
+}
+
+async function p4Mun(D) {
+  const [u, mun] = await Promise.all([D.uf, D.munUF]);
+  $('p4-mun-t').textContent = `Municípios mais afetados em ${MES_L[P.M - 1]} (${u.sigla})`;
+  $('p4-munl').innerHTML = rankHTML(mun.nomes.slice(0, 10).map((n, i) => ({ nome: n.replace(/\s*\([A-Z]{2}\)$/, ''), v: mun.valores[i] })));
+}
+
+/* ==========================================================
+   PAINEL EXPLORATÓRIO
+   ========================================================== */
+const E = { req: 0, tabReq: 0, page: 1, pages: 1, order: 'desc', f: null, g: null, map: null, layer: null, ready: false };
+const E_SECOES = ['e-tiles', 'e-serie', 'e-rank', 'e-uso', 'e-mapa', 'e-tab'];
+
+async function initExplorer() {
+  if (E.ready) return;
+  E.ready = true;
+  // Espera o último mês publicado para não abrir comparando um ano incompleto.
+  try { await periodoP; } catch { /* usa os padrões abaixo */ }
+  const anos = P.anos || await getJSON('/api/statistics/years');
+  $('e-ano').innerHTML = [...anos].reverse().map(a => `<option value="${a}">${a}</option>`).join('');
+  $('e-ano').value = P.Y || anos[anos.length - 1];
+  const opts = MES_L.map((m, i) => `<option value="${i + 1}">${cap(m)}</option>`).join('');
+  $('e-ini').innerHTML = opts;
+  $('e-fim').innerHTML = opts;
+  $('e-ini').value = 1;
+  $('e-fim').value = P.M || 12;
+  try {
+    const tr = await lcTrans();
+    const nivel1 = [1, 10, 14, 22, 26];
+    $('e-cob').innerHTML = '<option value="">Todas</option>'
+      + tr.filter(t => nivel1.includes(t.id)).map(t => `<option value="${t.id}">${t.namePt}</option>`).join('');
+  } catch { /* segue sem o filtro de cobertura */ }
+  preencherTerritorios();
+
+  $('e-tipo').addEventListener('change', () => { preencherTerritorios(); runExplorer(); });
+  ['e-terr', 'e-ano', 'e-cob'].forEach(id => $(id).addEventListener('change', runExplorer));
+  $('e-ini').addEventListener('change', () => {
+    if (+$('e-ini').value > +$('e-fim').value) $('e-fim').value = $('e-ini').value;
+    runExplorer();
+  });
+  $('e-fim').addEventListener('change', () => {
+    if (+$('e-fim').value < +$('e-ini').value) $('e-ini').value = $('e-fim').value;
+    runExplorer();
+  });
+  $('e-sort').addEventListener('click', () => {
+    E.order = E.order === 'desc' ? 'asc' : 'desc';
+    $('e-sort').textContent = `Área queimada (ha) ${E.order === 'desc' ? '↓' : '↑'}`;
+    E.page = 1;
+    loadTable();
+  });
+  $('e-prev').addEventListener('click', () => { if (E.page > 1) { E.page--; loadTable(); } });
+  $('e-next').addEventListener('click', () => { if (E.page < E.pages) { E.page++; loadTable(); } });
+  await runExplorer();
+}
+
+function preencherTerritorios() {
+  const tipo = $('e-tipo').value;
+  $('e-terr').innerHTML = TERRITORIOS[tipo].map(t => `<option value="${t.code}">${t.nome}</option>`).join('');
+  $('e-terr').value = PADRAO[tipo];
+  $('e-terr').disabled = tipo === 'country';
+}
+
+function lerFiltros() {
+  return {
+    tipo: $('e-tipo').value, code: +$('e-terr').value, ano: +$('e-ano').value,
+    ini: +$('e-ini').value, fim: +$('e-fim').value, cob: $('e-cob').value || null
+  };
+}
+const periodo = f => ({ year: f.ano, monthStart: f.ini, monthEnd: f.fim, landCover: f.cob });
+
+async function runExplorer() {
+  const req = ++E.req;
+  const f = lerFiltros();
+  E_SECOES.forEach(id => status(id, 'Carregando…'));
+  let g;
+  try { g = await pickGroup(f.tipo, f.code); }
+  catch (e) { E_SECOES.forEach(id => status(id, `Não foi possível validar a subdivisão (${e.message}).`, true)); return; }
+  if (req !== E.req) return;
+  E.f = f; E.g = g; E.page = 1;
+  const per = periodo(f);
+
+  const tarefas = [
+    ['e-tiles', () => st('area', f.tipo, f.code, per), d => renderETiles(d, f)],
+    ['e-serie', () => st('time-series', f.tipo, f.code, { monthStart: f.ini, monthEnd: f.fim, landCover: f.cob }), d => renderESerie(d, f)],
+    ['e-rank', () => st('ranking', f.tipo, f.code, { ...per, page: 1, order: 'desc' }), d => renderERank(d, g)],
+    ['e-uso', () => Promise.all([st('land-cover', f.tipo, f.code, { year: f.ano, monthStart: f.ini, monthEnd: f.fim, level: 1 }), lcTrans()]), d => renderEUso(...d)],
+    ['e-mapa', () => Promise.all([rankingAll('country', 0, per, 'state'), loadGeo()]), d => renderEMap(...d, f)],
+    ['e-tab', () => st('ranking', f.tipo, f.code, { ...per, page: E.page, order: E.order }), d => renderTable(d)]
+  ];
+  await Promise.all(tarefas.map(async ([id, buscar, render]) => {
+    try {
+      const d = await buscar();
+      if (req !== E.req) return;
+      render(d);
+      status(id);
+    } catch (e) {
+      if (req !== E.req) return;
+      console.error(id, e);
+      status(id, `Erro ao carregar (${e.message}).`, true);
+    }
+  }));
+}
+
+function renderETiles(a, f) {
+  $('et1-v').textContent = haC(a.areaHa);
+  $('et1-s').textContent = `${nf0(a.areaHa || 0)} ha de ${MES_L[f.ini - 1]} a ${MES_L[f.fim - 1]} de ${f.ano}`
+    + (f.ano === P.Y && f.fim > P.M ? `. Atenção: só há dados até ${MES_L[P.M - 1]}, e as comparações incluem meses ainda sem dado.` : '');
+  const py = a.previousYearVariation, av = a.averageVariation;
+  $('et2-l').textContent = py ? `Contra ${py.year}` : 'Contra o ano anterior';
+  $('et2-v').textContent = pctTxt(py?.percentage);
+  $('et2-v').className = `tile-v ${tone(py?.percentage)}`;
+  $('et2-s').textContent = py ? `${py.areaHa > 0 ? '+' : '−'}${haC(Math.abs(py.areaHa))} nos mesmos meses` : '';
+  $('et3-v').textContent = pctTxt(av?.percentage);
+  $('et3-v').className = `tile-v ${tone(av?.percentage)}`;
+  $('et3-s').textContent = av ? `${av.areaHa > 0 ? '+' : '−'}${haC(Math.abs(av.areaHa))} em relação à média` : '';
+}
+
+function renderESerie(d, f) {
+  const pts = d.monthly;
+  mkChart('e-serie', 'ec-serie', {
+    type: 'bar',
+    data: {
+      labels: pts.map(p => `${MES[p.month - 1]}/${String(p.year).slice(2)}`),
+      datasets: [{ data: pts.map(p => p.areaHa), backgroundColor: pts.map(p => p.year === f.ano ? C.red : C.redL), borderRadius: 3 }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => haC(c.raw) } } },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: true, maxTicksLimit: 16, maxRotation: 0 } },
+        y: yAxis()
+      }
+    }
+  });
+}
+
+function renderERank(d, g) {
+  const n = Math.min(10, d.x.length);
+  $('e-rank-sub').textContent = `Top ${n}, por ${g.nome.toLowerCase()}.`;
+  mkChart('e-rank', 'ec-rank', {
+    type: 'bar',
+    data: { labels: d.x.slice(0, n), datasets: [{ data: d.series[0].data.slice(0, n), backgroundColor: C.red, borderRadius: 3 }] },
+    options: {
+      indexAxis: 'y',
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => haC(c.raw) } } },
+      scales: {
+        x: yAxis({ ticks: { callback: v => cmp(v, 1), maxRotation: 0, maxTicksLimit: 5 } }),
+        y: { grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+}
+
+function renderEUso(lista, trans) {
+  const cor = Object.fromEntries(trans.map(t => [t.id, t.color]));
+  const itens = lista.filter(i => i.areaHa > 0);
+  const tot = itens.reduce((s, i) => s + i.areaHa, 0);
+  mkChart('e-uso', 'ec-uso', {
+    type: 'doughnut',
+    data: {
+      labels: itens.map(i => `${i.namePt} (${fmtP(i.areaHa / tot * 100)})`),
+      datasets: [{ data: itens.map(i => i.areaHa), backgroundColor: itens.map(i => cor[i.id] || '#999999'), borderColor: '#FFFFFF', borderWidth: 2 }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: window.innerWidth < 640 ? 'bottom' : 'right', labels: { boxWidth: 12 } },
+        tooltip: { callbacks: { label: c => ` ${haC(c.raw)}` } }
+      }
+    }
+  });
+}
+
+function renderEMap(r, geo, f) {
+  if (!window.L) throw new Error('biblioteca de mapa interativo não carregou');
+  if (!E.map) {
+    E.map = L.map('e-map', { scrollWheelZoom: true, zoomSnap: .25 });
+    L.tileLayer(ESRI, { maxZoom: 16, attribution: 'Mapa base © Esri' }).addTo(E.map);
+  }
+  const vals = Object.fromEntries(r.nomes.map((n, i) => [n, r.valores[i]]));
+  const cls = classes(r.valores);
+  const sel = f.tipo === 'state' ? UF_BY_CODE[f.code]?.nome : null;
+  let alvo = null;
+  E.layer?.remove();
+  E.layer = L.geoJSON(geo, {
+    style: ft => {
+      const n = ft.properties.name, on = n === sel;
+      return { fillColor: cls.cor(vals[n] || 0), fillOpacity: .85, color: on ? C.ink : '#FFFFFF', weight: on ? 2.5 : .8 };
+    },
+    onEachFeature: (ft, layer) => {
+      const n = ft.properties.name;
+      if (n === sel) alvo = layer;
+      layer.bindTooltip(`<b>${n}</b><br>${vals[n] != null ? `${nf0(vals[n])} ha` : 'sem dados'}`, { sticky: true });
+    }
+  }).addTo(E.map);
+  $('e-mapa-sub').textContent = `Brasil inteiro, ${MES_L[f.ini - 1]} a ${MES_L[f.fim - 1]} de ${f.ano}`
+    + (f.cob ? `, só ${$('e-cob').selectedOptions[0].text.toLowerCase()}` : '')
+    + (sel ? `. Contorno escuro: ${sel}.` : '.') + ' Use a roda do mouse ou os botões para aproximar.';
+  setTimeout(() => {
+    E.map.invalidateSize();
+    E.map.fitBounds((alvo || E.layer).getBounds(), { padding: [12, 12] });
+  }, 60);
+}
+
+async function loadTable() {
+  if (!E.f) return;
+  const req = ++E.tabReq;
+  status('e-tab', 'Carregando…');
+  try {
+    const d = await st('ranking', E.f.tipo, E.f.code, { ...periodo(E.f), page: E.page, order: E.order });
+    if (req !== E.tabReq) return;
+    renderTable(d);
+    status('e-tab');
+  } catch (e) {
+    if (req !== E.tabReq) return;
+    status('e-tab', `Erro ao carregar (${e.message}).`, true);
+  }
+}
+
+function renderTable(d) {
+  E.pages = d.pageAmount || 1;
+  $('e-tab-sub').textContent = `Por ${E.g.nome.toLowerCase()}, ordem ${E.order === 'desc' ? 'decrescente' : 'crescente'}.`;
+  $('e-pg').textContent = `${E.page} / ${E.pages}`;
+  $('e-prev').disabled = E.page <= 1;
+  $('e-next').disabled = E.page >= E.pages;
+  const vals = d.series[0].data, max = Math.max(...vals, 1);
+  $('e-tbody').innerHTML = d.x.map((n, i) => `<tr>
+    <td class="l">${d.position[i]}</td>
+    <td class="l">${esc(n)}</td>
+    <td>${nf0(vals[i])}</td>
+    <td class="l"><div class="rel"><span style="width:${(vals[i] / max * 100).toFixed(1)}%"></span></div></td>
+  </tr>`).join('');
+}
+
+/* ==========================================================
+   ABAS, IMPRESSÃO E INÍCIO
+   ========================================================== */
+function abrirAba(nome) {
+  document.querySelectorAll('.tab').forEach(b => {
+    const on = b.dataset.tab === nome;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-selected', String(on));
+  });
+  $('tab-boletim').hidden = nome !== 'boletim';
+  $('tab-explorer').hidden = nome !== 'explorer';
+  if (nome === 'explorer') initExplorer().catch(console.error);
+  setTimeout(() => {
+    Object.values(CHS).forEach(c => c.resize());
+    reajustarMapas();
+    if (E.map) E.map.invalidateSize();
+  }, 60);
+}
+document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => abrirAba(btn.dataset.tab)));
+
+// Liga/desliga o layout de folha A4. Com a classe aplicada, o layout de tela fica igual ao
+// de impressão, então chart.resize() e fitBounds() já medem o tamanho final da folha.
+function modoImpressao(on) {
+  document.documentElement.classList.toggle('pm', on);
+  Object.values(CHS).forEach(c => c.resize());
+  reajustarMapas();
+}
+$('btn-print').addEventListener('click', async () => {
+  if ($('tab-boletim').hidden) abrirAba('boletim');
+  await document.fonts.ready;
+  modoImpressao(true);
+  // Espera os mapas buscarem os tiles no novo enquadramento antes de abrir a impressão.
+  await new Promise(r => setTimeout(r, 700));
+  window.print();
+});
+window.addEventListener('beforeprint', () => modoImpressao(true));
+window.addEventListener('afterprint', () => setTimeout(() => modoImpressao(false), 50));
+let tResize;
+window.addEventListener('resize', () => { clearTimeout(tResize); tResize = setTimeout(reajustarMapas, 150); });
+
+if (window.Chart) {
+  Chart.defaults.font.family = 'Montserrat, system-ui, "Segoe UI", sans-serif';
+  Chart.defaults.color = C.muted;
+  Chart.defaults.borderColor = C.line;
+  // Sem animação: o PDF não pode capturar gráficos no meio do movimento.
+  Chart.defaults.animation = false;
+}
+const periodoP = detectarPeriodo();
+periodoP.catch(() => {});
+// #pdf abre já no layout de folha (usado para gerar o PDF pela linha de comando).
+if (location.hash === '#pdf') document.documentElement.classList.add('pm');
+initBoletim();
+if (location.hash === '#explorer') abrirAba('explorer');
+</script>
+</body>
+</html>

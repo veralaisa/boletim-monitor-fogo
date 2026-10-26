@@ -128,6 +128,28 @@
   .cvar b { font-weight: 800; }
   .cvar .up { color: var(--red-d); }
   .cvar .down { color: var(--good); }
+  /* Página 2: mapa dos biomas ao lado da lista. */
+  .biow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }
+  .lmap.bmap { height: 150px; }
+  #p2-map .map-svg { max-height: 285px; }
+  #pg2 .biow { grid-template-columns: 135px minmax(0, 1fr); }
+  #p2-bio .rk li { grid-template-columns: 12px minmax(0, 1.5fr) minmax(14px, .4fr) 68px; gap: 5px; }
+  #p2-bio .rk-v { white-space: nowrap; }
+  /* Página 5: anomalias (z-score). */
+  .cv-z { height: 175px; }
+  #pg5 .g2 { align-items: start; }
+  .ztab { width: 100%; border-collapse: collapse; font-size: 9px; font-variant-numeric: tabular-nums; }
+  .ztab th, .ztab td { padding: 1.5px 5px; border-bottom: 1px solid #FFFFFF; text-align: right; white-space: nowrap; }
+  .ztab th { font-size: 8.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--ink2); background: var(--soft); }
+  .ztab .l { text-align: left; }
+  .ztab td.zs { text-align: left; }
+  .ztab td b { font-weight: 800; }
+  .ztab tr.za3 td { background: #C9574C; color: #FFFFFF; }
+  .ztab tr.za2 td { background: #EBA79F; }
+  .ztab tr.za1 td { background: #F8DCD8; }
+  .ztab tr.zb1 td { background: #DCEDE2; }
+  .ztab tr.zb2 td { background: #A9D3B8; }
+  .ztab tr.zb3 td { background: #4F9B6C; color: #FFFFFF; }
   /* Roscas do mês e do acumulado no bloco "O que queimou". */
   .cdon { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 4px; }
   .cdon figure { min-width: 0; margin: 0; text-align: center; }
@@ -420,9 +442,9 @@
     <div class="blk tiles4" id="p1-tiles">
       <div class="st"></div>
       <div class="tl"><p class="tl-l">Pico do ano</p><p class="tl-v" id="p1-t1v">—</p><p class="tl-s" id="p1-t1s"></p></div>
-      <div class="tl"><p class="tl-l">Vegetação nativa</p><p class="tl-v" id="p1-t2v">—</p><p class="tl-s" id="p1-t2s"></p></div>
-      <div class="tl"><p class="tl-l" id="p1-t3l">Contra a média</p><p class="tl-v" id="p1-t3v">—</p><p class="tl-s" id="p1-t3s"></p></div>
-      <div class="tl"><p class="tl-l" id="p1-t4l">Contra o mês anterior</p><p class="tl-v" id="p1-t4v">—</p><p class="tl-s" id="p1-t4s"></p></div>
+      <div class="tl"><p class="tl-l" id="p1-t2l">Vegetação nativa</p><p class="tl-v" id="p1-t2v">—</p><p class="tl-s" id="p1-t2s"></p></div>
+      <div class="tl"><p class="tl-l" id="p1-t3l">Comparado à média</p><p class="tl-v" id="p1-t3v">—</p><p class="tl-s" id="p1-t3s"></p></div>
+      <div class="tl"><p class="tl-l" id="p1-t4l">Comparado ao mês anterior</p><p class="tl-v" id="p1-t4v">—</p><p class="tl-s" id="p1-t4s"></p></div>
     </div>
     <div class="blk g2" id="p1-anos">
       <div class="st"></div>
@@ -446,7 +468,7 @@
       </div>
     </div>
     <p class="fn">Classes do MapBiomas (nível 2): Floresta reúne formação florestal, floresta alagável, mangue e restinga arbórea; Campo reúne formação campestre, afloramento rochoso, apicum e restinga herbácea; Agricultura reúne lavouras temporárias e perenes; Outras reúne silvicultura, áreas não vegetadas e água.</p>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span></span><span>1/4</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span></span><span>1/5</span></footer>
   </section>
 
   <!-- Página 2: Onde queima -->
@@ -454,8 +476,8 @@
     <header class="sh"></header>
     <div class="ptit">
       <div>
-        <p class="eyebrow">Onde queima</p>
-        <h1 id="p2-t">Onde o fogo queimou</h1>
+        <p class="eyebrow">Territórios</p>
+        <h1 id="p2-t">Territórios mais afetados pelo fogo</h1>
         <p class="lead" id="p2-lead"></p>
       </div>
     </div>
@@ -472,17 +494,23 @@
         <ol class="rk" id="p2-uf"></ol>
       </div>
     </div>
-    <div class="g3">
-      <div class="blk" id="p2-bio"><div class="st"></div><p class="ct">Biomas <span class="per" data-per></span></p><ol class="rk c" id="p2-biol"></ol></div>
-      <div class="blk" id="p2-mun"><div class="st"></div><p class="ct">Municípios <span class="per" data-per></span></p><ol class="rk c" id="p2-munl"></ol></div>
-      <div class="blk" id="p2-uc"><div class="st"></div><p class="ct">Unidades de conservação <span class="per" data-per></span></p><ol class="rk c" id="p2-ucl"></ol></div>
+    <div class="g2">
+      <div class="blk" id="p2-bio">
+        <div class="st"></div>
+        <p class="ct">Biomas <span class="per" data-per></span></p>
+        <div class="biow">
+          <div class="lmap bmap" id="p2-bmap"></div>
+          <ol class="rk" id="p2-biol"></ol>
+        </div>
+      </div>
+      <div class="blk" id="p2-mun"><div class="st"></div><p class="ct">Os 5 municípios mais afetados <span class="per" data-per></span></p><ol class="rk" id="p2-munl"></ol><p class="fn" id="p2-mun-n"></p></div>
     </div>
     <div class="g3">
-      <div class="blk" id="p2-ti"><div class="st"></div><p class="ct">Terras indígenas <span class="per" data-per></span></p><ol class="rk c" id="p2-til"></ol></div>
-      <div class="blk" id="p2-qui"><div class="st"></div><p class="ct">Territórios quilombolas <span class="per" data-per></span></p><ol class="rk c" id="p2-quil"></ol></div>
-      <div class="blk" id="p2-out"><div class="st"></div><p class="ct">Outros recortes <span class="per" data-per></span></p><ol class="rk c" id="p2-outl"></ol><p class="fn" id="p2-out-n"></p></div>
+      <div class="blk" id="p2-uc"><div class="st"></div><p class="ct">As 5 unidades de conservação mais afetadas <span class="per" data-per></span></p><ol class="rk c" id="p2-ucl"></ol><p class="fn" id="p2-uc-n"></p></div>
+      <div class="blk" id="p2-ti"><div class="st"></div><p class="ct">As 5 terras indígenas mais afetadas <span class="per" data-per></span></p><ol class="rk c" id="p2-til"></ol><p class="fn" id="p2-ti-n"></p></div>
+      <div class="blk" id="p2-qui"><div class="st"></div><p class="ct">Os 5 territórios quilombolas mais afetados <span class="per" data-per></span></p><ol class="rk c" id="p2-quil"></ol><p class="fn" id="p2-qui-n"></p></div>
     </div>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Contornos estaduais: base IBGE.</span><span>2/4</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Contornos estaduais: base IBGE. Mapa base © Esri.</span><span>2/5</span></footer>
   </section>
 
   <!-- Página 3: Bioma mais afetado -->
@@ -520,7 +548,7 @@
       <div><p class="ct" id="p3-a1-t"></p><p class="cs cvar" id="p3-a1-s"></p><div class="cv cv-y"><canvas id="p3-a1"></canvas></div></div>
       <div><p class="ct" id="p3-a2-t"></p><p class="cs cvar" id="p3-a2-s"></p><div class="cv cv-y"><canvas id="p3-a2"></canvas></div></div>
     </div>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>3/4</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>3/5</span></footer>
   </section>
 
   <!-- Página 4: Estado mais afetado -->
@@ -543,7 +571,7 @@
       <div class="blk" id="p4-mapa">
         <div class="st"></div>
         <p class="ct" id="p4-map-t">Área queimada por município</p>
-        <div class="lmap" id="p4-map" style="height:420px"></div>
+        <div class="lmap" id="p4-map" style="height:400px"></div>
         <div class="leg" id="p4-leg"></div>
       </div>
       <div style="display:grid;gap:14px;align-content:start">
@@ -564,7 +592,41 @@
       <div><p class="ct" id="p4-a1-t"></p><p class="cs cvar" id="p4-a1-s"></p><div class="cv cv-y"><canvas id="p4-a1"></canvas></div></div>
       <div><p class="ct" id="p4-a2-t"></p><p class="cs cvar" id="p4-a2-s"></p><div class="cv cv-y"><canvas id="p4-a2"></canvas></div></div>
     </div>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>4/4</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>4/5</span></footer>
+  </section>
+
+  <!-- Página 5: Anomalias -->
+  <section class="sheet" id="pg5">
+    <header class="sh"></header>
+    <div class="ptit">
+      <div>
+        <p class="eyebrow">Anomalias</p>
+        <h1 id="p5-t">O quanto o mês fugiu do normal</h1>
+        <p class="lead" id="p5-lead"></p>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="blk" id="p5-z">
+        <div class="st"></div>
+        <p class="ct" id="p5-z-t">Anomalia da área queimada no mês, por ano</p>
+        <p class="cs" id="p5-z-s"></p>
+        <div class="cv cv-z"><canvas id="p5-zc"></canvas></div>
+        <div class="leg" id="p5-zleg"></div>
+      </div>
+      <div class="blk" id="p5-bio">
+        <div class="st"></div>
+        <p class="ct">Biomas</p>
+        <p class="cs" id="p5-bio-s"></p>
+        <table class="ztab" id="p5-biot"></table>
+      </div>
+    </div>
+    <div class="blk" id="p5-uf">
+      <div class="st"></div>
+      <p class="ct" id="p5-uf-t">Estados</p>
+      <table class="ztab" id="p5-uft"></table>
+    </div>
+    <p class="fn" id="p5-n"></p>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Método de anomalia inspirado nos boletins do Programa Queimadas (INPE).</span><span>5/5</span></footer>
   </section>
 </main>
 
@@ -1068,11 +1130,12 @@ function drawStates(el, geo, vals, total, cls) {
 }
 
 /* ---------- componentes do boletim ---------- */
-function varLine(v, ref) {
+// Ex.: "▼ 11%  vs. 2,92 mi ha em setembro de 2025 (−327 mil ha)". O areaHa da API é a diferença, não o valor.
+function varLine(v, atual, ref) {
   if (!v || v.percentage == null) return '';
   const up = v.percentage > 0;
   return `<li class="${up ? 'up' : 'down'}"><b>${up ? '▲' : '▼'} ${Math.abs(Math.round(v.percentage))}%</b>`
-    + `<span>${up ? '+' : '−'}${nf0(Math.abs(v.areaHa))} ha ${ref}</span></li>`;
+    + `<span>vs. ${haC(atual - v.areaHa)} ${ref} (${up ? '+' : '−'}${cmp(Math.abs(v.areaHa))})</span></li>`;
 }
 function kpiHTML(rotulo, valor, sub, linhas) {
   return `<p class="k-l">${rotulo}</p><p class="k-v">${nf0(valor)}<small> ha</small></p>`
@@ -1084,14 +1147,14 @@ function renderKpis(prefix, d, nacional) {
   const share = (a, b) => fmtP(a / b * 100);
   $(`${prefix}-k1`).innerHTML = kpiHTML(`Área queimada em ${mes} de ${Y}`, d.mes.areaHa,
     nacional ? `${share(d.mes.areaHa, nacional.mes)} da área queimada no Brasil no mês` : '',
-    [varLine(d.mes.previousYearVariation, `vs. ${mes} de ${Y - 1}`),
-      varLine(d.mes.averageVariation, `vs. média de ${mes} (${Y0}–${Y - 1})`)]);
+    [varLine(d.mes.previousYearVariation, d.mes.areaHa, `em ${ab}/${Y - 1}`),
+      varLine(d.mes.averageVariation, d.mes.areaHa, `na média ${Y0}–${Y - 1}`)]);
   $(`${prefix}-k2`).innerHTML = kpiHTML(M === 1 ? `Acumulado em janeiro de ${Y}` : `Acumulado de janeiro a ${mes} de ${Y}`, d.acum.areaHa,
     nacional
       ? `${share(d.acum.areaHa, nacional.acum)} da área queimada no Brasil no ano`
       : `${cap(mes)} respondeu por ${share(d.mes.areaHa, d.acum.areaHa)} desse total`,
-    [varLine(d.acum.previousYearVariation, `vs. jan–${ab} de ${Y - 1}`),
-      varLine(d.acum.averageVariation, `vs. média de jan–${ab} (${Y0}–${Y - 1})`)]);
+    [varLine(d.acum.previousYearVariation, d.acum.areaHa, `em jan–${ab}/${Y - 1}`),
+      varLine(d.acum.averageVariation, d.acum.areaHa, `na média ${Y0}–${Y - 1}`)]);
 }
 // Linha tracejada da média dos anos anteriores nos gráficos por ano.
 const linhaMedia = {
@@ -1103,7 +1166,15 @@ const linhaMedia = {
     ctx.strokeStyle = C.ink;
     ctx.lineWidth = 1.2;
     ctx.setLineDash([4, 3]);
-    ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right + 2, py); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = C.ink;
+    ctx.font = '500 8px Montserrat, sans-serif';
+    ctx.fillText('média', a.right + 5, py - 5);
+    ctx.font = '800 9px Montserrat, sans-serif';
+    ctx.fillText(o.txt, a.right + 5, py + 5);
     ctx.restore();
   }
 };
@@ -1121,10 +1192,10 @@ function yearChart(id, anos, vals, Y) {
     plugins: [topLabels, linhaMedia],
     options: {
       maintainAspectRatio: false,
-      layout: { padding: { top: 14 } },
+      layout: { padding: { top: 14, right: 40 } },
       plugins: {
         legend: { display: false },
-        linhaMedia: { v: med },
+        linhaMedia: { v: med, txt: med == null ? '' : cmp(med, 1) },
         topLabels: { indices: vals.map((_, i) => i), fmt: v => cmp(v, 1) },
         tooltip: { callbacks: { label: c => haC(c.raw) } }
       },
@@ -1187,17 +1258,17 @@ function coverHTML(lcMes, lcAcum, pfx) {
   const lm = cap(MES[M - 1]), la = M === 1 ? 'Jan' : `Jan–${MES[M - 1]}`;
   const rows = CLS.map((c, i) => ({ c, m: a.cls[i], y: b.cls[i] })).filter(r => r.m.ha > 0 || r.y.ha > 0);
   const resto = a.resto >= 1 || b.resto >= 1
-    ? `<p class="fn">Água e áreas não vegetadas: ${fmtP0(Math.round(a.resto * 10) / 10)} em ${lm.toLowerCase()} e ${fmtP0(Math.round(b.resto * 10) / 10)} em ${la.toLowerCase()}.</p>` : '';
+    ? `<p class="fn">Água e áreas não vegetadas: ${fmtP0(Math.round(b.resto * 10) / 10)} em ${la.toLowerCase()} e ${fmtP0(Math.round(a.resto * 10) / 10)} em ${lm.toLowerCase()}.</p>` : '';
   return `<div class="cdon">
-      <figure><div class="cdon-c"><canvas id="${pfx}-dm"></canvas></div><figcaption>${MES_L[M - 1]}</figcaption></figure>
       <figure><div class="cdon-c"><canvas id="${pfx}-da"></canvas></div><figcaption>${M === 1 ? 'janeiro' : `janeiro a ${MES_L[M - 1]}`}</figcaption></figure>
+      <figure><div class="cdon-c"><canvas id="${pfx}-dm"></canvas></div><figcaption>só ${MES_L[M - 1]}</figcaption></figure>
     </div>
     <table class="ctab">
-      <thead><tr><th class="l">Classe</th><th>${lm}</th><th>${la}</th></tr></thead>
-      <tbody>${rows.map(r => `<tr><td class="l"><i class="sw" style="${swatch(r.c)}"></i>${r.c.nome}</td><td>${fmtP0(r.m.p)}</td><td>${fmtP0(r.y.p)}</td></tr>`).join('')}</tbody>
+      <thead><tr><th class="l">Classe</th><th>${la}</th><th>${lm}</th></tr></thead>
+      <tbody>${rows.map(r => `<tr><td class="l"><i class="sw" style="${swatch(r.c)}"></i>${r.c.nome}</td><td>${fmtP0(r.y.p)}</td><td>${fmtP0(r.m.p)}</td></tr>`).join('')}</tbody>
       <tfoot>
-        <tr><td class="l"><b>Vegetação nativa</b></td><td><b>${fmtP(a.nat)}</b></td><td><b>${fmtP(b.nat)}</b></td></tr>
-        <tr><td class="l"><b>Área antrópica</b></td><td><b>${fmtP(a.antr)}</b></td><td><b>${fmtP(b.antr)}</b></td></tr>
+        <tr><td class="l"><b>Vegetação nativa</b></td><td><b>${fmtP(b.nat)}</b></td><td><b>${fmtP(a.nat)}</b></td></tr>
+        <tr><td class="l"><b>Área antrópica</b></td><td><b>${fmtP(b.antr)}</b></td><td><b>${fmtP(a.antr)}</b></td></tr>
       </tfoot>
     </table>${resto}`;
 }
@@ -1300,6 +1371,10 @@ async function initBoletim() {
   D.dBio = D.bioma.then(b => dadosTerritorio('biome', b.code, 'biome'));
   D.dUF = D.uf.then(u => dadosTerritorio('state', u.code, 'city'));
   D.munUF = D.uf.then(u => rankingAll('state', u.code, q, 'city'));
+  // Página 5: o mesmo mês em todos os anos, por estado e por bioma, para calcular a anomalia (z-score).
+  const porAno = want => Promise.all(P.anos.map(y => getJSON(`/api/statistics/ranking/country/0/${want}/raw?year=${y}&monthStart=${M}&monthEnd=${M}`)));
+  D.ufAnos = porAno('state');
+  D.bioAnos = porAno('biome');
   Object.values(D).forEach(p => p.catch(() => {}));
 
   await Promise.all([
@@ -1310,11 +1385,13 @@ async function initBoletim() {
     secao('p1-cob', async () => { const [a, b] = await Promise.all([D.lcMes, D.lcAcum]); renderCover('p1-cobc', 'p1', a, b); }),
     secao('p2-mapa', () => p2Mapa(D)),
     secao('p2-bio', () => p2Bio(D)),
-    secao('p2-mun', () => p2Lista('city', 'p2-munl', 6)),
-    secao('p2-uc', () => p2Lista('uc', 'p2-ucl', 5, limparNome)),
-    secao('p2-ti', () => p2Lista('indigenousLand', 'p2-til', 5)),
-    secao('p2-qui', () => p2Lista('quilombo', 'p2-quil', 5, limparNome)),
-    secao('p2-out', () => p2Outros(D)),
+    secao('p2-mun', () => p2Lista(D, 'city', 'p2-munl', 5, 'p2-mun-n', 'municípios')),
+    secao('p2-uc', () => p2Lista(D, 'uc', 'p2-ucl', 5, 'p2-uc-n', 'unidades de conservação')),
+    secao('p2-ti', () => p2Lista(D, 'indigenousLand', 'p2-til', 5, 'p2-ti-n', 'terras indígenas')),
+    secao('p2-qui', () => p2Lista(D, 'quilombo', 'p2-quil', 5, 'p2-qui-n', 'territórios quilombolas')),
+    secao('p5-z', () => p5Brasil(D)),
+    secao('p5-bio', () => p5Tabela(D.bioAnos, 'p5-biot', 'Bioma', false)),
+    secao('p5-uf', () => p5Tabela(D.ufAnos, 'p5-uft', 'Estado', true)),
     secao('p3-kpi', () => p3Kpi(D)),
     secao('p3-mapa', () => p3Mapa(D)),
     secao('p3-cob', async () => { const d = await D.dBio; renderCover('p3-cobc', 'p3', d.lcMes, d.lcAcum); }),
@@ -1349,21 +1426,26 @@ async function p1Tiles(D) {
   $('p1-t1v').textContent = cap(MES_L[pico.m - 1]);
   $('p1-t1s').textContent = `Mês mais queimado do ano: ${haC(pico.v)}, ${fmtP(pico.v / totAno * 100)} do total`;
 
-  const gm = agrupar(lcMes);
-  $('p1-t2v').textContent = fmtP(gm.nat);
-  $('p1-t2s').textContent = `do que queimou em ${mes} era floresta, savana ou campo; ${fmtP(gm.antr)} foi em área antrópica (${fmtP(agrupar(lcAcum).nat)} nativa no ano)`;
+  // Destaca a maior parcela: vegetação nativa ou área antrópica.
+  const gm = agrupar(lcMes), natMaior = gm.nat >= gm.antr;
+  $('p1-t2l').textContent = natMaior ? 'Vegetação nativa' : 'Área antrópica';
+  $('p1-t2v').textContent = fmtP(natMaior ? gm.nat : gm.antr);
+  $('p1-t2s').textContent = natMaior
+    ? `${fmtP(gm.nat)} do que queimou em ${mes} foi em vegetação nativa e ${fmtP(gm.antr)} em área antrópica.`
+    : `${fmtP(gm.antr)} do que queimou em ${mes} foi em área antrópica e ${fmtP(gm.nat)} em vegetação nativa.`;
 
   const av = acum.averageVariation;
-  $('p1-t3l').textContent = M === 1 ? 'Contra a média de janeiro' : `Contra a média de jan–${ab}`;
+  const per = M === 1 ? 'janeiro' : `jan–${ab}`;
+  $('p1-t3l').textContent = `${cap(per)} comparado à média`;
   $('p1-t3v').textContent = pctTxt(av?.percentage);
   $('p1-t3v').className = `tl-v ${tone(av?.percentage)}`;
-  $('p1-t3s').textContent = av ? `${haC(acum.areaHa)} em ${Y} vs. ${haC(acum.areaHa - av.areaHa)} na média de ${Y0} a ${Y - 1}` : '';
+  $('p1-t3s').textContent = av ? `${Y}: ${haC(acum.areaHa)}. Média de ${Y0} a ${Y - 1}: ${haC(acum.areaHa - av.areaHa)}.` : '';
 
   const pm = mesA.previousMonthVariation;
-  $('p1-t4l').textContent = pm ? `Contra ${MES_L[pm.month - 1]}` : 'Contra o mês anterior';
+  $('p1-t4l').textContent = pm ? `${cap(mes)} comparado a ${MES_L[pm.month - 1]}` : 'Comparado ao mês anterior';
   $('p1-t4v').textContent = pctTxt(pm?.percentage);
   $('p1-t4v').className = `tl-v ${tone(pm?.percentage)}`;
-  $('p1-t4s').textContent = pm ? `${haC(mesA.areaHa - pm.areaHa)} em ${MES_L[pm.month - 1]} → ${haC(mesA.areaHa)} em ${mes}` : '';
+  $('p1-t4s').textContent = pm ? `${cap(mes)}: ${haC(mesA.areaHa)}. ${cap(MES_L[pm.month - 1])}: ${haC(mesA.areaHa - pm.areaHa)}.` : '';
 }
 
 async function p1Mes(D) {
@@ -1440,7 +1522,7 @@ async function p2Mapa(D) {
   const { Y, M } = P, mes = MES_L[M - 1];
   const vals = Object.fromEntries(r.nomes.map((n, i) => [n, r.valores[i]]));
   const total = mesA.areaHa;
-  $('p2-t').textContent = `Onde o fogo queimou em ${mes} de ${Y}`;
+  $('p2-t').textContent = `Territórios mais afetados pelo fogo em ${mes} de ${Y}`;
   let lead = `${r.nomes[0]} e ${r.nomes[1]} concentraram ${fmtP((r.valores[0] + r.valores[1]) / total * 100)} da área queimada do país.`;
   try {
     const rb = await D.rankBio, b = BIO_BY_NAME[rb.x[0]];
@@ -1455,27 +1537,30 @@ async function p2Mapa(D) {
 }
 
 async function p2Bio(D) {
-  const [r, mesA] = await Promise.all([D.rankBio, D.mes]);
-  $('p2-biol').innerHTML = rankHTML(r.x.map((n, i) => ({
-    nome: `${n} · ${fmtP(r.series[0].data[i] / mesA.areaHa * 100)}`, v: r.series[0].data[i]
-  })));
+  const { Y, M } = P;
+  const [r, mesA, bounds] = await Promise.all([
+    getJSON(`/api/statistics/ranking/country/0/biome/raw?year=${Y}&monthStart=${M}&monthEnd=${M}`),
+    D.mes, getJSON('/api/territories/country/0/bounds')
+  ]);
+  const cls = classes(r.map(i => i.value || 0));
+  const vals = Object.fromEntries(r.map(i => [i.code, i.value || 0]));
+  $('p2-biol').innerHTML = rankHTML(r.map(i => ({ nome: `${i.name} ${fmtP((i.value || 0) / mesA.areaHa * 100)}`, v: i.value || 0 })));
+  const m = mapaEstatico('p2-bmap', bounds);
+  mvt('/api/territories/grouping/tiles/country/0/biome', p => ({
+    fill: true, fillColor: cls.cor(vals[p.code] || 0), fillOpacity: 1, color: '#FFFFFF', weight: 1
+  }), 2).addTo(m);
 }
 
-async function p2Lista(want, el, n, limpar) {
+// Os 5 primeiros de cada categoria e, embaixo, o total da categoria no país.
+async function p2Lista(D, want, el, n, nota, plural) {
   const { Y, M } = P;
-  const r = await st('ranking', 'country', 0, { year: Y, monthStart: M, monthEnd: M, page: 1, order: 'desc' }, want);
-  $(el).innerHTML = rankHTML(r.x.slice(0, n).map((x, i) => ({ nome: limpar ? limpar(x) : x, v: r.series[0].data[i] })));
-}
-
-async function p2Outros(D) {
-  const { Y, M } = P;
-  const q = { year: Y, monthStart: M, monthEnd: M, page: 1, order: 'desc' };
-  const recortes = ['legalAmazon', 'matopiba', 'amacro'];
-  const [mesA, ...rs] = await Promise.all([D.mes, ...recortes.map(w => st('ranking', 'country', 0, q, w).catch(() => null))]);
-  const itens = rs.filter(r => r && r.x.length).map(r => ({ nome: `${r.x[0]} · ${fmtP(r.series[0].data[0] / mesA.areaHa * 100)}`, v: r.series[0].data[0] }));
-  if (!itens.length) throw new Error('sem dados');
-  $('p2-outl').innerHTML = rankHTML(itens.map(i => ({ ...i, tag: '' })));
-  $('p2-out-n').textContent = 'Percentual em relação à área queimada no Brasil no mês. Os recortes se sobrepõem.';
+  const [r, mesA] = await Promise.all([getJSON(`/api/statistics/ranking/country/0/${want}/raw?year=${Y}&monthStart=${M}&monthEnd=${M}`), D.mes]);
+  const com = r.filter(i => i.value > 0), top = com.slice(0, n);
+  const br = mesA.areaHa || 1, soma = a => a.reduce((s, i) => s + i.value, 0);
+  $(el).innerHTML = rankHTML(top.map(i => ({ nome: nomeT(i), v: i.value })));
+  $(nota).textContent = `Os ${top.length} somam ${fmtP(soma(top) / br * 100)} da área queimada no Brasil no mês. `
+    + `Ao todo, ${nf0(com.length)} ${plural} tiveram fogo: ${haC(soma(com))} (${fmtP(soma(com) / br * 100)} do país)`
+    + (want === 'uc' ? '. Há UCs sobrepostas, então o total pode contar a mesma área duas vezes.' : '.');
 }
 
 /* ----- Página 3: Bioma mais afetado ----- */
@@ -1532,6 +1617,119 @@ async function p4Mun(D) {
   const [u, mun] = await Promise.all([D.uf, D.munUF]);
   $('p4-mun-t').textContent = `Municípios mais afetados em ${MES_L[P.M - 1]} (${u.sigla})`;
   $('p4-munl').innerHTML = rankHTML(mun.nomes.slice(0, 10).map((n, i) => ({ nome: n.replace(/\s*\([A-Z]{2}\)$/, ''), v: mun.valores[i] })));
+}
+
+/* ----- Página 5: Anomalias (z-score) ----- */
+// z = (valor do ano − média dos anos anteriores) ÷ desvio-padrão desses anos, como nos boletins do INPE.
+function zInfo(v, hist) {
+  const n = hist.length;
+  if (n < 3) return null;
+  const m = hist.reduce((s, x) => s + x, 0) / n;
+  const sd = Math.sqrt(hist.reduce((s, x) => s + (x - m) ** 2, 0) / (n - 1));
+  return { m, sd, z: sd > 0 ? (v - m) / sd : null };
+}
+const Z_CORES = { a3: '#C9574C', a2: '#EBA79F', a1: '#F8DCD8', b1: '#DCEDE2', b2: '#A9D3B8', b3: '#4F9B6C' };
+function zClasse(z) {
+  if (z == null) return { k: '', t: 'Sem variação no histórico' };
+  const a = Math.abs(z), up = z > 0, n = a <= 1 ? 0 : a <= 2 ? 1 : a <= 3 ? 2 : 3;
+  if (!n) return { k: '', t: 'Próximo à média' };
+  return { k: `${up ? 'a' : 'b'}${n}`, t: `${['', 'Moderadamente', 'Consideravelmente', 'Muito'][n]} ${up ? 'acima' : 'abaixo'} da média` };
+}
+const zTxt = z => z == null ? '—' : z.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+// Faixas coloridas atrás das barras: verde abaixo da média, vermelho acima.
+const zFaixas = {
+  id: 'zFaixas',
+  beforeDatasetsDraw(chart) {
+    const { ctx, chartArea: a, scales: { y } } = chart;
+    const fx = [[3, 99, 'a3'], [2, 3, 'a2'], [1, 2, 'a1'], [-2, -1, 'b1'], [-3, -2, 'b2'], [-99, -3, 'b3']];
+    ctx.save();
+    fx.forEach(([lo, hi, k]) => {
+      const y0 = Math.max(a.top, y.getPixelForValue(Math.min(hi, y.max))), y1 = Math.min(a.bottom, y.getPixelForValue(Math.max(lo, y.min)));
+      if (y1 > y0) { ctx.fillStyle = Z_CORES[k]; ctx.globalAlpha = .6; ctx.fillRect(a.left, y0, a.right - a.left, y1 - y0); }
+    });
+    ctx.restore();
+  },
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart, meta = chart.getDatasetMeta(0), d = chart.data.datasets[0].data;
+    ctx.save();
+    ctx.font = '700 8.5px Montserrat, sans-serif';
+    ctx.fillStyle = C.ink;
+    ctx.textAlign = 'center';
+    meta.data.forEach((el, i) => { if (d[i] != null) ctx.fillText(zTxt(d[i]), el.x, d[i] >= 0 ? el.y - 4 : el.y + 10); });
+    ctx.restore();
+  }
+};
+
+async function p5Brasil(D) {
+  const [ts, ufAnos] = await Promise.all([D.ts, D.ufAnos]);
+  const { Y, M, anos } = P, mes = MES_L[M - 1];
+  const ant = anos.filter(y => y < Y), a0 = ant[0], a1 = ant[ant.length - 1];
+  const vals = anos.map(y => sumTs(ts, y, M, M));
+  const base = zInfo(0, vals.filter((_, i) => anos[i] < Y));
+  const zs = vals.map(v => base && base.sd > 0 ? (v - base.m) / base.sd : null);
+  const zY = zs[anos.indexOf(Y)], cl = zClasse(zY);
+
+  // Quantos estados ficaram acima ou abaixo da média (|z| > 1).
+  const ufZ = linhasZ(ufAnos).filter(r => r.z != null);
+  const acima = ufZ.filter(r => r.z > 1).length, abaixo = ufZ.filter(r => r.z < -1).length;
+
+  $('p5-t').textContent = `O quanto ${mes} de ${Y} fugiu do normal`;
+  $('p5-lead').textContent = `No Brasil, a área queimada em ${mes} ficou ${cl.t.toLowerCase()} de ${a0} a ${a1} (z = ${zTxt(zY)}). `
+    + `${acima} ${acima === 1 ? 'estado ficou' : 'estados ficaram'} acima da média e ${abaixo} abaixo; os demais ficaram próximos do normal.`;
+  $('p5-z-t').textContent = `Anomalia da área queimada em ${mes}, por ano (Brasil)`;
+  $('p5-z-s').textContent = `Quantos desvios-padrão cada ano ficou acima ou abaixo da média de ${mes} de ${a0} a ${a1}.`;
+  const lim = Math.max(3.5, ...zs.filter(z => z != null).map(z => Math.abs(z) + .5));
+  mkChart('p5-zc', 'p5-zc', {
+    type: 'bar',
+    data: { labels: anos.map(String), datasets: [{ data: zs, backgroundColor: anos.map(y => y === Y ? C.red : '#5E5E5E'), borderRadius: 2, barPercentage: .6 }] },
+    plugins: [zFaixas],
+    options: {
+      maintainAspectRatio: false,
+      layout: { padding: { top: 6 } },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` z = ${zTxt(c.raw)} · ${haC(vals[c.dataIndex])}` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 9.5 }, color: c => anos[c.index] === Y ? C.redD : C.ink2 }, title: axTitle('Ano') },
+        y: { min: -lim, max: lim, grid: { color: 'rgba(0,0,0,.06)' }, border: { display: false }, ticks: { stepSize: 1, font: { size: 9 } }, title: axTitle('Z-score') }
+      }
+    }
+  });
+  const leg = [['a3', 'z > 3: muito acima'], ['a2', '2 a 3: consideravelmente acima'], ['a1', '1 a 2: moderadamente acima'], ['', '−1 a 1: próximo à média'],
+    ['b1', '−2 a −1: moderadamente abaixo'], ['b2', '−3 a −2: consideravelmente abaixo'], ['b3', 'z < −3: muito abaixo']];
+  $('p5-zleg').innerHTML = leg.map(([k, t]) => `<span><i style="background:${k ? Z_CORES[k] : '#FFFFFF'};box-shadow:inset 0 0 0 1px #D0D0D0"></i>${t}</span>`).join('');
+  $('p5-n').textContent = `Como ler: o z-score compara o mês com a média de ${a0} a ${a1} (série do Monitor do Fogo), considerando o quanto ela costuma variar. `
+    + `Com só ${ant.length} anos de referência, trate os valores como indicação. Diferença relativa = (${Y} − média) ÷ média.`;
+}
+
+// Uma linha por território: valor do ano, média e desvio dos anos anteriores, z e o ano anterior.
+function linhasZ(porAno) {
+  const { Y, anos } = P, iY = anos.indexOf(Y), iP = anos.indexOf(Y - 1);
+  const mapas = porAno.map(r => Object.fromEntries(r.map(i => [i.code, i])));
+  return porAno[iY].map(i => {
+    const hist = anos.map((y, k) => y < Y ? (mapas[k][i.code]?.value || 0) : null).filter(v => v != null);
+    const v = i.value || 0, zi = zInfo(v, hist), pv = iP >= 0 ? (mapas[iP][i.code]?.value || 0) : null;
+    return { nome: i.name, v, m: zi?.m ?? null, z: zi?.z ?? null, pv };
+  });
+}
+async function p5Tabela(prom, el, rotulo, comAnterior) {
+  const linhas = linhasZ(await prom).sort((a, b) => (b.z ?? -99) - (a.z ?? -99));
+  const { Y, M, anos } = P, ab = cap(MES[M - 1]);
+  const ant = anos.filter(y => y < Y);
+  const dif = (a, b) => b > 0 ? pctTxt(pct(a, b)) : '—';
+  // Na coluna estreita dos biomas, a tabela mostra só o essencial.
+  $(el).innerHTML = comAnterior
+    ? `<thead><tr><th class="l">${rotulo}</th><th>${ab}/${Y} (ha)</th><th>Média ${ant[0]}–${ant[ant.length - 1]}</th><th>Dif.</th><th>Z</th><th class="l">Situação</th><th>${ab}/${Y - 1} (ha)</th><th>Dif.</th></tr></thead><tbody>`
+      + linhas.map(r => {
+        const c = zClasse(r.z);
+        return `<tr class="${c.k ? `z${c.k}` : ''}"><td class="l">${esc(r.nome)}</td><td>${nf0(r.v)}</td><td>${r.m == null ? '—' : nf0(r.m)}</td><td>${dif(r.v, r.m)}</td>`
+          + `<td><b>${zTxt(r.z)}</b></td><td class="zs">${c.t}</td><td>${r.pv == null ? '—' : nf0(r.pv)}</td><td>${dif(r.v, r.pv)}</td></tr>`;
+      }).join('') + '</tbody>'
+    : `<thead><tr><th class="l">${rotulo}</th><th>Dif. da média</th><th>Z</th><th class="l">Situação</th></tr></thead><tbody>`
+      + linhas.map(r => {
+        const c = zClasse(r.z);
+        return `<tr class="${c.k ? `z${c.k}` : ''}"><td class="l">${esc(r.nome)}</td><td>${dif(r.v, r.m)}</td><td><b>${zTxt(r.z)}</b></td><td class="zs">${c.t.replace(' da média', '')}</td></tr>`;
+      }).join('') + '</tbody>';
+  if (!comAnterior) $('p5-bio-s').textContent = `${cap(MES_L[M - 1])} de ${Y} comparado à média do mês.`;
+  else $('p5-uf-t').textContent = `Estados: ${MES_L[M - 1]} de ${Y} comparado à média e a ${Y - 1}`;
 }
 
 /* ==========================================================

@@ -130,7 +130,12 @@
   .cvar .down { color: var(--good); }
   /* Página 2: mapa dos biomas ao lado da lista. */
   .biow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }
-  .lmap.bmap { height: 245px; }
+  .lmap.bmap { height: 245px; background: #FFFFFF; border: 0; }
+  .blab > div { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; text-align: center; color: var(--ink); line-height: 1.15;
+    text-shadow: 0 0 2px #FFFFFF, 0 0 2px #FFFFFF, 0 0 3px #FFFFFF; }
+  .blab b { display: block; font: 700 9px Montserrat, sans-serif; }
+  .blab span { font: 500 8px Montserrat, sans-serif; }
+  .blab > .esc { color: #FFFFFF; text-shadow: 0 0 2px rgba(0, 0, 0, .35); }
   .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .g4 > * { min-width: 0; }
   #pg2 .p2-top { align-items: start; }
@@ -149,12 +154,10 @@
   .ztab .l { text-align: left; }
   .ztab td.zs { text-align: left; }
   .ztab td b { font-weight: 800; }
-  .ztab tr.za3 td { background: #C9574C; color: #FFFFFF; }
-  .ztab tr.za2 td { background: #EBA79F; }
-  .ztab tr.za1 td { background: #F8DCD8; }
-  .ztab tr.zb1 td { background: #DCEDE2; }
-  .ztab tr.zb2 td { background: #A9D3B8; }
-  .ztab tr.zb3 td { background: #4F9B6C; color: #FFFFFF; }
+  .ztab tr.za2 td { background: #D46A5F; color: #FFFFFF; }
+  .ztab tr.za1 td { background: #F6CBC5; }
+  .ztab tr.zb1 td { background: #CDE6D5; }
+  .ztab tr.zb2 td { background: #5FA67D; color: #FFFFFF; }
   /* Divisória entre o boletim e as páginas de proposta. */
   .divisor { width: 210mm; margin: 0 auto 24px; padding: 18px 22px; border: 2px dashed var(--red); border-radius: 12px; background: #FFF6F4; text-align: center; }
   .divisor p { margin: 4px 0 0; font-size: 13px; color: var(--ink2); }
@@ -164,6 +167,13 @@
   .como { padding: 8px 12px; border-left: 3px solid var(--red); border-radius: 6px; background: var(--soft); font-size: 10px; line-height: 1.45; color: var(--ink2); }
   .como b { color: var(--ink); }
   .como ol { margin: 4px 0; padding-left: 16px; }
+  /* Concentração: destaque em texto, top 10 e a lista resumida. */
+  .dest { margin: 4px 0 2px; padding: 8px 12px; border-left: 3px solid var(--red); border-radius: 6px; background: #FFF6F4; font-size: 10.5px; line-height: 1.4; color: var(--ink2); }
+  .dest b.n { display: block; margin-bottom: 2px; font-size: 15px; font-weight: 800; line-height: 1.2; color: var(--ink); }
+  .dest b.n em { font-style: normal; color: var(--red-d); }
+  .cv-top { height: 175px; }
+  .mtxt { margin: 2px 0 4px; font-size: 9.5px; line-height: 1.55; color: var(--ink); }
+  .mtxt span { color: var(--muted); }
   /* Lista dos municípios que somam metade da área queimada. */
   .mlist { margin: 4px 0 0; padding-left: 22px; columns: 3; column-gap: 18px; font-size: 9.5px; line-height: 1.5; color: var(--ink); }
   .mlist li { break-inside: avoid; }
@@ -546,7 +556,7 @@
         <div class="blk" id="p2-qui"><div class="st"></div><p class="ct">Territórios quilombolas</p><ol class="rk c" id="p2-quil"></ol><p class="fn" id="p2-qui-n"></p></div>
       </div>
     </div>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Contornos estaduais: base IBGE. Mapa base © Esri.</span><span>2/7</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Contornos estaduais: base IBGE. Biomas: limites do Monitor do Fogo.</span><span>2/7</span></footer>
   </section>
 
   <!-- Página 3: Bioma mais afetado -->
@@ -702,15 +712,16 @@
       <div class="blk" id="p6-conc">
         <div class="st"></div>
         <p class="ct" id="p6-conc-t">Concentração do fogo nos municípios</p>
-        <p class="cs" id="p6-conc-s"></p>
-        <div class="p6-num" id="p6-conc-n"></div>
-        <div class="cv cv-p6"><canvas id="p6-concc"></canvas></div>
+        <div class="dest" id="p6-conc-d"></div>
+        <p class="ct p2-sub" id="p6-top-t">Os 10 municípios com mais área queimada</p>
+        <div class="cv cv-top"><canvas id="p6-concc"></canvas></div>
       </div>
     </div>
     <div class="blk" id="p6-mun">
       <div class="st"></div>
-      <p class="ct" id="p6-mun-t">Os municípios que concentraram metade da área queimada</p>
-      <ol class="mlist" id="p6-munl"></ol>
+      <p class="ct" id="p6-mun-t">Quem são os municípios que somam metade da área queimada</p>
+      <p class="mtxt" id="p6-munl"></p>
+      <p class="cs" id="p6-uf"></p>
     </div>
     <p class="fn" id="p6-n"></p>
     <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>.</span><span>6/7</span></footer>
@@ -1170,7 +1181,7 @@ const axTitle = text => ({ display: true, text, color: C.ink2, font: { size: 9.5
 
 /* ---------- mapas ---------- */
 const MAPS = {};
-function mapaEstatico(id, bounds) {
+function mapaEstatico(id, bounds, semBase = false) {
   if (!window.L) throw new Error('biblioteca de mapas não carregou');
   MAPS[id]?.m.remove();
   // Mapa estático: sem interação e sem animações. A animação de zoom faz os vector tiles
@@ -1181,7 +1192,7 @@ function mapaEstatico(id, bounds) {
     zoomAnimation: false, fadeAnimation: false, markerZoomAnimation: false, inertia: false
   });
   m.attributionControl.setPrefix(false);
-  L.tileLayer(ESRI, { attribution: 'Mapa base © Esri', zIndex: 1 }).addTo(m);
+  if (!semBase) L.tileLayer(ESRI, { attribution: 'Mapa base © Esri', zIndex: 1 }).addTo(m);
   const bb = L.geoJSON(bounds).getBounds();
   m.fitBounds(bb, { padding: [14, 14], animate: false });
   MAPS[id] = { m, bb, tam: m.getSize().toString() };
@@ -1232,6 +1243,8 @@ function drawStates(el, geo, vals, total, cls) {
     const t = lab.append('text').attr('text-anchor', 'middle').attr('fill', cls.idx(v || 0) >= 3 ? '#FFFFFF' : C.ink);
     t.append('tspan').attr('class', 'ml-s').attr('x', c[0]).attr('y', c[1]).text(s);
     if (v != null) t.append('tspan').attr('class', 'ml-v').attr('x', c[0]).attr('dy', '1.2em').text(cmp(v, 1));
+    // Percentual do país só nos estados com fatia relevante, para não poluir.
+    if (v != null && v / total >= .03) t.append('tspan').attr('class', 'ml-v').attr('x', c[0]).attr('dy', '1.1em').text(fmtP(v / total * 100));
   });
   fora.sort((a, b) => a.c[1] - b.c[1]);
   let ultimo = -Infinity;
@@ -1655,7 +1668,7 @@ async function p2Mapa(D) {
   const cls = classes(r.valores);
   drawStates($('p2-map'), geo, vals, total, cls);
   $('p2-leg').innerHTML = legHTML(cls);
-  $('p2-uf').innerHTML = rankHTML(r.nomes.slice(0, 10).map((n, i) => ({ tag: UF_BY_NAME[n]?.sigla, nome: n, v: r.valores[i] })));
+  $('p2-uf').innerHTML = rankHTML(r.nomes.slice(0, 10).map((n, i) => ({ tag: UF_BY_NAME[n]?.sigla, nome: `${n} · ${fmtP(r.valores[i] / total * 100)}`, v: r.valores[i] })));
 }
 
 async function p2Bio(D) {
@@ -1668,12 +1681,26 @@ async function p2Bio(D) {
   const vals = Object.fromEntries(r.map(i => [i.code, i.value || 0]));
   $('p2-biol').innerHTML = rankHTML(r.map(i => ({ nome: `${i.name} · ${fmtP((i.value || 0) / mesA.areaHa * 100)}`, v: i.value || 0 })));
   $('p2-bleg').innerHTML = legHTML(cls);
-  const m = mapaEstatico('p2-bmap', bounds);
+  // Mesmo estilo do mapa de estados: sem mapa de fundo, borda branca e rótulo com nome, área e %.
+  const m = mapaEstatico('p2-bmap', bounds, true);
   mvt('/api/territories/grouping/tiles/country/0/biome', p => ({
-    fill: true, fillColor: cls.cor(vals[p.code] || 0), fillOpacity: 1, color: '#FFFFFF', weight: 1
+    fill: true, fillColor: cls.cor(vals[p.code] || 0), fillOpacity: 1, color: '#FFFFFF', weight: 1.2
   }), 2).addTo(m);
+  const total = mesA.areaHa || 1;
+  r.forEach(i => {
+    const pos = BIO_ROTULO[i.code];
+    if (!pos) return;
+    const claroFundo = cls.idx(i.value || 0) < 3 || pos[2];
+    L.marker([pos[0], pos[1]], {
+      interactive: false, keyboard: false,
+      icon: L.divIcon({ className: 'blab', iconSize: null,
+        html: `<div class="${claroFundo ? '' : 'esc'}"><b>${esc(i.name)}</b><span>${cmp(i.value || 0, 1)} · ${fmtP((i.value || 0) / total * 100)}</span></div>` })
+    }).addTo(m);
+  });
 }
 
+// Posição do rótulo de cada bioma [lat, lng, fora do bioma?]. Mata Atlântica e Pampa ficam ao lado, no mar.
+const BIO_ROTULO = { 1: [-4.5, -62, false], 2: [-7.2, -39.6, false], 3: [-14.6, -49, false], 4: [-24.6, -40.6, true], 5: [-32.6, -50.6, true], 6: [-18.6, -57.2, false] };
 // Os 5 primeiros de cada categoria e, embaixo, o total da categoria no país.
 async function p2Lista(D, want, el, n, nota, plural) {
   const { Y, M } = P;
@@ -1752,12 +1779,13 @@ function zInfo(v, hist) {
   const sd = Math.sqrt(hist.reduce((s, x) => s + (x - m) ** 2, 0) / (n - 1));
   return { m, sd, z: sd > 0 ? (v - m) / sd : null };
 }
-const Z_CORES = { a3: '#C9574C', a2: '#EBA79F', a1: '#F8DCD8', b1: '#DCEDE2', b2: '#A9D3B8', b3: '#4F9B6C' };
+// Cinco categorias: muito abaixo, abaixo, dentro do normal, acima, muito acima.
+const Z_CORES = { a2: '#D46A5F', a1: '#F6CBC5', b1: '#CDE6D5', b2: '#5FA67D' };
 function zClasse(z) {
   if (z == null) return { k: '', t: 'Sem histórico suficiente' };
-  const a = Math.abs(z), up = z > 0, n = a <= 1 ? 0 : a <= 2 ? 1 : a <= 3 ? 2 : 3;
+  const a = Math.abs(z), up = z > 0, n = a <= 1 ? 0 : a <= 2 ? 1 : 2;
   if (!n) return { k: '', t: 'Dentro do normal' };
-  return { k: `${up ? 'a' : 'b'}${n}`, t: `${['', '', 'Bem ', 'Muito '][n]}${n === 1 ? (up ? 'Acima' : 'Abaixo') : (up ? 'acima' : 'abaixo')} do normal` };
+  return { k: `${up ? 'a' : 'b'}${n}`, t: `${n === 2 ? 'Muito ' : ''}${n === 2 ? (up ? 'acima' : 'abaixo') : (up ? 'Acima' : 'Abaixo')} do normal` };
 }
 // Faixas atrás das barras, em % da média: branca = normal; vermelho acima, verde abaixo.
 const faixasNormal = {
@@ -1765,7 +1793,7 @@ const faixasNormal = {
   beforeDatasetsDraw(chart, _a, o) {
     if (!o.passo) return;
     const { ctx, chartArea: a, scales: { y } } = chart, p = o.passo;
-    const fx = [[3 * p, 1e9, 'a3'], [2 * p, 3 * p, 'a2'], [p, 2 * p, 'a1'], [-2 * p, -p, 'b1'], [-3 * p, -2 * p, 'b2'], [-1e9, -3 * p, 'b3']];
+    const fx = [[2 * p, 1e9, 'a2'], [p, 2 * p, 'a1'], [-2 * p, -p, 'b1'], [-1e9, -2 * p, 'b2']];
     ctx.save();
     fx.forEach(([lo, hi, k]) => {
       const y0 = Math.max(a.top, y.getPixelForValue(Math.min(hi, y.max))), y1 = Math.min(a.bottom, y.getPixelForValue(Math.max(lo, y.min)));
@@ -1829,12 +1857,12 @@ async function p5Brasil(D) {
       }
     }
   });
-  const leg = [['a3', 'Muito acima'], ['a2', 'Bem acima'], ['a1', 'Acima'], ['', 'Dentro do normal'], ['b1', 'Abaixo'], ['b2', 'Bem abaixo'], ['b3', 'Muito abaixo']];
+  const leg = [['a2', 'Muito acima do normal'], ['a1', 'Acima do normal'], ['', 'Dentro do normal'], ['b1', 'Abaixo do normal'], ['b2', 'Muito abaixo do normal']];
   $('p5-zleg').innerHTML = leg.map(([k, t]) => `<span><i style="background:${k ? Z_CORES[k] : '#FFFFFF'};box-shadow:inset 0 0 0 1px #D0D0D0"></i>${t}</span>`).join('');
   $('p5-como').innerHTML = `<b>Como calculamos o “normal”</b><ol>`
     + `<li>Para cada território, pegamos a área queimada em ${mes} de cada ano de ${a0} a ${a1} e calculamos a média.</li>`
     + `<li>Medimos o quanto esses anos costumam se afastar da média (o desvio-padrão). Essa é a <b>variação típica</b>.</li>`
-    + `<li>Se ${mes} de ${Y} ficou a menos de uma variação típica da média, está <b>dentro do normal</b>. De uma a duas, <b>acima ou abaixo do normal</b>; de duas a três, <b>bem acima ou abaixo</b>; mais de três, <b>muito acima ou abaixo</b>.</li>`
+    + `<li>Se ${mes} de ${Y} ficou a menos de uma variação típica da média, está <b>dentro do normal</b>. De uma a duas, <b>acima ou abaixo do normal</b>; mais de duas, <b>muito acima ou muito abaixo</b>.</li>`
     + `<li>A diferença em % é (área de ${Y} − média) ÷ média.</li></ol>`
     + `É a mesma lógica do índice de anomalia usado pelo INPE nos boletins de queimadas, contada em linguagem simples. Como a série do Monitor do Fogo começa em 2019, a média se apoia em ${ant.length} anos: leia como indicação.`;
 }
@@ -1920,41 +1948,52 @@ async function p6Prot(D) {
 }
 
 async function p6Conc() {
-  const { Y, M, anos } = P, mes = MES_L[M - 1];
+  const { Y, M, anos } = P, mes = MES_L[M - 1], iY = anos.indexOf(Y);
   const rs = await Promise.all(anos.map(y => getJSON(`/api/statistics/ranking/country/0/city/raw?year=${y}&monthStart=${M}&monthEnd=${M}`)));
-  // Quantos municípios, do maior para o menor, somam 50% e 80% da área queimada no mês.
+  // Municípios do mais ao menos queimado; quantos somam metade da área queimada no mês.
   const conc = r => {
-    const v = r.map(i => i.value || 0).filter(x => x > 0).sort((a, b) => b - a);
-    const tot = v.reduce((s, x) => s + x, 0);
-    let acc = 0, n50 = null, n80 = null;
-    v.forEach((x, i) => { acc += x; if (n50 == null && acc >= tot * .5) n50 = i + 1; if (n80 == null && acc >= tot * .8) n80 = i + 1; });
-    return { n50, n80, com: v.length };
+    const v = r.filter(i => i.value > 0).sort((a, b) => b.value - a.value);
+    const tot = v.reduce((s, i) => s + i.value, 0);
+    let acc = 0, n50 = null;
+    v.forEach((i, k) => { acc += i.value; if (n50 == null && acc >= tot * .5) n50 = k + 1; });
+    return { n50, com: v.length, tot, v };
   };
-  const c = rs.map(conc), cy = c[anos.indexOf(Y)];
-  const lideres = rs[anos.indexOf(Y)].filter(i => i.value > 0).sort((a, b) => b.value - a.value).slice(0, cy.n50);
-  $('p6-mun-t').textContent = `Os ${cy.n50} municípios que concentraram metade da área queimada em ${mes} de ${Y}`;
-  $('p6-munl').innerHTML = lideres.map(i => `<li>${esc(nomeT(i))} <span>${haC(i.value)}</span></li>`).join('');
-  status('p6-mun');
+  const c = rs.map(conc), cy = c[iY];
+  const ant = c.filter((_, i) => anos[i] < Y).map(x => x.n50);
+  const med = ant.length ? Math.round(ant.reduce((s, x) => s + x, 0) / ant.length) : null;
+  const top = cy.v.slice(0, 10), soma10 = top.reduce((s, i) => s + i.value, 0) / cy.tot * 100;
+  const tendencia = med == null || cy.n50 === med ? '.'
+    : `: em ${Y}, o fogo ficou ${cy.n50 < med ? 'mais concentrado' : 'mais espalhado'} que o habitual.`;
+
   $('p6-conc-t').textContent = `Concentração do fogo nos municípios em ${mes}`;
-  $('p6-conc-s').textContent = `Em ${mes} de ${Y}, ${nf0(cy.com)} municípios tiveram fogo, mas poucos concentraram a maior parte da área queimada.`;
-  $('p6-conc-n').innerHTML = `<div>Metade da área queimada<b>${nf0(cy.n50)} municípios</b>${fmtP(cy.n50 / cy.com * 100)} dos que tiveram fogo</div>`
-    + `<div>80% da área queimada<b>${nf0(cy.n80)} municípios</b>${fmtP(cy.n80 / cy.com * 100)} dos que tiveram fogo</div>`;
-  const vals = c.map(x => x.n50);
+  $('p6-conc-d').innerHTML = `<b class="n">Metade da área queimada em ${mes} está em <em>${cy.n50} municípios</em></b>`
+    + `São só ${fmtP(cy.n50 / cy.com * 100)} dos ${nf0(cy.com)} municípios que tiveram fogo. Os 10 primeiros, sozinhos, somam ${fmtP(soma10)} da área queimada no país.`
+    + (med == null ? '' : ` De ${anos[0]} a ${Y - 1}, metade da área ficava em média em ${med} municípios${tendencia}`);
+  $('p6-top-t').textContent = `Os 10 municípios com mais área queimada em ${mes}`;
   mkChart('p6-concc', 'p6-concc', {
     type: 'bar',
-    data: { labels: anos.map(String), datasets: [{ data: vals, backgroundColor: anos.map(y => y === Y ? C.red : C.redL), borderRadius: 3, barPercentage: .7 }] },
-    plugins: [topLabels],
+    data: { labels: top.map(i => nomeT(i)), datasets: [{ data: top.map(i => i.value), backgroundColor: C.red, borderRadius: 2, barPercentage: .75 }] },
+    plugins: [rotulos],
     options: {
-      maintainAspectRatio: false, layout: { padding: { top: 12 } },
-      plugins: { legend: { display: false }, topLabels: { indices: vals.map((_, i) => i), fmt: v => nf0(v) }, tooltip: { callbacks: { label: c2 => ` ${nf0(c2.raw)} municípios somam metade da área` } } },
+      indexAxis: 'y', maintainAspectRatio: false, layout: { padding: { right: 84 } },
+      plugins: { legend: { display: false }, rotulos: { fmt: v => `${cmp(v, 1)} ha · ${fmtP(v / cy.tot * 100)}` }, tooltip: { callbacks: { label: x => ` ${haC(x.raw)}` } } },
       scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 9 }, color: x => anos[x.index] === Y ? C.redD : C.ink2 } },
-        y: yAxis({ ticks: { font: { size: 9 }, maxTicksLimit: 4, callback: v => nf0(v) }, title: axTitle('Municípios com 50% da área') })
+        x: { display: false, beginAtZero: true },
+        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 9 }, color: C.ink } }
       }
     }
   });
-  $('p6-n').textContent = `Áreas protegidas: terras indígenas e unidades de conservação podem se sobrepor, então as porcentagens não se somam. `
-    + `Concentração: no gráfico, quanto menor a barra, mais o fogo de ${mes} se concentrou em poucos municípios naquele ano.`;
+
+  // Lista só com os nomes (os valores dos 10 primeiros já estão no gráfico) e a contagem por estado.
+  const lideres = cy.v.slice(0, cy.n50);
+  $('p6-mun-t').textContent = `Os ${cy.n50} municípios que somam metade da área queimada em ${mes} de ${Y}`;
+  $('p6-munl').innerHTML = lideres.map((i, k) => `<span>${k + 1}.</span> ${esc(nomeT(i))}`).join(' · ');
+  const porUF = {};
+  lideres.forEach(i => { porUF[i.uf] = (porUF[i.uf] || 0) + 1; });
+  $('p6-uf').textContent = `Por estado: ${Object.entries(porUF).sort((a, b) => b[1] - a[1]).map(([u, n]) => `${u} ${n}`).join(' · ')}.`;
+  status('p6-mun');
+  $('p6-n').textContent = 'Áreas protegidas: terras indígenas e unidades de conservação podem se sobrepor, então as porcentagens não se somam. '
+    + 'Concentração: municípios ordenados do mais ao menos queimado no mês; contamos quantos são necessários para chegar a metade da área queimada no Brasil.';
 }
 
 /* ----- Página 7: Sobre este boletim ----- */

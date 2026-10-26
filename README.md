@@ -6,10 +6,12 @@ Relatório visual com dados ao vivo sobre área queimada no Brasil, exportável 
 
 ## 📄 O que tem
 
-- **Boletim do Mês** (4 páginas em PDF) ✅
-  - Brasil: área queimada total, gráficos e estatísticas
-  - Onde queima: rankings de estados e municípios
-  - Informações por bioma e cobertura do solo
+- **Boletim do Mês** (6 páginas em PDF) ✅
+  - Brasil: área queimada, comparações com o ano anterior e a média, uso e cobertura
+  - Territórios mais afetados: estados, biomas, municípios, UCs, terras indígenas e quilombos
+  - Bioma e estado mais afetados
+  - Anomalias: z-score do mês por ano, bioma e estado
+  - Em perspectiva: calendário do fogo, fogo em áreas protegidas e concentração nos municípios
 
 - **Destaque Dinâmico** (painel interativo, versão de teste)
   - Qualquer recorte da API: Brasil, bioma, estado, município, terra indígena, UC, quilombo, bacias e outros

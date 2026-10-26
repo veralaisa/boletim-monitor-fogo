@@ -150,6 +150,14 @@
   .ztab tr.zb1 td { background: #DCEDE2; }
   .ztab tr.zb2 td { background: #A9D3B8; }
   .ztab tr.zb3 td { background: #4F9B6C; color: #FFFFFF; }
+  /* Página 6: em perspectiva. */
+  .calb { position: relative; margin-top: 4px; }
+  .calb canvas { display: block; width: 100%; }
+  .cv-p6 { height: 215px; margin-bottom: 6px; }
+  #p6-prott th, #p6-prott td { padding: 2px 3px; }
+  .p6-num { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 8px; }
+  .p6-num div { padding: 6px 9px; border-radius: 8px; background: var(--soft); font-size: 10px; color: var(--ink2); }
+  .p6-num b { display: block; font-size: 17px; font-weight: 800; line-height: 1.2; color: var(--ink); white-space: nowrap; }
   /* Roscas do mês e do acumulado no bloco "O que queimou". */
   .cdon { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 4px; }
   .cdon figure { min-width: 0; margin: 0; text-align: center; }
@@ -468,7 +476,7 @@
       </div>
     </div>
     <p class="fn">Classes do MapBiomas (nível 2): Floresta reúne formação florestal, floresta alagável, mangue e restinga arbórea; Campo reúne formação campestre, afloramento rochoso, apicum e restinga herbácea; Agricultura reúne lavouras temporárias e perenes; Outras reúne silvicultura, áreas não vegetadas e água.</p>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span></span><span>1/5</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span></span><span>1/6</span></footer>
   </section>
 
   <!-- Página 2: Onde queima -->
@@ -510,7 +518,7 @@
       <div class="blk" id="p2-ti"><div class="st"></div><p class="ct">As 5 terras indígenas mais afetadas <span class="per" data-per></span></p><ol class="rk c" id="p2-til"></ol><p class="fn" id="p2-ti-n"></p></div>
       <div class="blk" id="p2-qui"><div class="st"></div><p class="ct">Os 5 territórios quilombolas mais afetados <span class="per" data-per></span></p><ol class="rk c" id="p2-quil"></ol><p class="fn" id="p2-qui-n"></p></div>
     </div>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Contornos estaduais: base IBGE. Mapa base © Esri.</span><span>2/5</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Contornos estaduais: base IBGE. Mapa base © Esri.</span><span>2/6</span></footer>
   </section>
 
   <!-- Página 3: Bioma mais afetado -->
@@ -548,7 +556,7 @@
       <div><p class="ct" id="p3-a1-t"></p><p class="cs cvar" id="p3-a1-s"></p><div class="cv cv-y"><canvas id="p3-a1"></canvas></div></div>
       <div><p class="ct" id="p3-a2-t"></p><p class="cs cvar" id="p3-a2-s"></p><div class="cv cv-y"><canvas id="p3-a2"></canvas></div></div>
     </div>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>3/5</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>3/6</span></footer>
   </section>
 
   <!-- Página 4: Estado mais afetado -->
@@ -592,7 +600,7 @@
       <div><p class="ct" id="p4-a1-t"></p><p class="cs cvar" id="p4-a1-s"></p><div class="cv cv-y"><canvas id="p4-a1"></canvas></div></div>
       <div><p class="ct" id="p4-a2-t"></p><p class="cs cvar" id="p4-a2-s"></p><div class="cv cv-y"><canvas id="p4-a2"></canvas></div></div>
     </div>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>4/5</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>4/6</span></footer>
   </section>
 
   <!-- Página 5: Anomalias -->
@@ -626,7 +634,44 @@
       <table class="ztab" id="p5-uft"></table>
     </div>
     <p class="fn" id="p5-n"></p>
-    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Método de anomalia inspirado nos boletins do Programa Queimadas (INPE).</span><span>5/5</span></footer>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Método de anomalia inspirado nos boletins do Programa Queimadas (INPE).</span><span>5/6</span></footer>
+  </section>
+
+  <!-- Página 6: Em perspectiva -->
+  <section class="sheet" id="pg6">
+    <header class="sh"></header>
+    <div class="ptit">
+      <div>
+        <p class="eyebrow">Em perspectiva</p>
+        <h1 id="p6-t">O fogo do mês em perspectiva</h1>
+        <p class="lead" id="p6-lead">Três jeitos de olhar o fogo do mês: quando ele costuma acontecer, quanto atinge áreas protegidas e o quanto está concentrado em poucos municípios.</p>
+      </div>
+    </div>
+    <div class="blk" id="p6-cal">
+      <div class="st"></div>
+      <p class="ct">Calendário do fogo no Brasil</p>
+      <p class="cs" id="p6-cal-s"></p>
+      <div class="calb"><canvas id="p6-calc"></canvas></div>
+      <div class="cal-leg" id="p6-cal-leg"></div>
+    </div>
+    <div class="g2">
+      <div class="blk" id="p6-prot">
+        <div class="st"></div>
+        <p class="ct" id="p6-prot-t">Fogo em áreas protegidas</p>
+        <p class="cs" id="p6-prot-s"></p>
+        <div class="cv cv-p6"><canvas id="p6-protc"></canvas></div>
+        <table class="ztab" id="p6-prott"></table>
+      </div>
+      <div class="blk" id="p6-conc">
+        <div class="st"></div>
+        <p class="ct" id="p6-conc-t">Concentração do fogo nos municípios</p>
+        <p class="cs" id="p6-conc-s"></p>
+        <div class="p6-num" id="p6-conc-n"></div>
+        <div class="cv cv-p6"><canvas id="p6-concc"></canvas></div>
+      </div>
+    </div>
+    <p class="fn" id="p6-n"></p>
+    <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>.</span><span>6/6</span></footer>
   </section>
 </main>
 
@@ -1392,6 +1437,9 @@ async function initBoletim() {
     secao('p5-z', () => p5Brasil(D)),
     secao('p5-bio', () => p5Tabela(D.bioAnos, 'p5-biot', 'Bioma', false)),
     secao('p5-uf', () => p5Tabela(D.ufAnos, 'p5-uft', 'Estado', true)),
+    secao('p6-cal', () => p6Cal(D)),
+    secao('p6-prot', () => p6Prot(D)),
+    secao('p6-conc', () => p6Conc()),
     secao('p3-kpi', () => p3Kpi(D)),
     secao('p3-mapa', () => p3Mapa(D)),
     secao('p3-cob', async () => { const d = await D.dBio; renderCover('p3-cobc', 'p3', d.lcMes, d.lcAcum); }),
@@ -1730,6 +1778,99 @@ async function p5Tabela(prom, el, rotulo, comAnterior) {
       }).join('') + '</tbody>';
   if (!comAnterior) $('p5-bio-s').textContent = `${cap(MES_L[M - 1])} de ${Y} comparado à média do mês.`;
   else $('p5-uf-t').textContent = `Estados: ${MES_L[M - 1]} de ${Y} comparado à média e a ${Y - 1}`;
+}
+
+/* ----- Página 6: Em perspectiva ----- */
+let CAL6 = null;
+function desenharCal6() {
+  if (!CAL6) return;
+  const r = pintarCalendario($('p6-calc'), CAL6, P.Y, P.M, P.M, { rh: 25, fonte: .9 });
+  if (r) $('p6-cal-leg').innerHTML = `<span>0 ha</span><span class="g"></span><span>${cmp(r.max, 1)} ha</span>`
+    + `<span class="fn">· “—” = ainda sem dado · contorno = ${P.Y} · mês em vermelho = ${MES_L[P.M - 1]}</span>`;
+}
+async function p6Cal(D) {
+  const ts = await D.ts, { Y, M, anos } = P;
+  CAL6 = matriz(ts);
+  desenharCal6();
+  const ant = anos.filter(y => y < Y);
+  const pico = y => CAL6[y].reduce((k, v, i, a) => (v != null && v > a[k] ? i : k), 0);
+  const cont = {};
+  ant.forEach(y => { const k = pico(y); cont[k] = (cont[k] || 0) + 1; });
+  const freq = Object.entries(cont).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${MES_L[k]} (${n} ${n > 1 ? 'anos' : 'ano'})`);
+  $('p6-t').textContent = `O fogo de ${MES_L[M - 1]} em perspectiva`;
+  $('p6-cal-s').textContent = `De ${ant[0]} a ${ant[ant.length - 1]}, o mês com mais área queimada foi ${lista(freq)}. `
+    + `Em ${Y}, até ${MES_L[M - 1]}, o pico foi em ${MES_L[pico(Y)]}.`;
+}
+
+async function p6Prot(D) {
+  const ts = await D.ts, { Y, M, anos } = P, mes = MES_L[M - 1], ab = MES[M - 1];
+  const tipos = [['indigenousLand', 'Terras indígenas'], ['uc', 'Unidades de conservação'], ['quilombo', 'Territórios quilombolas']];
+  const soma = r => r.reduce((s, i) => s + (i.value || 0), 0);
+  const raw = (t, y, a) => getJSON(`/api/statistics/ranking/country/0/${t}/raw?year=${y}&monthStart=${a}&monthEnd=${M}`).then(soma);
+  const [acum, doMes] = await Promise.all([
+    Promise.all(tipos.map(([t]) => Promise.all(anos.map(y => raw(t, y, 1))))),
+    Promise.all(tipos.map(([t]) => raw(t, Y, M)))
+  ]);
+  const br = anos.map(y => sumTs(ts, y, 1, M)), iY = anos.indexOf(Y);
+  const share = acum.map(v => v.map((x, i) => br[i] ? x / br[i] * 100 : null));
+  const per = M === 1 ? 'janeiro' : `janeiro a ${mes}`;
+  $('p6-prot-t').textContent = `Fogo em áreas protegidas, de ${per}`;
+  $('p6-prot-s').textContent = `Em ${Y}, ${fmtP(share[0][iY])} da área queimada no Brasil estava em terras indígenas e ${fmtP(share[1][iY])} em unidades de conservação.`;
+  mkChart('p6-protc', 'p6-protc', {
+    type: 'line',
+    data: { labels: anos.map(String), datasets: tipos.map(([, n], k) => ({ label: n, data: share[k], borderColor: SER[k + 1], backgroundColor: SER[k + 1], borderDash: DASH[k + 1], borderWidth: 2, pointRadius: 2.5, tension: .25 })) },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', align: 'start', labels: { boxWidth: 18, boxHeight: 2, font: { size: 9 }, color: C.ink2 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmtP(c.raw)} (${haC(acum[c.datasetIndex][c.dataIndex])})` } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 9 }, color: c => anos[c.index] === Y ? C.redD : C.ink2 } },
+        y: yAxis({ ticks: { callback: v => `${v}%`, font: { size: 9 }, maxTicksLimit: 5 }, title: axTitle('% da área queimada no Brasil') })
+      }
+    }
+  });
+  const ant = k => { const v = acum[k].filter((_, i) => anos[i] < Y); return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null; };
+  const dif = (a, b) => b ? pctTxt(pct(a, b)) : '—';
+  const curto = ['Terras indígenas', 'UCs', 'Quilombos'];
+  $('p6-prott').innerHTML = `<thead><tr><th class="l">${Y}</th><th>Só ${ab}</th><th>Jan–${ab}</th><th>% Brasil</th><th>vs. ${Y - 1}</th><th>vs. média</th></tr></thead><tbody>`
+    + tipos.map((_, k) => `<tr><td class="l">${curto[k]}</td><td>${haC(doMes[k])}</td><td>${haC(acum[k][iY])}</td><td>${fmtP(share[k][iY])}</td>`
+      + `<td>${dif(acum[k][iY], acum[k][iY - 1])}</td><td>${dif(acum[k][iY], ant(k))}</td></tr>`).join('') + '</tbody>';
+}
+
+async function p6Conc() {
+  const { Y, M, anos } = P, mes = MES_L[M - 1];
+  const rs = await Promise.all(anos.map(y => getJSON(`/api/statistics/ranking/country/0/city/raw?year=${y}&monthStart=${M}&monthEnd=${M}`)));
+  // Quantos municípios, do maior para o menor, somam 50% e 80% da área queimada no mês.
+  const conc = r => {
+    const v = r.map(i => i.value || 0).filter(x => x > 0).sort((a, b) => b - a);
+    const tot = v.reduce((s, x) => s + x, 0);
+    let acc = 0, n50 = null, n80 = null;
+    v.forEach((x, i) => { acc += x; if (n50 == null && acc >= tot * .5) n50 = i + 1; if (n80 == null && acc >= tot * .8) n80 = i + 1; });
+    return { n50, n80, com: v.length };
+  };
+  const c = rs.map(conc), cy = c[anos.indexOf(Y)];
+  $('p6-conc-t').textContent = `Concentração do fogo nos municípios em ${mes}`;
+  $('p6-conc-s').textContent = `Em ${mes} de ${Y}, ${nf0(cy.com)} municípios tiveram fogo, mas poucos concentraram a maior parte da área queimada.`;
+  $('p6-conc-n').innerHTML = `<div>Metade da área queimada<b>${nf0(cy.n50)} municípios</b>${fmtP(cy.n50 / cy.com * 100)} dos que tiveram fogo</div>`
+    + `<div>80% da área queimada<b>${nf0(cy.n80)} municípios</b>${fmtP(cy.n80 / cy.com * 100)} dos que tiveram fogo</div>`;
+  const vals = c.map(x => x.n50);
+  mkChart('p6-concc', 'p6-concc', {
+    type: 'bar',
+    data: { labels: anos.map(String), datasets: [{ data: vals, backgroundColor: anos.map(y => y === Y ? C.red : C.redL), borderRadius: 3, barPercentage: .7 }] },
+    plugins: [topLabels],
+    options: {
+      maintainAspectRatio: false, layout: { padding: { top: 12 } },
+      plugins: { legend: { display: false }, topLabels: { indices: vals.map((_, i) => i), fmt: v => nf0(v) }, tooltip: { callbacks: { label: c2 => ` ${nf0(c2.raw)} municípios somam metade da área` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 9 }, color: x => anos[x.index] === Y ? C.redD : C.ink2 } },
+        y: yAxis({ ticks: { font: { size: 9 }, maxTicksLimit: 4, callback: v => nf0(v) }, title: axTitle('Municípios com 50% da área') })
+      }
+    }
+  });
+  $('p6-n').textContent = `Áreas protegidas: terras indígenas e unidades de conservação podem se sobrepor, então as porcentagens não se somam. `
+    + `Concentração: no gráfico, quanto menor a barra, mais o fogo de ${mes} se concentrou em poucos municípios naquele ano.`;
 }
 
 /* ==========================================================
@@ -2334,9 +2475,18 @@ function xAnual(M, f) {
 
 function xCal(M, f) {
   X.calArgs = [M, f];
-  const cv = $('xc-cal'), W = cv.parentElement.clientWidth;
-  if (!W || !window.d3) return;
-  const anos = P.anos, left = 46, top = 24, rh = 28, gap = 2, H = top + anos.length * rh + 4;
+  const r = pintarCalendario($('xc-cal'), M, f.ano, f.ini, f.fim);
+  if (!r) return;
+  X.calGeo = r.geo;
+  $('x-cal-leg').innerHTML = `<span>0 ha</span><span class="g"></span><span>${cmp(r.max, 1)} ha</span><span class="fn">· “—” = mês ainda sem dado · contorno = ${f.ano}</span>`;
+  setDl('x-cal', { nome: 'calendario', cols: ['ano', ...MES_L], rows: P.anos.map(y => [y, ...M[y].map(v => v ?? '')]) });
+}
+// Grade ano × mês colorida pela área queimada (painel e página 6 do boletim).
+function pintarCalendario(cv, M, anoDest, ini, fim, o = {}) {
+  const W = cv.parentElement.clientWidth;
+  if (!W || !window.d3) return null;
+  const anos = P.anos, left = 46, top = 24, rh = o.rh || 28, gap = 2, H = top + anos.length * rh + 4;
+  const fs = o.fonte || 1, f = { ano: anoDest, ini, fim };
   const dpr = Math.max(3, window.devicePixelRatio || 1);
   cv.width = Math.round(W * dpr);
   cv.height = Math.round(H * dpr);
@@ -2352,28 +2502,26 @@ function xCal(M, f) {
     const on = i + 1 >= f.ini && i + 1 <= f.fim;
     c.textAlign = 'center';
     c.fillStyle = on ? C.redD : C.muted;
-    c.font = `${on ? 700 : 500} 10px Montserrat, sans-serif`;
+    c.font = `${on ? 700 : 500} ${10 * fs}px Montserrat, sans-serif`;
     c.fillText(cap(m), left + cw * i + cw / 2, top / 2);
   });
   anos.forEach((y, r) => {
     const yy = top + r * rh;
     c.textAlign = 'right';
     c.fillStyle = y === f.ano ? C.redD : C.ink2;
-    c.font = `${y === f.ano ? 800 : 600} 11px Montserrat, sans-serif`;
+    c.font = `${y === f.ano ? 800 : 600} ${11 * fs}px Montserrat, sans-serif`;
     c.fillText(String(y), left - 8, yy + rh / 2);
     c.textAlign = 'center';
     M[y].forEach((v, i) => {
       const x = left + cw * i;
       c.fillStyle = v == null ? '#F4F4F4' : cor(v);
       c.fillRect(x + gap / 2, yy + gap / 2, cw - gap, rh - gap);
-      if (v == null) { c.fillStyle = C.muted; c.font = '500 9px Montserrat, sans-serif'; c.fillText('—', x + cw / 2, yy + rh / 2); }
-      else if (cw >= 40) { c.fillStyle = v > max * .3 ? '#FFFFFF' : C.ink; c.font = '600 9.5px Montserrat, sans-serif'; c.fillText(v ? cmp(v, 1) : '0', x + cw / 2, yy + rh / 2); }
+      if (v == null) { c.fillStyle = C.muted; c.font = `500 ${9 * fs}px Montserrat, sans-serif`; c.fillText('—', x + cw / 2, yy + rh / 2); }
+      else if (cw >= 34) { c.fillStyle = v > max * .3 ? '#FFFFFF' : C.ink; c.font = `600 ${9.5 * fs}px Montserrat, sans-serif`; c.fillText(v ? cmp(v, 1) : '0', x + cw / 2, yy + rh / 2); }
     });
     if (y === f.ano) { c.strokeStyle = C.ink; c.lineWidth = 1.5; c.strokeRect(left + .75, yy + .75, W - left - 1.5, rh - 1.5); }
   });
-  X.calGeo = { left, top, rh, cw, anos, M };
-  $('x-cal-leg').innerHTML = `<span>0 ha</span><span class="g"></span><span>${cmp(max, 1)} ha</span><span class="fn">· “—” = mês ainda sem dado · contorno = ${f.ano}</span>`;
-  setDl('x-cal', { nome: 'calendario', cols: ['ano', ...MES_L], rows: anos.map(y => [y, ...M[y].map(v => v ?? '')]) });
+  return { max, geo: { left, top, rh, cw, anos, M } };
 }
 
 /* ---------- mapa ---------- */
@@ -2856,6 +3004,7 @@ function abrirAba(nome) {
     reajustarMapas();
     [X.m1, X.m2].forEach(m => m?.invalidateSize());
     if (nome === 'explorer' && X.calArgs) xCal(...X.calArgs);
+    if (nome === 'boletim') desenharCal6();
   }, 60);
 }
 document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => abrirAba(btn.dataset.tab)));
@@ -2866,6 +3015,7 @@ function modoImpressao(on) {
   document.documentElement.classList.toggle('pm', on);
   Object.values(CHS).forEach(c => c.resize());
   reajustarMapas();
+  desenharCal6();
 }
 $('btn-print').addEventListener('click', async () => {
   if (!$('tab-explorer').hidden) { imprimirPainel(); return; }
@@ -2883,6 +3033,7 @@ window.addEventListener('resize', () => {
   tResize = setTimeout(() => {
     reajustarMapas();
     if (!$('tab-explorer').hidden && X.calArgs) xCal(...X.calArgs);
+    if ($('tab-explorer').hidden) desenharCal6();
   }, 150);
 });
 

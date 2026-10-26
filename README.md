@@ -14,7 +14,7 @@ Relatório visual com dados ao vivo sobre área queimada no Brasil, exportável 
 - **Destaque Dinâmico** (painel interativo, versão de teste)
   - Qualquer recorte da API: Brasil, bioma, estado, município, terra indígena, UC, quilombo, bacias e outros
   - Período livre (ano, mês inicial e final) e filtro por classe de cobertura
-  - Sazonalidade, acumulado contra a média, série anual, calendário do fogo, mapas, rankings e comparação entre territórios
+  - Sazonalidade, acumulado contra a média, série anual, calendário do fogo, uso e cobertura (níveis 1 a 4), mapas, ranking e tabela comparados com outro ano ou com a média histórica
   - Download de cada gráfico em PNG e dos dados em CSV, PDF do painel e link com os filtros
 
 ## 🚀 Acesso

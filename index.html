@@ -122,8 +122,27 @@
   .ct .per { display: block; font-size: 9.5px; font-weight: 500; color: var(--muted); }
   .cs { margin-bottom: 4px; font-size: 11px; color: var(--ink2); }
   .cv { position: relative; }
-  .cv-y { height: 170px; }
-  #pg4 .cv-y { height: 150px; }
+  .cv-y { height: 158px; }
+  #pg4 .cv-y { height: 138px; }
+  .cvar { margin: 0 0 2px; font-size: 10px; color: var(--ink2); }
+  .cvar b { font-weight: 800; }
+  .cvar .up { color: var(--red-d); }
+  .cvar .down { color: var(--good); }
+  /* Roscas do mês e do acumulado no bloco "O que queimou". */
+  .cdon { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 4px; }
+  .cdon figure { min-width: 0; margin: 0; text-align: center; }
+  .cdon-c { position: relative; height: 100px; }
+  .cdon-c canvas { max-width: 100%; }
+  #pg1 .cdon-c { height: 82px; }
+  #pg4 .cdon-c { height: 70px; }
+  :is(#pg1, #pg4) .cdon { margin: 2px 0 0; }
+  :is(#pg1, #pg4) .ctab th, :is(#pg1, #pg4) .ctab td { padding-top: 1px; padding-bottom: 1px; }
+  .cvar .med { display: inline-block; width: 14px; margin: 0 3px 2px 0; border-top: 1.5px dashed var(--ink); vertical-align: middle; }
+  .cdon figcaption { margin-top: 2px; font-size: 10px; font-weight: 700; color: var(--ink2); }
+  .cres { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+  .cres div { padding: 5px 8px; border-radius: 6px; background: var(--soft); font-size: 9.5px; color: var(--ink2); }
+  .cres b { display: block; font-size: 13px; color: var(--ink); }
+  .cres b small { font-size: 9.5px; font-weight: 600; color: var(--ink2); }
   .cv-m { height: 220px; }
   .fn { margin-top: 4px; font-size: 9.5px; line-height: 1.35; color: var(--muted); }
 
@@ -407,8 +426,8 @@
     </div>
     <div class="blk g2" id="p1-anos">
       <div class="st"></div>
-      <div><p class="ct" id="p1-a1-t"></p><div class="cv cv-y"><canvas id="p1-a1"></canvas></div></div>
-      <div><p class="ct" id="p1-a2-t"></p><div class="cv cv-y"><canvas id="p1-a2"></canvas></div></div>
+      <div><p class="ct" id="p1-a1-t"></p><p class="cs cvar" id="p1-a1-s"></p><div class="cv cv-y"><canvas id="p1-a1"></canvas></div></div>
+      <div><p class="ct" id="p1-a2-t"></p><p class="cs cvar" id="p1-a2-s"></p><div class="cv cv-y"><canvas id="p1-a2"></canvas></div></div>
     </div>
     <div class="g21">
       <div class="blk" id="p1-mes">
@@ -498,8 +517,8 @@
     </div>
     <div class="blk g2" id="p3-anos">
       <div class="st"></div>
-      <div><p class="ct" id="p3-a1-t"></p><div class="cv cv-y"><canvas id="p3-a1"></canvas></div></div>
-      <div><p class="ct" id="p3-a2-t"></p><div class="cv cv-y"><canvas id="p3-a2"></canvas></div></div>
+      <div><p class="ct" id="p3-a1-t"></p><p class="cs cvar" id="p3-a1-s"></p><div class="cv cv-y"><canvas id="p3-a1"></canvas></div></div>
+      <div><p class="ct" id="p3-a2-t"></p><p class="cs cvar" id="p3-a2-s"></p><div class="cv cv-y"><canvas id="p3-a2"></canvas></div></div>
     </div>
     <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>3/4</span></footer>
   </section>
@@ -542,8 +561,8 @@
     </div>
     <div class="blk g2" id="p4-anos">
       <div class="st"></div>
-      <div><p class="ct" id="p4-a1-t"></p><div class="cv cv-y"><canvas id="p4-a1"></canvas></div></div>
-      <div><p class="ct" id="p4-a2-t"></p><div class="cv cv-y"><canvas id="p4-a2"></canvas></div></div>
+      <div><p class="ct" id="p4-a1-t"></p><p class="cs cvar" id="p4-a1-s"></p><div class="cv cv-y"><canvas id="p4-a1"></canvas></div></div>
+      <div><p class="ct" id="p4-a2-t"></p><p class="cs cvar" id="p4-a2-s"></p><div class="cv cv-y"><canvas id="p4-a2"></canvas></div></div>
     </div>
     <footer class="sf"><span>Fonte: MapBiomas Monitor do Fogo · <span data-atual></span>. Mapa base © Esri.</span><span>4/4</span></footer>
   </section>
@@ -686,6 +705,7 @@
     <div><h3>Territórios</h3><p id="x-ter-ctx"></p></div>
     <div class="x-sec-a">
       <label class="x-campo">Dividir por <select id="x-div"></select></label>
+      <label class="x-campo" title="Vale para o ranking, a tabela e a variação no mapa">Comparar com <select id="x-ref"></select></label>
       <button class="btn-s" data-ir-filtros>Mudar recorte ou território</button>
     </div>
   </div>
@@ -705,7 +725,7 @@
         </div>
       </div>
       <label class="x-campo" id="x-metrica-w">Medida
-        <select id="x-metrica"><option value="area">Área queimada (ha)</option><option value="var">Variação contra o ano anterior</option></select>
+        <select id="x-metrica"><option value="area">Área queimada (ha)</option><option value="var">Variação (ver “Comparar com”)</option></select>
       </label>
       <label class="x-campo">Comparar com o ano <select id="x-ano2"></select></label>
       <button class="btn-s" id="x-gif-b" title="Anima mês a mês as cicatrizes da área visível no mapa">Gerar animação (GIF)</button>
@@ -726,32 +746,6 @@
       <div class="c-a"><button class="mini" data-png="x-rank">PNG</button><button class="mini" data-csv="x-rank">CSV</button></div>
     </div>
     <div class="ch" id="x-rank-ch"><canvas id="xc-rank" role="img" aria-label="Barras com os territórios de maior área queimada no período e no mesmo período do ano anterior"></canvas></div>
-  </section>
-
-  <section class="card" id="x-cmp">
-    <div class="st"></div>
-    <div class="c-h">
-      <div><p class="eyebrow">Comparar territórios</p><h2 id="x-cmp-t">Comparação entre territórios</h2><p class="sub">Adicione até 3 territórios de qualquer tipo para comparar com <b data-x-nome></b>.</p></div>
-      <div class="c-a"><button class="mini" data-png="x-cmp">PNG</button><button class="mini" data-csv="x-cmp">CSV</button></div>
-    </div>
-    <div class="x-mopts">
-      <div class="x-campo">
-        <label for="x-cmp-busca">Adicionar território</label>
-        <div class="combo">
-          <input id="x-cmp-busca" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="x-cmp-lista" placeholder="Município, UC, terra indígena, estado…">
-          <ul class="combo-l" id="x-cmp-lista" role="listbox" hidden></ul>
-        </div>
-      </div>
-      <div class="x-campo"><span>Mostrar</span>
-        <div class="chips" id="x-cmp-modo">
-          <button class="chip" data-cm="mes">Mês a mês no ano</button>
-          <button class="chip" data-cm="ano">Total do período, por ano</button>
-        </div>
-      </div>
-    </div>
-    <div class="chips x-anos" id="x-cmp-ters"></div>
-    <div class="ch"><canvas id="xc-cmp" role="img" aria-label="Linhas da área queimada de cada território comparado"></canvas></div>
-    <div class="tbl-w"><table class="tbl" id="x-cmp-tab"></table></div>
   </section>
 
   <section class="card" id="x-tab">
@@ -1099,19 +1093,38 @@ function renderKpis(prefix, d, nacional) {
     [varLine(d.acum.previousYearVariation, `vs. jan–${ab} de ${Y - 1}`),
       varLine(d.acum.averageVariation, `vs. média de jan–${ab} (${Y0}–${Y - 1})`)]);
 }
+// Linha tracejada da média dos anos anteriores nos gráficos por ano.
+const linhaMedia = {
+  id: 'linhaMedia',
+  afterDatasetsDraw(chart, _a, o) {
+    if (o.v == null) return;
+    const { ctx, chartArea: a, scales: { y } } = chart, py = y.getPixelForValue(o.v);
+    ctx.save();
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke();
+    ctx.restore();
+  }
+};
+const varSpan = (p, ref) => p == null ? '' : `<b class="${tone(p)}">${p > 0 ? '▲' : '▼'} ${Math.abs(Math.round(p))}%</b> vs. ${ref}`;
 function yearChart(id, anos, vals, Y) {
+  const ant = vals.filter((_, i) => anos[i] < Y);
+  const med = ant.length ? ant.reduce((s, v) => s + v, 0) / ant.length : null;
+  const a0 = anos.find(y => y < Y), a1 = anos.filter(y => y < Y).pop();
   mkChart(id, id, {
     type: 'bar',
     data: {
       labels: anos.map(String),
       datasets: [{ data: vals, backgroundColor: anos.map(y => y === Y ? C.red : C.redL), borderRadius: 3, barPercentage: .78, categoryPercentage: .9 }]
     },
-    plugins: [topLabels],
+    plugins: [topLabels, linhaMedia],
     options: {
       maintainAspectRatio: false,
       layout: { padding: { top: 14 } },
       plugins: {
         legend: { display: false },
+        linhaMedia: { v: med },
         topLabels: { indices: vals.map((_, i) => i), fmt: v => cmp(v, 1) },
         tooltip: { callbacks: { label: c => haC(c.raw) } }
       },
@@ -1125,6 +1138,9 @@ function yearChart(id, anos, vals, Y) {
       }
     }
   });
+  const v = vals[anos.indexOf(Y)], pv = vals[anos.indexOf(Y - 1)];
+  $(`${id}-s`).innerHTML = [pv ? varSpan(pct(v, pv), Y - 1) : '', med ? varSpan(pct(v, med), `<i class="med"></i>média ${a0}–${a1}`) : '']
+    .filter(Boolean).join(' · ');
 }
 // Mesmos dois gráficos (acumulado por ano e só o mês por ano) em todas as páginas.
 function anosCharts(prefix, ts) {
@@ -1146,24 +1162,62 @@ function agrupar(lista) {
   return { cls: out, tot, nat, antr: antrP, resto: Math.max(0, 100 - nat - antrP) };
 }
 const swatch = c => `background:${c.cor}${c.borda ? `;box-shadow:inset 0 0 0 1px ${c.borda}` : ''}`;
-// Cobertura do mês e do acumulado lado a lado, com a mesma legenda e as mesmas cores.
-function coverHTML(lcMes, lcAcum) {
+// Texto no centro da rosca (total do período).
+const centroRosca = {
+  id: 'centroRosca',
+  afterDatasetsDraw(chart, _a, o) {
+    if (!o.l1) return;
+    const { ctx, chartArea: a } = chart, cx = (a.left + a.right) / 2, cy = (a.top + a.bottom) / 2;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = C.ink;
+    ctx.font = '800 10px Montserrat, sans-serif';
+    ctx.fillText(o.l1, cx, cy - 5);
+    ctx.fillStyle = C.ink2;
+    ctx.font = '600 8px Montserrat, sans-serif';
+    ctx.fillText(o.l2, cx, cy + 6);
+    ctx.restore();
+  }
+};
+// Cobertura do mês e do acumulado: duas roscas com as mesmas cores e uma legenda comum.
+function coverHTML(lcMes, lcAcum, pfx) {
   const a = agrupar(lcMes), b = agrupar(lcAcum);
   const { M } = P;
   const lm = cap(MES[M - 1]), la = M === 1 ? 'Jan' : `Jan–${MES[M - 1]}`;
-  const bar = g => `<div class="stack">${g.cls.filter(c => c.ha > 0)
-    .map(c => `<span style="flex:${c.ha};${swatch(c)}" title="${c.nome}: ${fmtP(c.p)}"></span>`).join('')}</div>`;
   const rows = CLS.map((c, i) => ({ c, m: a.cls[i], y: b.cls[i] })).filter(r => r.m.ha > 0 || r.y.ha > 0);
-  return `<div class="cbars"><span>${lm}</span>${bar(a)}<span>${la}</span>${bar(b)}</div>
+  const resto = a.resto >= 1 || b.resto >= 1
+    ? `<p class="fn">Água e áreas não vegetadas: ${fmtP0(Math.round(a.resto * 10) / 10)} em ${lm.toLowerCase()} e ${fmtP0(Math.round(b.resto * 10) / 10)} em ${la.toLowerCase()}.</p>` : '';
+  return `<div class="cdon">
+      <figure><div class="cdon-c"><canvas id="${pfx}-dm"></canvas></div><figcaption>${MES_L[M - 1]}</figcaption></figure>
+      <figure><div class="cdon-c"><canvas id="${pfx}-da"></canvas></div><figcaption>${M === 1 ? 'janeiro' : `janeiro a ${MES_L[M - 1]}`}</figcaption></figure>
+    </div>
     <table class="ctab">
       <thead><tr><th class="l">Classe</th><th>${lm}</th><th>${la}</th></tr></thead>
       <tbody>${rows.map(r => `<tr><td class="l"><i class="sw" style="${swatch(r.c)}"></i>${r.c.nome}</td><td>${fmtP0(r.m.p)}</td><td>${fmtP0(r.y.p)}</td></tr>`).join('')}</tbody>
       <tfoot>
         <tr><td class="l"><b>Vegetação nativa</b></td><td><b>${fmtP(a.nat)}</b></td><td><b>${fmtP(b.nat)}</b></td></tr>
         <tr><td class="l"><b>Área antrópica</b></td><td><b>${fmtP(a.antr)}</b></td><td><b>${fmtP(b.antr)}</b></td></tr>
-        ${a.resto >= 1 || b.resto >= 1 ? `<tr><td class="l">Água e áreas não vegetadas</td><td>${fmtP0(Math.round(a.resto * 10) / 10)}</td><td>${fmtP0(Math.round(b.resto * 10) / 10)}</td></tr>` : ''}
       </tfoot>
-    </table>`;
+    </table>${resto}`;
+}
+function coverDonuts(pfx, lcMes, lcAcum) {
+  [[`${pfx}-dm`, agrupar(lcMes)], [`${pfx}-da`, agrupar(lcAcum)]].forEach(([id, g]) => {
+    const it = g.cls.filter(c => c.ha > 0);
+    mkChart(id, id, {
+      type: 'doughnut',
+      data: { labels: it.map(c => c.nome), datasets: [{ data: it.map(c => c.ha), backgroundColor: it.map(c => c.cor), borderColor: it.map(c => c.borda || '#FFFFFF'), borderWidth: it.map(c => c.borda ? 1 : 1.5) }] },
+      plugins: [centroRosca],
+      options: {
+        maintainAspectRatio: false, cutout: '62%',
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.label}: ${fmtP(c.raw / g.tot * 100)}` } }, centroRosca: { l1: cmp(g.tot, 1), l2: 'ha' } }
+      }
+    });
+  });
+}
+function renderCover(el, pfx, lcMes, lcAcum) {
+  $(el).innerHTML = coverHTML(lcMes, lcAcum, pfx);
+  coverDonuts(pfx, lcMes, lcAcum);
 }
 function rankHTML(items, cor = C.red) {
   const max = Math.max(...items.map(i => i.v), 1);
@@ -1253,7 +1307,7 @@ async function initBoletim() {
     secao('p1-tiles', () => p1Tiles(D)),
     secao('p1-anos', async () => anosCharts('p1', await D.ts)),
     secao('p1-mes', () => p1Mes(D)),
-    secao('p1-cob', async () => { const [a, b] = await Promise.all([D.lcMes, D.lcAcum]); $('p1-cobc').innerHTML = coverHTML(a, b); }),
+    secao('p1-cob', async () => { const [a, b] = await Promise.all([D.lcMes, D.lcAcum]); renderCover('p1-cobc', 'p1', a, b); }),
     secao('p2-mapa', () => p2Mapa(D)),
     secao('p2-bio', () => p2Bio(D)),
     secao('p2-mun', () => p2Lista('city', 'p2-munl', 6)),
@@ -1263,13 +1317,13 @@ async function initBoletim() {
     secao('p2-out', () => p2Outros(D)),
     secao('p3-kpi', () => p3Kpi(D)),
     secao('p3-mapa', () => p3Mapa(D)),
-    secao('p3-cob', async () => { const d = await D.dBio; $('p3-cobc').innerHTML = coverHTML(d.lcMes, d.lcAcum); }),
+    secao('p3-cob', async () => { const d = await D.dBio; renderCover('p3-cobc', 'p3', d.lcMes, d.lcAcum); }),
     secao('p3-anos', async () => anosCharts('p3', (await D.dBio).ts)),
     secao('p4-kpi', () => p4Kpi(D)),
     secao('p4-mapa', () => p4Mapa(D)),
     secao('p4-mun', () => p4Mun(D)),
     secao('p4-anos', async () => anosCharts('p4', (await D.dUF).ts)),
-    secao('p4-cob', async () => { const d = await D.dUF; $('p4-cobc').innerHTML = coverHTML(d.lcMes, d.lcAcum); })
+    secao('p4-cob', async () => { const d = await D.dUF; renderCover('p4-cobc', 'p4', d.lcMes, d.lcAcum); })
   ]);
 }
 
@@ -1554,15 +1608,6 @@ async function fonteTerr(term) {
   for (const t of l) { const i = t.n.indexOf(q); if (i === 0) a.push(t); else if (i > 0) b.push(t); }
   return a.concat(b).slice(0, 80);
 }
-async function fonteBusca(term) {
-  const t = term.trim();
-  if (t.length < 2) return [];
-  const r = await gj(`/api/territories/search/${encodeURIComponent(t)}`);
-  const out = r.filter(i => TIPO_NOME[i.type]).slice(0, 80).map(i => ({ tipo: i.type, code: i.code, label: nomeT(i), sub: TIPO_NOME[i.type] }));
-  if ('brasil'.startsWith(norm(t))) out.unshift({ tipo: 'country', code: 0, label: 'Brasil', sub: 'País' });
-  return out;
-}
-
 // Campo de busca com lista de sugestões, navegável pelo teclado.
 function combo(input, lista, fonte, aoEscolher, aoSair) {
   let itens = [], ativo = -1, t, n = 0;
@@ -1613,12 +1658,11 @@ function lerHash() {
   return {
     tipo, code: int('c', null), label: '', ano, ini, fim, cob: h.get('cob') || '', div: h.get('d') || '',
     anosCmp: (h.get('anos') ?? String(ano - 1)).split(',').map(Number).filter(y => P.anos.includes(y) && y !== ano).slice(0, 3),
-    extras: (h.get('ter') || '').split(',').filter(Boolean).map(s => { const [t, c] = s.split(':'); return { tipo: t, code: +c, label: '' }; })
-      .filter(t => TIPO_NOME[t.tipo] && Number.isFinite(t.code)).slice(0, 3),
+    // Referência dos rankings: '' = ano anterior, um ano, ou 'media' = média dos anos anteriores.
+    ref: h.get('ref') === 'media' ? 'media' : P.anos.includes(int('ref')) ? int('ref') : '',
     modo: ['sub', 'fogo', 'calor'].includes(h.get('mp')) ? h.get('mp') : '',
     metrica: h.get('m') === 'var' ? 'var' : 'area',
     ano2: P.anos.includes(int('m2')) ? int('m2') : '',
-    cmpModo: h.get('cm') === 'ano' ? 'ano' : 'mes',
     nivel: [1, 2, 3, 4].includes(int('nv')) ? int('nv') : 2
   };
 }
@@ -1627,11 +1671,10 @@ function salvarHash() {
   if (f.cob) p.set('cob', f.cob);
   if (f.div) p.set('d', f.div);
   p.set('anos', f.anosCmp.join(','));
-  if (f.extras.length) p.set('ter', f.extras.map(t => `${t.tipo}:${t.code}`).join(','));
+  if (f.ref) p.set('ref', f.ref);
   if (f.modo) p.set('mp', f.modo);
   if (f.metrica === 'var') p.set('m', 'var');
   if (f.ano2) p.set('m2', f.ano2);
-  if (f.cmpModo === 'ano') p.set('cm', 'ano');
   if (f.nivel !== 2) p.set('nv', f.nivel);
   history.replaceState(null, '', `#explorer?${p}`);
 }
@@ -1709,21 +1752,7 @@ function ligarEventos() {
   $('x-metrica').addEventListener('change', () => { f().metrica = $('x-metrica').value; refazer('x-mapa'); });
   $('x-ano2').addEventListener('change', () => { f().ano2 = $('x-ano2').value ? +$('x-ano2').value : ''; refazer('x-mapa'); });
   $('x-gif-b').addEventListener('click', gerarGif);
-  combo($('x-cmp-busca'), $('x-cmp-lista'), fonteBusca, t => {
-    const x = f();
-    $('x-cmp-busca').value = '';
-    if ((t.tipo === x.tipo && t.code === x.code) || x.extras.some(e => e.tipo === t.tipo && e.code === t.code)) return;
-    x.extras.push({ tipo: t.tipo, code: t.code, label: t.label });
-    if (x.extras.length > 3) x.extras.shift();
-    refazer('x-cmp');
-  }, () => { $('x-cmp-busca').value = ''; });
-  $('x-cmp-ters').addEventListener('click', e => {
-    const b = e.target.closest('[data-rm]');
-    if (!b) return;
-    f().extras.splice(+b.dataset.rm, 1);
-    refazer('x-cmp');
-  });
-  $('x-cmp-modo').addEventListener('click', e => { const b = e.target.closest('[data-cm]'); if (b) { f().cmpModo = b.dataset.cm; refazer('x-cmp'); } });
+  $('x-ref').addEventListener('change', () => { const v = $('x-ref').value; f().ref = v === 'media' ? 'media' : v ? +v : ''; xRun(); });
   $('x-tab-q').addEventListener('input', () => { X.tab.q = norm($('x-tab-q').value.trim()); X.tab.page = 1; xTab(); });
   $('x-thead').addEventListener('click', e => {
     const b = e.target.closest('[data-k]');
@@ -1767,7 +1796,7 @@ async function definirTerritorio(tipo, code, manterDiv = false) {
     inp.value = '';
     inp.disabled = false;
     X.req++;
-    ['x-kpi', 'x-saz', 'x-acu', 'x-anual', 'x-cal', 'x-mapa', 'x-rank', 'x-uso', 'x-usoano', 'x-cmp', 'x-tab']
+    ['x-kpi', 'x-saz', 'x-acu', 'x-anual', 'x-cal', 'x-mapa', 'x-rank', 'x-uso', 'x-usoano', 'x-tab']
       .forEach(id => status(id, `Não foi possível carregar a lista de territórios (${e.message}).`, true));
     return;
   }
@@ -1809,10 +1838,17 @@ function atualizarControles() {
   document.querySelectorAll('#x-atalhos [data-at]').forEach(b => { b.classList.toggle('on', b.dataset.at === at); b.setAttribute('aria-pressed', String(b.dataset.at === at)); });
   document.querySelectorAll('#x-nivel [data-nv]').forEach(b => { const on = +b.dataset.nv === f.nivel; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   document.querySelectorAll('[data-x-nome]').forEach(s => { s.textContent = f.label; });
+  const ant = P.anos.filter(y => y < f.ano);
+  $('x-ref').innerHTML = (P.anos.includes(f.ano - 1) ? `<option value="">Ano anterior (${f.ano - 1})</option>` : '')
+    + [...P.anos].reverse().filter(y => y !== f.ano && y !== f.ano - 1).map(y => `<option value="${y}">${y}</option>`).join('')
+    + (ant.length ? `<option value="media">Média dos anos anteriores (${ant[0]}–${ant[ant.length - 1]})</option>` : '');
+  $('x-ref').value = f.ref === 'media' && !ant.length ? '' : String(f.ref);
+  if ($('x-ref').selectedIndex < 0) $('x-ref').selectedIndex = 0;
   const div = (TIPO_NOME[f.div] || '').toLowerCase();
-  $('x-ter-ctx').innerHTML = `Mostrando <b>${esc(f.label)}</b> (${esc(TIPO_NOME[f.tipo].toLowerCase())})`
+  const ri = refInfo(f);
+  $('x-ter-ctx').innerHTML = `Mostrando <b>${esc(f.label)}</b>${f.tipo === 'country' ? '' : ` (${esc(TIPO_NOME[f.tipo].toLowerCase())})`}`
     + (temSub(f) ? `, dividido por ${esc(div)}` : ', que não tem subdivisões na API')
-    + `, em ${esc(mesesTxt(f))}. Para outro recorte, use o botão ao lado ou o filtro no topo.`;
+    + `, em ${esc(mesesTxt(f))}${ri && temSub(f) ? `, comparado com ${esc(ri.rot)}` : ''}. Para outro recorte, use o botão ao lado ou o filtro no topo.`;
   $('x-ctx-t').innerHTML = `<b>${esc(f.label)}</b> · ${esc(abrevP(f))} ${f.ano}${f.cob ? ` · ${esc(cobNome(f))}` : ''}`;
   const parcial = f.ano === P.Y && f.fim > P.M;
   $('x-aviso').hidden = !parcial;
@@ -1843,10 +1879,7 @@ function xRun() {
   const tot = `${f.tipo}/${f.code}/${gTot(f)}`, sub = `${f.tipo}/${f.code}/${f.div}`;
   const MP = gj(`/api/statistics/time-series/${tot}${qs({ monthStart: 1, monthEnd: 12, landCover: f.cob })}`).then(matriz);
   const rankP = temSub(f)
-    ? Promise.all([
-      gj(`/api/statistics/ranking/${sub}/raw${qs(per)}`),
-      f.ano > P.anos[0] ? gj(`/api/statistics/ranking/${sub}/raw${qs({ ...per, year: f.ano - 1 })}`).catch(() => []) : Promise.resolve([])
-    ])
+    ? Promise.all([gj(`/api/statistics/ranking/${sub}/raw${qs(per)}`), refVals(sub, per, refInfo(f))])
     : null;
   MP.catch(() => {});
   rankP?.catch(() => {});
@@ -1898,7 +1931,6 @@ function xRun() {
       ]);
       if (vivo()) xUsoAno(lcs, tr, f);
     }),
-    'x-cmp': job('x-cmp', () => xCmp(f, vivo)),
     'x-tab': job('x-tab', async () => {
       if (!rankP) return semSub('x-tab');
       const [cur, prev] = await rankP;
@@ -1906,6 +1938,20 @@ function xRun() {
     })
   };
   Object.values(X.jobs).forEach(j => j());
+}
+// Com o que o ranking, a tabela e a variação do mapa são comparados.
+function refInfo(f) {
+  const ant = P.anos.filter(y => y < f.ano);
+  if (f.ref === 'media') return ant.length ? { anos: ant, rot: `média ${ant[0]}–${ant[ant.length - 1]}`, col: `media_${ant[0]}_${ant[ant.length - 1]}` } : null;
+  const y = f.ref && f.ref !== f.ano ? f.ref : f.ano - 1;
+  return P.anos.includes(y) ? { anos: [y], rot: String(y), col: String(y) } : null;
+}
+async function refVals(sub, per, ri) {
+  if (!ri) return { v: {}, rot: null, col: null };
+  const rs = await Promise.all(ri.anos.map(y => gj(`/api/statistics/ranking/${sub}/raw${qs({ ...per, year: y })}`).catch(() => [])));
+  const v = {};
+  rs.forEach(r => r.forEach(i => { v[i.code] = (v[i.code] || 0) + (i.value || 0) / ri.anos.length; }));
+  return { v, rot: ri.rot, col: ri.col };
 }
 // Redesenha só alguns blocos, com os dados já em cache (troca de anos comparados, camada do mapa etc.).
 function refazer(...ids) {
@@ -2210,9 +2256,9 @@ async function xMapa(f, vivo, rankP) {
     gj(`/api/territories/${f.tipo}/${f.code}/bounds`),
     (async () => {
       if (modoOk !== 'sub') return { url1: await fogoUrl(f.ano), url2: ano2 ? await fogoUrl(ano2) : null };
-      const [cur, prev] = await rankP;
+      const [cur, ref] = await rankP;
       const cur2 = ano2 ? await gj(`/api/statistics/ranking/${f.tipo}/${f.code}/${f.div}/raw${qs({ ...per, year: ano2 })}`) : null;
-      return { cur, prev, cur2 };
+      return { cur, ref, cur2 };
     })()
   ]);
   if (!vivo()) return;
@@ -2220,14 +2266,14 @@ async function xMapa(f, vivo, rankP) {
   let d1, d2 = null, leg = '', csv = null;
   if (modoOk === 'sub') {
     const v1 = Object.fromEntries(dados.cur.map(i => [i.code, i.value || 0]));
-    const vp = Object.fromEntries(dados.prev.map(i => [i.code, i.value || 0]));
+    const vp = dados.ref.v, rot = dados.ref.rot || 'referência';
     const nomes = Object.fromEntries(dados.cur.map(i => [i.code, nomeT(i)]));
     const v2 = dados.cur2 ? Object.fromEntries(dados.cur2.map(i => [i.code, i.value || 0])) : null;
     if (metrica === 'var') {
       const pv = code => (v1[code] || vp[code]) ? (vp[code] ? pct(v1[code] || 0, vp[code]) : 100) : null;
       const cor = code => { const k = classeVar(pv(code)); return k < 0 ? SEM_DADO : DIV_CORES[k]; };
-      const tip = p => { const code = p.code, x = pv(code); return `<b>${esc(nomes[code] || p.name)}</b><br>${f.ano}: ${haC(v1[code] || 0)}<br>${f.ano - 1}: ${haC(vp[code] || 0)}`
-        + (x == null ? '' : `<br>Variação: ${vp[code] ? pctTxt(x) : 'sem fogo no ano anterior'}`) + '<br><small>Clique para abrir este recorte</small>'; };
+      const tip = p => { const code = p.code, x = pv(code); return `<b>${esc(nomes[code] || p.name)}</b><br>${f.ano}: ${haC(v1[code] || 0)}<br>${cap(rot)}: ${haC(vp[code] || 0)}`
+        + (x == null ? '' : `<br>Variação: ${vp[code] ? pctTxt(x) : `sem fogo em ${rot}`}`) + '<br><small>Clique para abrir este recorte</small>'; };
       d1 = { modo: 'sub', cor, tip };
       leg = legVar();
     } else {
@@ -2243,7 +2289,7 @@ async function xMapa(f, vivo, rankP) {
     }
     csv = {
       nome: `mapa-por-${slug(TIPO_NOME[f.div] || f.div)}`,
-      cols: ['codigo', 'territorio', 'uf', `area_${f.ano}_ha`, `area_${f.ano - 1}_ha`, 'variacao_pct', ...(v2 ? [`area_${ano2}_ha`] : [])],
+      cols: ['codigo', 'territorio', 'uf', `area_${f.ano}_ha`, `area_${dados.ref.col || 'referencia'}_ha`, 'variacao_pct', ...(v2 ? [`area_${ano2}_ha`] : [])],
       rows: dados.cur.map(i => [i.code, i.uf ? i.name : nomeT(i), i.uf || '', i.value || 0, vp[i.code] ?? '', vp[i.code] ? pct(i.value || 0, vp[i.code]) : '', ...(v2 ? [v2[i.code] ?? ''] : [])])
     };
   } else {
@@ -2256,7 +2302,7 @@ async function xMapa(f, vivo, rankP) {
   setDl('x-mapa', csv);
   const camadaTxt = { sub: `por ${(TIPO_NOME[f.div] || '').toLowerCase()}`, fogo: 'cicatrizes de fogo', calor: 'mapa de calor' }[modoOk];
   $('x-mapa-t').textContent = `Onde queimou: ${f.label}`;
-  $('x-mapa-s').textContent = `${cap(mesesTxt(f))} · ${camadaTxt}${metrica === 'var' && modoOk === 'sub' ? `, variação contra ${f.ano - 1}` : ''}.`;
+  $('x-mapa-s').textContent = `${cap(mesesTxt(f))} · ${camadaTxt}${metrica === 'var' && modoOk === 'sub' ? `, variação contra ${refInfo(f)?.rot || 'o ano anterior'}` : ''}.`;
   $('x-mapa-leg').innerHTML = leg;
   $('x-mapa-n').textContent = modoOk === 'sub'
     ? 'Passe o mouse sobre uma área para ver os valores. Clique para abrir esse território como recorte.'
@@ -2320,14 +2366,14 @@ const rotulos = {
   }
 };
 
-function xRank(cur, prev, f) {
-  const vp = Object.fromEntries(prev.map(i => [i.code, i.value || 0]));
+function xRank(cur, ref, f) {
+  const vp = ref.v, rot = ref.rot;
   const it = cur.filter(i => i.value > 0).slice(0, 15);
   const nomes = it.map(nomeT);
   const div = (TIPO_NOME[f.div] || f.div).toLowerCase();
   $('x-rank-t').textContent = `Mais afetados por ${div}`;
   $('x-rank-s').textContent = it.length
-    ? `Os ${it.length} com mais área queimada em ${mesesTxt(f)}, comparados ao mesmo período de ${f.ano - 1}.`
+    ? `Os ${it.length} com mais área queimada em ${mesesTxt(f)}${rot ? (rot.startsWith('média') ? `, comparados à ${rot} dos mesmos meses` : `, comparados aos mesmos meses de ${rot}`) : ''}.`
     : 'Nenhuma área queimada no período.';
   $('x-rank-ch').style.height = `${Math.max(200, it.length * 30 + 70)}px`;
   mkChart('x-rank', 'xc-rank', {
@@ -2336,7 +2382,7 @@ function xRank(cur, prev, f) {
       labels: nomes.map(n => curto(n)),
       datasets: [
         { label: String(f.ano), data: it.map(i => i.value), backgroundColor: SER[0], borderRadius: 3, barPercentage: .9, categoryPercentage: .8 },
-        { label: String(f.ano - 1), data: it.map(i => vp[i.code] || 0), backgroundColor: '#C4C4C4', borderRadius: 3, barPercentage: .9, categoryPercentage: .8 }
+        ...(rot ? [{ label: cap(rot), data: it.map(i => vp[i.code] || 0), backgroundColor: '#BDBDBD', borderRadius: 3, barPercentage: .9, categoryPercentage: .8 }] : [])
       ]
     },
     options: {
@@ -2347,7 +2393,7 @@ function xRank(cur, prev, f) {
           callbacks: {
             title: items => nomes[items[0].dataIndex],
             label: c => ` ${c.dataset.label}: ${haC(c.raw)}`,
-            afterBody: items => { const i = it[items[0].dataIndex], p = pct(i.value, vp[i.code] || 0); return p == null ? 'Sem fogo no ano anterior' : `Variação: ${pctTxt(p)}`; }
+            afterBody: items => { if (!rot) return ''; const i = it[items[0].dataIndex], p = pct(i.value, vp[i.code] || 0); return p == null ? `Sem fogo em ${rot}` : `Variação contra ${rot}: ${pctTxt(p)}`; }
           }
         }
       },
@@ -2359,7 +2405,7 @@ function xRank(cur, prev, f) {
   });
   setDl('x-rank', {
     nome: `ranking-por-${slug(TIPO_NOME[f.div] || f.div)}`,
-    cols: ['posicao', 'codigo', 'territorio', 'uf', `area_${f.ano}_ha`, `area_${f.ano - 1}_ha`, 'variacao_pct'],
+    cols: ['posicao', 'codigo', 'territorio', 'uf', `area_${f.ano}_ha`, `area_${ref.col || 'referencia'}_ha`, 'variacao_pct'],
     rows: it.map((i, k) => [k + 1, i.code, i.uf ? i.name : nomeT(i), i.uf || '', i.value, vp[i.code] ?? '', vp[i.code] ? pct(i.value, vp[i.code]) : ''])
   });
 }
@@ -2447,53 +2493,10 @@ function xUsoAno(lcs, tr, f) {
   });
 }
 
-async function tsTerr(t, f) {
-  const g = t.tipo === 'country' ? 'biome' : (await pickGroup(t.tipo, t.code)).key;
-  return matriz(await gj(`/api/statistics/time-series/${t.tipo}/${t.code}/${g}${qs({ monthStart: 1, monthEnd: 12, landCover: f.cob })}`));
-}
-async function rotuloTerr(t) {
-  if (t.label) return t.label;
-  try { t.label = (await listaTerr(t.tipo)).find(x => x.code === t.code)?.label || `${TIPO_NOME[t.tipo]} ${t.code}`; }
-  catch { t.label = `${TIPO_NOME[t.tipo]} ${t.code}`; }
-  return t.label;
-}
-async function xCmp(f, vivo) {
-  document.querySelectorAll('#x-cmp-modo [data-cm]').forEach(b => { b.classList.toggle('on', b.dataset.cm === f.cmpModo); b.setAttribute('aria-pressed', String(b.dataset.cm === f.cmpModo)); });
-  const ters = [{ tipo: f.tipo, code: f.code, label: f.label }, ...f.extras];
-  await Promise.all(f.extras.map(rotuloTerr));
-  if (!vivo()) return;
-  const traco = ['solid', 'solid', 'dashed', 'dotted'];
-  $('x-cmp-ters').innerHTML = ters.map((t, i) => `<span class="chip sel"><i style="height:0;background:none;border-top:3px ${traco[i]} ${SER[i]}"></i>${esc(t.label)}`
-    + (i ? `<button class="mini" style="margin-left:6px;padding:0 6px" data-rm="${i - 1}" aria-label="Remover ${esc(t.label)}">×</button>` : '') + '</span>').join('')
-    + (f.extras.length ? '' : '<span class="fn">Use a busca acima para adicionar territórios.</span>');
-  const Ms = await Promise.all(ters.map(t => tsTerr(t, f)));
-  if (!vivo()) return;
-  const porAno = f.cmpModo === 'ano';
-  const labels = porAno ? P.anos.map(String) : MES.map(cap);
-  const serie = M => porAno ? P.anos.map(y => somaP(M[y], f.ini, f.fim)) : M[f.ano];
-  $('x-cmp-t').textContent = porAno ? `Área queimada de ${abrevP(f).toLowerCase()} em cada ano` : `Área queimada mês a mês em ${f.ano}`;
-  mkChart('x-cmp', 'xc-cmp', {
-    type: 'line',
-    data: { labels, datasets: ters.map((t, i) => linhaAno(t.label, serie(Ms[i]), SER[i], i ? 2 : 3, DASH[i])) },
-    options: opLinha('Área queimada (ha)', porAno ? 'Ano' : 'Mês', null)
-  });
-  const linhas = ters.map((t, i) => {
-    const v = somaP(Ms[i][f.ano], f.ini, f.fim), p = Ms[i][f.ano - 1] ? somaP(Ms[i][f.ano - 1], f.ini, f.fim) : null;
-    return { t, v, p, d: p == null ? null : pct(v, p) };
-  });
-  $('x-cmp-tab').innerHTML = `<thead><tr><th class="l">Território</th><th class="l">Tipo</th><th>${abrevP(f)} ${f.ano} (ha)</th><th>${abrevP(f)} ${f.ano - 1} (ha)</th><th>Variação</th></tr></thead><tbody>`
-    + linhas.map((r, i) => `<tr><td class="l"><i class="sw" style="background:${SER[i]}"></i>${esc(r.t.label)}</td><td class="l">${esc(TIPO_NOME[r.t.tipo])}</td>`
-      + `<td>${nf0(r.v)}</td><td>${r.p == null ? '—' : nf0(r.p)}</td><td class="${tone(r.d)}">${r.d == null ? '—' : pctTxt(r.d)}</td></tr>`).join('') + '</tbody>';
-  setDl('x-cmp', {
-    nome: porAno ? 'comparacao-por-ano' : 'comparacao-mes-a-mes',
-    cols: [porAno ? 'ano' : 'mes', ...ters.map(t => `${t.label} (ha)`)],
-    rows: labels.map((l, k) => [porAno ? +l : MES_L[k], ...ters.map((_, i) => serie(Ms[i])[k] ?? '')])
-  });
-}
-
 /* ---------- tabela ---------- */
-function xTabDados(cur, prev, f) {
-  const vp = Object.fromEntries(prev.map(i => [i.code, i.value || 0]));
+function xTabDados(cur, ref, f) {
+  const vp = ref.v;
+  X.tab.rot = ref.rot ? cap(ref.rot) : 'Referência';
   const total = cur.reduce((s, i) => s + (i.value || 0), 0) || 1;
   X.tab.rows = cur.map(i => {
     const v = i.value || 0, p = vp[i.code];
@@ -2509,7 +2512,7 @@ function xTabDados(cur, prev, f) {
   xTab();
   setDl('x-tab', {
     nome: `tabela-por-${slug(TIPO_NOME[f.div] || f.div)}`,
-    cols: ['posicao', 'codigo', 'territorio', ...(X.tab.uf ? ['uf'] : []), `area_${f.ano}_ha`, 'percentual_do_total', `area_${f.ano - 1}_ha`, 'variacao_pct'],
+    cols: ['posicao', 'codigo', 'territorio', ...(X.tab.uf ? ['uf'] : []), `area_${f.ano}_ha`, 'percentual_do_total', `area_${ref.col || 'referencia'}_ha`, 'variacao_pct'],
     rows: X.tab.rows.map(r => [r.pos, r.code, r.nome, ...(X.tab.uf ? [r.uf] : []), r.v, r.share, r.p ?? '', r.var ?? ''])
   });
 }
@@ -2528,7 +2531,7 @@ function xTab() {
   const max = Math.max(1, ...T.rows.map(r => r.v));
   const th = (k, txt, l = false) => `<th class="${l ? 'l' : ''}" aria-sort="${T.k === k ? (T.dir > 0 ? 'ascending' : 'descending') : 'none'}"><button data-k="${k}">${txt}${T.k === k ? (T.dir > 0 ? ' ↑' : ' ↓') : ''}</button></th>`;
   $('x-thead').innerHTML = `<tr>${th('pos', '#', true)}${th('nome', 'Território', true)}${T.uf ? th('uf', 'UF', true) : ''}${th('v', `${a} (ha)`)}${th('share', '% do total')}`
-    + `<th class="l">Proporção</th>${th('p', `${a - 1} (ha)`)}${th('var', 'Variação')}</tr>`;
+    + `<th class="l">Proporção</th>${th('p', `${T.rot} (ha)`)}${th('var', 'Variação')}</tr>`;
   $('x-tbody').innerHTML = ord.slice((T.page - 1) * POR, T.page * POR).map(r => `<tr>
     <td class="l">${r.pos}</td><td class="l">${esc(r.nome)}</td>${T.uf ? `<td class="l">${r.uf}</td>` : ''}
     <td>${nf0(r.v)}</td><td>${r.v ? fmtP(r.share) : '–'}</td>

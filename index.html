@@ -943,7 +943,11 @@
         </div>
       </div>
       <label class="x-campo" id="x-metrica-w">Medida
-        <select id="x-metrica"><option value="area">Área queimada (ha)</option><option value="var">Variação percentual</option></select>
+        <select id="x-metrica">
+          <option value="area">Área queimada (ha)</option>
+          <option value="var">Variação % vs. ano anterior</option>
+          <option value="var-media">Variação % vs. média histórica</option>
+        </select>
       </label>
     </div>
     <div class="leg" id="x-mapa-leg"></div>
@@ -2291,13 +2295,24 @@ function ligarEventos() {
     refazer('x-saz', 'x-acu', 'x-anual');
   });
   $('x-modo').addEventListener('click', e => { const b = e.target.closest('[data-modo]'); if (b) { f().modo = b.dataset.modo; refazer('x-mapa'); } });
-  $('x-metrica').addEventListener('change', () => { f().metrica = $('x-metrica').value; refazer('x-mapa'); });
+  $('x-metrica').addEventListener('change', () => {
+    const v = $('x-metrica').value, x = f();
+    const base = v === 'var-media' ? 'media' : '';
+    const mudouBase = v !== 'area' && x.ref !== base;
+    x.metrica = v === 'area' ? 'area' : 'var';
+    if (v !== 'area') x.ref = base;
+    sincronizarCmp();
+    // A base de comparação entra no rankP: só dá para trocar sem refazer tudo quando ela não muda.
+    if (mudouBase) xRun(); else refazer('x-mapa', 'x-rank');
+  });
   $('x-cmp').addEventListener('click', e => {
     const b = e.target.closest('[data-cmp]');
     if (!b) return;
     const x = f();
     x.ref = b.dataset.cmp === 'media' ? 'media' : '';
     x.metrica = 'var';
+    $('x-metrica').value = x.ref === 'media' ? 'var-media' : 'var';
+    sincronizarCmp();
     xRun();
   });
   $('x-link').addEventListener('click', copiarLink);
@@ -2358,6 +2373,18 @@ async function atualizarDiv(manter) {
   sel.disabled = keys.length <= 1;
 }
 
+// O toggle do Top 15 e o seletor de medida do mapa falam da mesma base de comparação.
+function sincronizarCmp() {
+  const f = X.f;
+  document.querySelectorAll('#x-cmp [data-cmp]').forEach(b => {
+    const on = b.dataset.cmp === 'media' ? f.ref === 'media' : f.ref !== 'media';
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+  const sel = $('x-metrica');
+  if (sel && f.metrica === 'var') sel.value = f.ref === 'media' ? 'var-media' : 'var';
+}
+
 function atualizarControles() {
   const f = X.f, ult = f.ano === P.Y ? P.M : 12;
   $('x-ano').value = f.ano;
@@ -2373,11 +2400,7 @@ function atualizarControles() {
   document.querySelectorAll('#x-atalhos [data-at]').forEach(b => { b.classList.toggle('on', b.dataset.at === at); b.setAttribute('aria-pressed', String(b.dataset.at === at)); });
   document.querySelectorAll('#x-nivel [data-nv]').forEach(b => { const on = +b.dataset.nv === f.nivel; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   document.querySelectorAll('[data-x-nome]').forEach(s => { s.textContent = f.label; });
-  document.querySelectorAll('#x-cmp [data-cmp]').forEach(b => {
-    const on = b.dataset.cmp === 'media' ? f.ref === 'media' : f.ref !== 'media';
-    b.classList.toggle('on', on);
-    b.setAttribute('aria-pressed', String(on));
-  });
+  sincronizarCmp();
   const div = (TIPO_NOME[f.div] || '').toLowerCase();
   const ri = refInfo(f);
   $('x-ter-ctx').innerHTML = `Mostrando <b>${esc(f.label)}</b>${f.tipo === 'country' ? '' : ` (${esc(TIPO_NOME[f.tipo].toLowerCase())})`}`
@@ -2729,10 +2752,11 @@ function classeVar(p) {
   while (i < DIV_LIM.length && p > DIV_LIM[i]) i++;
   return i;
 }
-function legVar() {
+function legVar(base) {
   const t = ['queda de mais de 50%', 'queda de 10% a 50%', 'estável (±10%)', 'alta de 10% a 50%', 'alta de mais de 50%'];
+  const sem = base === 'media' ? 'sem fogo na média histórica' : 'sem fogo nos dois anos';
   return DIV_CORES.map((c, i) => `<span><i style="background:${c}"></i>${t[i]}</span>`).join('')
-    + `<span><i style="background:${SEM_DADO}"></i>sem fogo nos dois anos</span>`;
+    + `<span><i style="background:${SEM_DADO}"></i>${sem}</span>`;
 }
 function camadas(m, f, d) {
   limparMapa(m);
@@ -2767,7 +2791,8 @@ async function xMapa(f, vivo, rankP) {
     b.disabled = b.dataset.modo === 'sub' && !sub;
   });
   // A variação só existe no mapa por subdivisão; nas camadas de cicatrizes e calor mostramos a área do ano.
-  const metrica = modoOk === 'sub' && f.metrica === 'var' ? 'var' : 'area';
+  const variacao = modoOk === 'sub' && f.metrica === 'var';
+  const metrica = variacao ? (f.ref === 'media' ? 'var-media' : 'var') : 'area';
   $('x-metrica-w').hidden = modoOk !== 'sub';
   $('x-metrica').value = metrica;
   $('x-metrica').disabled = modoOk !== 'sub';
@@ -2788,7 +2813,7 @@ async function xMapa(f, vivo, rankP) {
     const vp = dados.ref.v;
     rot = dados.ref.rot || 'referência';
     const nomes = Object.fromEntries(dados.cur.map(i => [i.code, nomeT(i)]));
-    if (metrica === 'var') {
+    if (variacao) {
       // Um único mapa coroplético divergente: frio para queda, neutro para estabilidade e quente para aumento.
       const pv = code => vp[code] > 0 ? pct(v1[code] || 0, vp[code]) : null;
       const cor = code => { const k = classeVar(pv(code)); return k < 0 ? SEM_DADO : DIV_CORES[k]; };
@@ -2799,7 +2824,7 @@ async function xMapa(f, vivo, rankP) {
           + '<br><small>Clique para abrir este recorte</small>';
       };
       d1 = { modo: 'sub', cor, tip };
-      leg = legVar();
+      leg = legVar(f.ref);
     } else {
       const cls = classes(Object.values(v1));
       d1 = {
@@ -2822,7 +2847,7 @@ async function xMapa(f, vivo, rankP) {
   setDl('x-mapa', csv);
   const camadaTxt = { sub: `por ${(TIPO_NOME[f.div] || '').toLowerCase()}`, fogo: 'cicatrizes de fogo', calor: 'mapa de calor' }[modoOk];
   $('x-mapa-t').textContent = `Onde queimou: ${f.label}`;
-  $('x-mapa-s').textContent = `${cap(mesesTxt(f))} · ${camadaTxt}${metrica === 'var' && modoOk === 'sub' ? ` · variação contra ${rot}` : ''}.`;
+  $('x-mapa-s').textContent = `${cap(mesesTxt(f))} · ${camadaTxt}${variacao ? ` · variação contra ${rot}` : ''}.`;
   $('x-mapa-leg').innerHTML = leg;
   $('x-mapa-n').textContent = modoOk === 'sub'
     ? 'Passe o mouse sobre uma área para ver os valores. Clique para abrir esse território como recorte.'

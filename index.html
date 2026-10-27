@@ -395,6 +395,10 @@
   .x-cmp button + button { border-left: 1px solid var(--line); }
   .x-cmp button:hover { background: var(--soft); }
   .x-cmp button.on { background: var(--red); color: #fff; }
+  .x-rankopts { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 10px; }
+  .x-rankopts .x-cmp { margin-top: 0; }
+  .x-ranklab { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); }
+  .x-ranklab.sep { margin-left: 8px; }
   .rk15 { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 1px; }
   .rk15 li { display: grid; grid-template-columns: 26px minmax(0, 1fr) minmax(80px, 1.3fr) 96px 80px; align-items: center; gap: 10px;
     padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
@@ -408,7 +412,8 @@
   .rk15 .d.up { color: var(--red-d); }
   .rk15 .d.down { color: var(--good); }
   .rk15 .d.zero { color: var(--muted); }
-  .rk15 .vazio { display: block; padding: 12px 0; color: var(--muted); font-size: 12px; }
+  .rk15 .vazio { display: block; padding: 18px 8px; color: var(--muted); font-size: 12.5px; text-align: center; }
+  .rk15 li.vazio-l { display: block; border-bottom: 0; }
   @media screen and (max-width: 700px) {
     .rk15 li { grid-template-columns: 22px minmax(0, 1fr) 86px 68px; }
     .rk15 .b { display: none; }
@@ -420,7 +425,7 @@
 
   /* Painel no modo PDF: largura de uma folha A4 deitada, sem os controles. */
   html.px .xpane { width: 277mm; max-width: none; margin: 0 auto; padding: 0; }
-  html.px :is(.x-filtros, .c-a, .x-mopts, .x-anos, .x-cmp, #x-mapa-n, .leaflet-control-zoom, .x-perrow, .x-sec .x-campo, .x-sec-a, .x-ctx, .x-per .sub) { display: none !important; }
+  html.px :is(.x-filtros, .c-a, .x-mopts, .x-anos, .x-cmp, .x-rankopts, #x-mapa-n, .leaflet-control-zoom, .x-perrow, .x-sec .x-campo, .x-sec-a, .x-ctx, .x-per .sub) { display: none !important; }
   html.px .x-print-head { display: flex; align-items: center; gap: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--red); }
   html.px .x-print-head img { height: 34px; }
   html.px .x-print-head .x-ph-desc { margin-left: auto; font-size: 12px; font-weight: 700; }
@@ -889,10 +894,10 @@
     <div><h3>Uso e cobertura</h3><p>O que queimou em <b data-x-nome></b>, pelas classes de uso e cobertura do MapBiomas.</p></div>
     <div class="x-campo"><span>Nível da legenda</span>
       <div class="chips" id="x-nivel">
-        <button class="chip" data-nv="1">Nível 1</button>
-        <button class="chip" data-nv="2">Nível 2</button>
-        <button class="chip" data-nv="3">Nível 3</button>
-        <button class="chip" data-nv="4">Nível 4</button>
+        <button type="button" class="chip" data-nv="1" aria-pressed="false">Nível 1</button>
+        <button type="button" class="chip on" data-nv="2" aria-pressed="true">Nível 2</button>
+        <button type="button" class="chip" data-nv="3" aria-pressed="false">Nível 3</button>
+        <button type="button" class="chip" data-nv="4" aria-pressed="false">Nível 4</button>
       </div>
     </div>
   </div>
@@ -963,9 +968,17 @@
       <div><p class="eyebrow">Ranking</p><h2 id="x-rank-t">Top 15 territórios</h2><p class="sub" id="x-rank-s"></p></div>
       <div class="c-a"><button class="mini" data-csv="x-rank">CSV</button></div>
     </div>
-    <div class="x-cmp" id="x-cmp" role="group" aria-label="Base de comparação do ranking">
-      <button type="button" class="on" data-cmp="ano" aria-pressed="true">vs. Ano Anterior</button>
-      <button type="button" data-cmp="media" aria-pressed="false">vs. Média Histórica</button>
+    <div class="x-rankopts">
+      <span class="x-ranklab">Comparar</span>
+      <div class="x-cmp" id="x-cmp" role="group" aria-label="Base de comparação do ranking">
+        <button type="button" class="on" data-cmp="ano" aria-pressed="true">vs. Ano Anterior</button>
+        <button type="button" data-cmp="media" aria-pressed="false">vs. Média Histórica</button>
+      </div>
+      <span class="x-ranklab sep">Mostrar</span>
+      <div class="x-cmp" id="x-anom" role="group" aria-label="Filtro do ranking">
+        <button type="button" class="on" data-anom="todos" aria-pressed="true">Todos</button>
+        <button type="button" data-anom="media" aria-pressed="false">Apenas acima da média</button>
+      </div>
     </div>
     <ol class="rk15" id="x-rank-l" aria-live="polite"></ol>
   </section>
@@ -2204,11 +2217,14 @@ function lerHash() {
   const ano = P.anos.includes(int('a')) ? int('a') : P.Y;
   const ini = Math.min(12, Math.max(1, int('i', 1)));
   const fim = Math.min(12, Math.max(ini, int('f', ano === P.Y ? P.M : 12)));
+  // "Apenas acima da média" só faz sentido com a média histórica como base.
+  const anom = h.get('anom') === '1';
   return {
     tipo, code: int('c', null), label: '', ano, ini, fim, cob: h.get('cob') || '', div: h.get('d') || '',
     anosCmp: (h.get('anos') ?? String(ano - 1)).split(',').map(Number).filter(y => P.anos.includes(y) && y !== ano).slice(0, 3),
     // Referência dos rankings e da variação no mapa: '' = ano anterior, 'media' = média dos anos anteriores.
-    ref: h.get('ref') === 'media' ? 'media' : '',
+    ref: (anom || h.get('ref') === 'media') ? 'media' : '',
+    anom,
     modo: ['sub', 'fogo', 'calor'].includes(h.get('mp')) ? h.get('mp') : '',
     metrica: h.get('m') === 'var' ? 'var' : 'area',
     nivel: [1, 2, 3, 4].includes(int('nv')) ? int('nv') : 2
@@ -2220,6 +2236,7 @@ function salvarHash() {
   if (f.div) p.set('d', f.div);
   p.set('anos', f.anosCmp.join(','));
   if (f.ref) p.set('ref', f.ref);
+  if (f.anom) p.set('anom', '1');
   if (f.modo) p.set('mp', f.modo);
   if (f.metrica === 'var') p.set('m', 'var');
   if (f.nivel !== 2) p.set('nv', f.nivel);
@@ -2276,7 +2293,13 @@ function ligarEventos() {
     x.anosCmp = x.anosCmp.filter(y => y !== x.ano);
     xRun();
   });
-  $('x-nivel').addEventListener('click', e => { const b = e.target.closest('[data-nv]'); if (b) { f().nivel = +b.dataset.nv; refazer('x-uso', 'x-usoano'); } });
+  $('x-nivel').addEventListener('click', e => {
+    const b = e.target.closest('[data-nv]');
+    if (!b) return;
+    f().nivel = +b.dataset.nv;
+    sincronizarNivel();
+    refazer('x-uso', 'x-usoano');
+  });
   document.querySelectorAll('[data-ir-filtros]').forEach(b => b.addEventListener('click', () => {
     $('x-filtros').scrollIntoView({ behavior: 'smooth', block: 'start' });
     setTimeout(() => ($('x-terr').disabled ? $('x-tipo') : $('x-terr')).focus({ preventScroll: true }), 450);
@@ -2301,7 +2324,10 @@ function ligarEventos() {
     const mudouBase = v !== 'area' && x.ref !== base;
     x.metrica = v === 'area' ? 'area' : 'var';
     if (v !== 'area') x.ref = base;
+    // O filtro do ranking é definido pela média histórica; ao variar contra o ano anterior, ele sai.
+    if (v === 'var') x.anom = false;
     sincronizarCmp();
+    sincronizarAnom();
     // A base de comparação entra no rankP: só dá para trocar sem refazer tudo quando ela não muda.
     if (mudouBase) xRun(); else refazer('x-mapa', 'x-rank');
   });
@@ -2310,10 +2336,26 @@ function ligarEventos() {
     if (!b) return;
     const x = f();
     x.ref = b.dataset.cmp === 'media' ? 'media' : '';
+    // O filtro "apenas acima da média" depende da média histórica: ao voltar para o ano anterior, ele sai.
+    if (x.ref !== 'media') x.anom = false;
     x.metrica = 'var';
     $('x-metrica').value = x.ref === 'media' ? 'var-media' : 'var';
     sincronizarCmp();
+    sincronizarAnom();
     xRun();
+  });
+  $('x-anom').addEventListener('click', e => {
+    const b = e.target.closest('[data-anom]');
+    if (!b) return;
+    const x = f(), on = b.dataset.anom === 'media';
+    if (x.anom === on) return;
+    const mudouBase = on && x.ref !== 'media';
+    x.anom = on;
+    if (on) x.ref = 'media';
+    sincronizarCmp();
+    sincronizarAnom();
+    // A base de comparação entra no rankP: mudar para a média exige recalcular o ranking.
+    if (mudouBase) xRun(); else refazer('x-rank');
   });
   $('x-link').addEventListener('click', copiarLink);
   $('tab-explorer').addEventListener('click', e => {
@@ -2385,6 +2427,25 @@ function sincronizarCmp() {
   if (sel && f.metrica === 'var') sel.value = f.ref === 'media' ? 'var-media' : 'var';
 }
 
+// Estado visual do filtro do ranking e do seletor de nível da legenda.
+function sincronizarAnom() {
+  const on = !!X.f.anom;
+  document.querySelectorAll('#x-anom [data-anom]').forEach(b => {
+    const ativo = (b.dataset.anom === 'media') === on;
+    b.classList.toggle('on', ativo);
+    b.setAttribute('aria-pressed', String(ativo));
+  });
+}
+
+function sincronizarNivel() {
+  const n = X.f.nivel;
+  document.querySelectorAll('#x-nivel [data-nv]').forEach(b => {
+    const ativo = +b.dataset.nv === n;
+    b.classList.toggle('on', ativo);
+    b.setAttribute('aria-pressed', String(ativo));
+  });
+}
+
 function atualizarControles() {
   const f = X.f, ult = f.ano === P.Y ? P.M : 12;
   $('x-ano').value = f.ano;
@@ -2398,9 +2459,10 @@ function atualizarControles() {
   $('x-at-mes').textContent = `Mês mais recente (${MES[P.M - 1]}/${P.Y})`;
   $('x-at-acum').textContent = f.ano === P.Y ? `Ano até agora (jan–${MES[P.M - 1]})` : `Ano inteiro (jan–dez de ${f.ano})`;
   document.querySelectorAll('#x-atalhos [data-at]').forEach(b => { b.classList.toggle('on', b.dataset.at === at); b.setAttribute('aria-pressed', String(b.dataset.at === at)); });
-  document.querySelectorAll('#x-nivel [data-nv]').forEach(b => { const on = +b.dataset.nv === f.nivel; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  sincronizarNivel();
   document.querySelectorAll('[data-x-nome]').forEach(s => { s.textContent = f.label; });
   sincronizarCmp();
+  sincronizarAnom();
   const div = (TIPO_NOME[f.div] || '').toLowerCase();
   const ri = refInfo(f);
   $('x-ter-ctx').innerHTML = `Mostrando <b>${esc(f.label)}</b>${f.tipo === 'country' ? '' : ` (${esc(TIPO_NOME[f.tipo].toLowerCase())})`}`
@@ -2882,16 +2944,26 @@ const rotulos = {
 
 function xRank(cur, ref, f) {
   const vp = ref.v, rot = ref.rot;
-  const it = cur.filter(i => i.value > 0).sort((a, b) => b.value - a.value).slice(0, 15);
-  const max = Math.max(1, ...it.map(i => i.value || 0));
   const div = (TIPO_NOME[f.div] || f.div).toLowerCase();
-  $('x-rank-t').textContent = `Top 15 por ${div}`;
+  const comArea = cur.filter(i => i.value > 0);
+  // "Apenas acima da média": só quem queimou mais do que a média histórica dos mesmos meses.
+  const it = (f.anom ? comArea.filter(i => vp[i.code] > 0 && i.value > vp[i.code]) : comArea)
+    .sort((a, b) => b.value - a.value).slice(0, 15);
+  const max = Math.max(1, ...it.map(i => i.value || 0));
+  $('x-rank-t').textContent = f.anom ? `Acima da média por ${div}` : `Top 15 por ${div}`;
   const base = rot
     ? (rot.startsWith('média') ? `à ${rot} dos mesmos meses` : `aos mesmos meses de ${rot}`)
     : '';
-  $('x-rank-s').textContent = it.length
-    ? `Os ${it.length} territórios com mais área queimada em ${mesesTxt(f)}${base ? `, comparados ${base}` : ''}.`
-    : 'Nenhuma área queimada no período.';
+  $('x-rank-s').textContent = f.anom
+    ? (it.length
+      ? `Os ${it.length} territórios com mais área queimada em ${mesesTxt(f)} que ficaram acima da ${rot} dos mesmos meses.`
+      : `Comparação com a ${rot || 'média histórica'} dos mesmos meses.`)
+    : it.length
+      ? `Os ${it.length} territórios com mais área queimada em ${mesesTxt(f)}${base ? `, comparados ${base}` : ''}.`
+      : 'Nenhuma área queimada no período.';
+  const vazio = f.anom
+    ? 'Nenhum território registrou queima acima da média histórica no período selecionado.'
+    : 'Nenhum território com área queimada no período.';
   $('x-rank-l').innerHTML = it.length ? it.map((i, k) => {
     const v = i.value || 0, p = vp[i.code] || 0;
     const d = p > 0 ? pct(v, p) : null;
@@ -2906,9 +2978,9 @@ function xRank(cur, ref, f) {
       <span class="v">${haC(v)}</span>
       <span class="d ${cls}">${tag}</span>
     </li>`;
-  }).join('') : '<li><span class="vazio">Nenhum território com área queimada no período.</span></li>';
+  }).join('') : `<li class="vazio-l"><span class="vazio">${vazio}</span></li>`;
   setDl('x-rank', {
-    nome: `top15-por-${slug(TIPO_NOME[f.div] || f.div)}`,
+    nome: `${f.anom ? 'acima-da-media' : 'top15'}-por-${slug(TIPO_NOME[f.div] || f.div)}`,
     cols: ['posicao', 'codigo', 'territorio', 'uf', `area_${f.ano}_ha`, `area_${ref.col || 'referencia'}_ha`, 'variacao_pct'],
     rows: it.map((i, k) => [k + 1, i.code, i.uf ? i.name : nomeT(i), i.uf || '', i.value || 0, vp[i.code] ?? '', vp[i.code] ? pct(i.value || 0, vp[i.code]) : ''])
   });

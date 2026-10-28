@@ -140,18 +140,19 @@
   .sl-g > * { min-width: 0; }
   .sl-l { position: relative; display: flex; flex-direction: column; }
   .sl-r { display: flex; flex-direction: column; gap: 10px; }
-  .sl-t { margin-bottom: 6px; font-size: 15px; font-weight: 700; text-align: center; }
+  .sl-t { margin-bottom: 2px; font-size: 15px; font-weight: 700; text-align: center; }
   .sl-kl { font-size: 11px; font-weight: 500; letter-spacing: .02em; text-transform: uppercase; color: var(--ink2); }
   .sl-kv { font-size: 44px; font-weight: 800; line-height: 1.05; letter-spacing: -.02em; }
   .sl-kv small { margin-left: 6px; font-size: 26px; font-weight: 800; }
   .sl-r .ct { margin-bottom: 0; font-size: 13px; }
   .sl-r .cs { margin-bottom: 2px; font-size: 11px; }
-  .sl-mapa { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+  /* O mapa encosta no título (folhas 2 e 4); a sobra de altura fica embaixo, com legenda e selo. */
+  .sl-mapa { flex: 1; display: flex; align-items: flex-start; justify-content: center; min-height: 0; }
   .sl-mapa .map-svg { height: 500px; width: auto; max-width: 100%; }
   .lmap.sl-lm { flex: 1; height: auto; min-height: 380px; border: 0; }
   /* Legenda do mapa coroplético: sem fundo nem borda, integrada ao branco da folha. */
   .sl-legw { position: absolute; right: 0; bottom: 4px; z-index: 450; padding: 0; background: none; }
-  .sl-legw b { display: block; font-size: 11px; }
+  .sl-legw b { display: block; max-width: 190px; font-size: 11px; line-height: 1.25; }
   .sl-legw .leg { flex-direction: column; gap: 1px; margin: 2px 0 0; font-size: 10px; }
   .sl-legw .leg span:last-child { display: none; }
   /* Selo circular de destaque (substitui os antigos losangos). */
@@ -211,6 +212,8 @@
   /* Legenda do mapa municipal abaixo do mapa, em linha e sem fundo. */
   .d5-leg b { display: block; font-size: 11px; }
   .d5-leg .leg { margin: 2px 0 0; font-size: 10px; }
+  /* A unidade já está no título da legenda. */
+  .d5-leg .leg span:last-child { display: none; }
   /* Folha 4: mapa de estados | KPI, resumo e barras do top 10. */
   #d4 .lead { margin-top: -4px; font-size: 12px; }
   /* Barra de uso e cobertura em dois níveis: natural × antrópico em cima, classes de nível 2 embaixo. */
@@ -472,7 +475,7 @@
         <div class="st"></div>
         <p class="sl-t" id="d2-map-t">Biomas mais afetados</p>
         <div class="sl-mapa" id="d2-map"></div>
-        <div class="sl-legw"><b>Hectares por bioma</b><div class="leg" id="d2-leg"></div></div>
+        <div class="sl-legw"><b id="d2-leg-t">Área queimada por bioma (ha)</b><div class="leg" id="d2-leg"></div></div>
         <div class="selo" id="d2-selo"></div>
       </div>
       <div class="blk sl-r" id="d2-rank">
@@ -521,7 +524,7 @@
         <div class="st"></div>
         <p class="sl-t" id="d4-map-t">Estados mais afetados</p>
         <div class="sl-mapa" id="d4-map"></div>
-        <div class="sl-legw"><b>Hectares por estado</b><div class="leg" id="d4-leg"></div></div>
+        <div class="sl-legw"><b id="d4-leg-t">Área queimada por estado (ha)</b><div class="leg" id="d4-leg"></div></div>
         <div class="selo" id="d4-selo"></div>
       </div>
       <div class="blk sl-r" id="d4-rank">
@@ -556,7 +559,7 @@
           <div class="lmap sl-lm" id="d5-map"></div>
           <div class="sl-loc" id="d5-loc"></div>
         </div>
-        <div class="d5-leg"><b>Hectares por município</b><div class="leg" id="d5-leg"></div></div>
+        <div class="d5-leg"><b id="d5-leg-t">Área queimada por município (ha)</b><div class="leg" id="d5-leg"></div></div>
       </div>
       <div class="blk mx-col" id="d5-mes" data-col></div>
       <div class="blk mx-col" id="d5-acum" data-col></div>
@@ -1436,8 +1439,17 @@ function lulcResumo(lc) {
   const nat = cls.filter(c => c.m === 'nat'), antr = cls.filter(c => c.m === 'antr');
   return { cls, nat, antr, tot, pNat: nat.reduce((s, c) => s + c.p, 0) };
 }
+// Classes com menos de 0,5% viram "Outras" (cinza neutro). O agrupamento é feito dentro de cada lado
+// (natural e antrópico), para as larguras continuarem somando exatamente a barra de cima.
+const LULC_OUTRAS = { nome: 'Outras', cor: '#B5B5B5' };
+function agruparMiudas(arr) {
+  const grandes = arr.filter(c => c.p >= .5), miudas = arr.filter(c => c.p < .5);
+  if (!miudas.length) return grandes;
+  return [...grandes, { ...LULC_OUTRAS, outras: true, inclui: miudas.map(c => c.nome),
+    ha: miudas.reduce((s, c) => s + c.ha, 0), p: miudas.reduce((s, c) => s + c.p, 0) }];
+}
 function lulcHTML(lc, titulo) {
-  const { cls, nat, antr, tot, pNat } = lulcResumo(lc);
+  const { nat, antr, tot, pNat } = lulcResumo(lc);
   const cab = `<p class="ct">${titulo}</p>`;
   if (!tot) return `<div class="lulc-h">${cab}</div><p class="fn">Sem área queimada nas classes naturais e antrópicas no período.</p>`;
   const soma = (a, k) => a.reduce((s, c) => s + c[k], 0);
@@ -1446,15 +1458,20 @@ function lulcHTML(lc, titulo) {
     ? `<span style="width:${p}%;background:${cor};color:${corTexto(cor)}${borda ? `;box-shadow:inset 0 0 0 1px ${borda}` : ''}" title="${esc(nome)}: ${pct1(p)} (${haC(ha)})">${p >= min ? pct1(p) : ''}</span>`
     : '';
   const { nat: mN, antr: mA } = LULC_MACRO;
-  // Legenda com todas as classes desenhadas na barra (inclusive as finas, como Afloramento Rochoso).
+  const gNat = agruparMiudas(nat), gAntr = agruparMiudas(antr), micro = [...gNat, ...gAntr];
+  const outras = micro.filter(c => c.outras);
+  const nomeSeg = c => c.outras ? `Outras (${c.inclui.join(', ')})` : c.nome;
+  // Legenda: as classes de 0,5% ou mais e, no fim, uma única entrada "Outras".
+  const leg = micro.filter(c => !c.outras);
+  if (outras.length) leg.push({ ...LULC_OUTRAS, p: soma(outras, 'p'), inclui: outras.flatMap(c => c.inclui), outras: true });
   return `<div class="lulc-h">${cab}<ul class="lulc-leg">`
       + [mN, mA].map(m => `<li><i style="background:${m.cor}${claro(m.cor) ? `;box-shadow:inset 0 0 0 1px ${BORDA_CLARA}` : ''}"></i>${m.nome}</li>`).join('') + `</ul></div>
     <div class="lulc" role="img" aria-label="${mN.nome} ${pct1(pNat)}, ${mA.nome} ${pct1(100 - pNat)}">
       <div class="lulc-r macro">${seg(mN.nome, mN.cor, '', pNat, soma(nat, 'ha'), 5)}${seg(mA.nome, mA.cor, BORDA_CLARA, 100 - pNat, soma(antr, 'ha'), 5)}</div>
-      <div class="lulc-r">${[...nat, ...antr].map(c => seg(c.nome, c.cor, c.borda, c.p, c.ha, 5)).join('')}</div>
+      <div class="lulc-r">${micro.map(c => seg(nomeSeg(c), c.cor, c.borda, c.p, c.ha, 5)).join('')}</div>
       <i class="lulc-div" style="left:${pNat}%"></i>
     </div>
-    <ul class="lulc-leg">${cls.map(c => `<li title="${pct1(c.p)}"><i style="${swatch(c)}"></i>${c.nome}</li>`).join('')}</ul>`;
+    <ul class="lulc-leg">${leg.map(c => `<li title="${esc(c.outras ? `${pct1(c.p)}: ${c.inclui.join(', ')}` : pct1(c.p))}"><i style="${swatch(c)}"></i>${c.outras ? 'Outras (&lt;0,5% cada)' : c.nome}</li>`).join('')}</ul>`;
 }
 // Barras horizontais do ranking, coloridas pela mesma classe (quantil) do mapa ao lado.
 // Com total, o rótulo traz também a % do Brasil: "515.254 ha · 20%".
@@ -1539,6 +1556,7 @@ async function d2Mapa(D) {
   $('d2-map-t').textContent = `Biomas mais afetados em ${nm}`;
   $('d2-selo').textContent = `${cap(b.art)} ${b.nome} foi o bioma mais afetado`;
   drawBiomes($('d2-map'), r, mesA.areaHa || 1, cls);
+  $('d2-leg-t').textContent = `Área queimada em ${nm} de ${P.Y} por bioma (ha)`;
   $('d2-leg').innerHTML = legHTML(cls);
 }
 async function d2Rank(D) {
@@ -1571,6 +1589,7 @@ async function d4Mapa(D) {
   $('d4-map-t').textContent = `Estados mais afetados em ${nm}`;
   $('d4-selo').textContent = lista(r.nomes.slice(0, 3));
   drawStates($('d4-map'), geo, vals, mesA.areaHa, cls);
+  $('d4-leg-t').textContent = `Área queimada em ${nm} de ${P.Y} por estado (ha)`;
   $('d4-leg').innerHTML = legHTML(cls);
 }
 async function d4Rank(D) {
@@ -1593,6 +1612,7 @@ async function d5Mapa(D) {
   $('d5-lead').textContent = `${fmtP(d.mes.areaHa / br.mes * 100)} da área queimada no Brasil no mês e `
     + `${fmtP(d.acum.areaHa / br.acum * 100)} no ano. ${semUF(mun.nomes[0])} liderou os municípios (${haC(mun.valores[0])}).`;
   localizador($('d5-loc'), geo, r.nomes[0]);
+  $('d5-leg-t').textContent = `Área queimada em ${nm} de ${P.Y} por municípios do ${u.sigla} (ha)`;
   await mapaMun('d5-map', 'd5-leg', u, mun);
 }
 

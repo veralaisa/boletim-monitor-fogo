@@ -181,7 +181,7 @@
   .mx-tile .tl-s { font-size: 10px; }
   /* Variação em pílula: seta e % em destaque, base de comparação e diferença em hectares ao lado. */
   .sl-pls { display: flex; flex-wrap: wrap; gap: 4px 22px; margin-top: 8px; }
-  .sl-var.pl { display: flex; align-items: baseline; gap: 6px; font-size: 11px; line-height: 1.3; color: var(--ink2); }
+  .sl-var.pl { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; font-size: 11px; line-height: 1.3; color: var(--ink2); }
   .sl-var.pl b { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
   .sl-var.pl.up b { color: var(--red-d); }
   .sl-var.pl.down b { color: var(--good); }
@@ -381,6 +381,11 @@
     html:not(.pm) .doc { padding: 0; }
     html:not(.pm) .sheet { width: auto; min-height: 0; margin: 0 0 10px; padding: 18px 16px; box-shadow: none; }
     html:not(.pm) :is(.xrow, .sl-g) { grid-template-columns: 1fr; }
+    /* .sl-g.mxg.c3 é mais específica que a regra acima: as folhas 3 e 5 precisam da sua própria. */
+    html:not(.pm) .sl-g.mxg.c3 { grid-template-columns: 1fr; }
+    html:not(.pm) .d5-mw .lmap.sl-lm { height: 300px; }
+    html:not(.px) .ztab { font-size: 11px; }
+    html:not(.px) :is(.ztab th, .ztab td) { padding: 3px 5px; white-space: normal; }
     html:not(.pm) .mx-card.com-tile { grid-template-columns: 1fr; }
     html:not(.pm) .mx-card .sl-kv { font-size: 34px; }
     html:not(.pm) .mx-tit { flex-wrap: wrap; }
@@ -822,7 +827,6 @@ const UF = [
   [52, 'GO', 'Goiás'], [53, 'DF', 'Distrito Federal']
 ].map(([code, sigla, nome]) => ({ code, sigla, nome }));
 const UF_BY_NAME = Object.fromEntries(UF.map(u => [u.nome, u]));
-const UF_BY_CODE = Object.fromEntries(UF.map(u => [u.code, u]));
 
 const BIOMAS = [
   { code: 1, nome: 'Amazônia', art: 'a' },
@@ -832,10 +836,7 @@ const BIOMAS = [
   { code: 5, nome: 'Pampa', art: 'o' },
   { code: 6, nome: 'Pantanal', art: 'o' }
 ];
-const BIO_BY_NAME = Object.fromEntries(BIOMAS.map(b => [b.nome, b]));
 
-const TERRITORIOS = { country: [{ code: 0, nome: 'Brasil' }], biome: BIOMAS, state: UF };
-const PADRAO = { country: 0, biome: 1, state: 15 };
 // Subdivisão preferida por tipo de território; só é usada se /groupings a listar.
 const PREF = { country: ['state'], biome: ['biome'], state: ['city'] };
 
@@ -1254,12 +1255,17 @@ async function initBoletim() {
     lcMes: st('land-cover', 'country', 0, { ...q, level: 2 }),
     lcAcum: st('land-cover', 'country', 0, { ...qa, level: 2 }),
     rankUF: rankingAll('country', 0, q, 'state'),
-    rankBio: st('ranking', 'country', 0, { ...q, page: 1, order: 'desc' }, 'biome'),
     // Ranking bruto dos biomas (com código): mapa e barras da folha 2.
     bioRaw: getJSON(`/api/statistics/ranking/country/0/biome/raw?year=${Y}&monthStart=${M}&monthEnd=${M}`),
     geo: loadGeo()
   };
-  D.bioma = D.rankBio.then(r => { const b = BIO_BY_NAME[r.x[0]]; if (!b) throw new Error(`bioma não reconhecido: ${r.x[0]}`); return b; });
+  // Bioma líder: o de maior área no ranking bruto (que já vem com o código), sem uma segunda consulta.
+  D.bioma = D.bioRaw.then(r => {
+    const top = r.reduce((a, i) => ((i.value || 0) > (a.value || 0) ? i : a), r[0] || {});
+    const b = BIOMAS.find(x => x.code === top.code);
+    if (!b) throw new Error(`bioma não reconhecido: ${top.name}`);
+    return b;
+  });
   D.uf = D.rankUF.then(r => { const u = UF_BY_NAME[r.nomes[0]]; if (!u) throw new Error(`estado não reconhecido: ${r.nomes[0]}`); return u; });
   D.dBio = D.bioma.then(b => dadosTerritorio('biome', b.code, 'biome'));
   D.dUF = D.uf.then(u => dadosTerritorio('state', u.code, 'city'));
@@ -1661,7 +1667,6 @@ const num = v => v == null || !isFinite(v) ? '' : (Math.round(v * 100) / 100).to
 const slug = s => norm(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const sinal = d => `${d > 0 ? '+' : '−'}${haC(Math.abs(d))}`;
 const pct = (a, b) => b > 0 ? (a - b) / b * 100 : null;
-const curto = (s, n = 30) => s.length > n ? `${s.slice(0, n - 1)}…` : s;
 // Totais do Brasil saem pelo agrupamento por bioma: é o que reproduz o boletim oficial.
 const gTot = f => f.tipo === 'country' ? 'biome' : f.div;
 const temSub = f => !!f.div && (f.tipo === 'country' || f.div !== f.tipo);

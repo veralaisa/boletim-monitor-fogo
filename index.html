@@ -199,7 +199,9 @@
   .c3 .mx-card .sl-kv { font-size: 34px; }
   .c3 .mx-card .sl-kv small { font-size: 18px; }
   .c3 .sl-pls { gap: 3px 14px; }
-  .c3 .cv-sl { height: 175px; }
+  /* Folhas 3 e 5: série anual mais alta, e o uso e cobertura desce um pouco para abrir espaço. */
+  .c3 .cv-sl { height: 205px; }
+  .c3 .mx-lulc { margin-top: 10px; }
   .c3 .sl-l { gap: 8px; }
   .c3 .mx-tit { align-items: flex-start; gap: 10px; }
   .c3 .mx-tit .selo.sm { width: 74px; height: 74px; padding: 8px; font-size: 9.5px; }
@@ -357,6 +359,10 @@
   .rk15 .d.zero { color: var(--muted); }
   .rk15 .vazio { display: block; padding: 18px 8px; color: var(--muted); font-size: 12.5px; text-align: center; }
   .rk15 li.vazio-l { display: block; border-bottom: 0; }
+  /* Linhas navegáveis: clicar abre o território. */
+  .rk15 li.nav { cursor: pointer; border-radius: 6px; }
+  .rk15 li.nav:hover { background: var(--soft); }
+  .rk15 li.nav:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
   @media screen and (max-width: 700px) {
     .rk15 li { grid-template-columns: 22px minmax(0, 1fr) 86px 68px; }
     .rk15 .b { display: none; }
@@ -760,19 +766,25 @@
         <button type="button" class="on" data-anom="todos" aria-pressed="true">Todos</button>
         <button type="button" data-anom="media" aria-pressed="false">Apenas acima da média</button>
       </div>
+      <span class="x-ranklab sep">Ordenar</span>
+      <div class="x-cmp" id="x-ordem" role="group" aria-label="Ordem do ranking">
+        <button type="button" class="on" data-ordem="area" aria-pressed="true">Maior área</button>
+        <button type="button" data-ordem="alta" aria-pressed="false">Maior aumento</button>
+      </div>
     </div>
     <ol class="rk15" id="x-rank-l" aria-live="polite"></ol>
   </section>
 
-  <!-- Fora do normal? (anomalias do mês de referência; não depende dos filtros do painel) -->
+  <!-- Fora do normal? (anomalia do território e do período escolhidos nos filtros) -->
   <div class="x-sec" id="x-sec-fn">
-    <div><h3>Fora do normal?</h3><p>O mês mais recente (<b data-x-ref></b>) comparado à variação típica dos anos anteriores, no Brasil, nos biomas e nos estados. Esta seção não muda com os filtros acima.</p></div>
+    <div><h3>Fora do normal?</h3><p>O período escolhido em <b data-x-nome></b> comparado à variação típica dos anos anteriores, no território e em cada subdivisão.</p></div>
   </div>
 
   <section class="card" id="x-fn-z">
     <div class="st"></div>
     <div class="c-h">
-      <div><p class="eyebrow">Brasil</p><h2 id="x-fn-t">O mês ficou dentro do normal?</h2><p class="sub" id="x-fn-lead"></p></div>
+      <div><p class="eyebrow" data-x-nome></p><h2 id="x-fn-t">O período ficou dentro do normal?</h2><p class="sub" id="x-fn-lead"></p></div>
+      <div class="c-a"><button class="mini" data-png="x-fn-z">PNG</button><button class="mini" data-csv="x-fn-z">CSV</button></div>
     </div>
     <p class="cs" id="x-fn-z-t"></p>
     <p class="cs" id="x-fn-z-s"></p>
@@ -780,18 +792,14 @@
     <div class="leg" id="x-fn-leg"></div>
   </section>
 
-  <div class="xrow">
-    <section class="card" id="x-fn-bio">
-      <div class="st"></div>
-      <div class="c-h"><div><p class="eyebrow">Biomas</p><h2>Cada bioma contra o próprio normal</h2><p class="sub" id="x-fn-bio-s"></p></div></div>
-      <table class="ztab" id="x-fn-biot"></table>
-    </section>
-    <section class="card" id="x-fn-uf">
-      <div class="st"></div>
-      <div class="c-h"><div><p class="eyebrow">Estados</p><h2>Estados que mais fugiram do normal</h2><p class="sub" id="x-fn-uf-s"></p></div></div>
-      <table class="ztab" id="x-fn-uft"></table>
-    </section>
-  </div>
+  <section class="card" id="x-fn-sub">
+    <div class="st"></div>
+    <div class="c-h">
+      <div><p class="eyebrow">Subdivisões</p><h2 id="x-fn-sub-t">Cada subdivisão contra o próprio normal</h2><p class="sub" id="x-fn-sub-s"></p></div>
+      <div class="c-a"><button class="mini" data-csv="x-fn-sub">CSV</button></div>
+    </div>
+    <table class="ztab" id="x-fn-subt"></table>
+  </section>
 
   <div class="como" id="x-fn-como"></div>
 
@@ -1242,8 +1250,6 @@ async function initBoletim() {
   document.title = `Boletim do Monitor do Fogo · ${cap(mes)} ${Y}`;
   document.querySelectorAll('.sh').forEach(h => { h.innerHTML = cabecalho(`${mes} ${Y}`); });
   document.querySelectorAll('[data-atual]').forEach(s => { s.textContent = `dados até ${mes} de ${Y}`; });
-  // Mês de referência citado na seção "Fora do normal?" do painel.
-  document.querySelectorAll('[data-x-ref]').forEach(s => { s.textContent = `${mes} de ${Y}`; });
   $('d1-t').textContent = `Destaques do fogo no Brasil em ${mes} de ${Y}`;
 
   const q = { year: Y, monthStart: M, monthEnd: M }, qa = { year: Y, monthStart: 1, monthEnd: M };
@@ -1270,10 +1276,6 @@ async function initBoletim() {
   D.dBio = D.bioma.then(b => dadosTerritorio('biome', b.code, 'biome'));
   D.dUF = D.uf.then(u => dadosTerritorio('state', u.code, 'city'));
   D.munUF = D.uf.then(u => rankingAll('state', u.code, q, 'city'));
-  // "Fora do normal?" (painel): o mesmo mês em todos os anos, por estado e por bioma, para a anomalia (z-score).
-  const porAno = want => Promise.all(P.anos.map(y => getJSON(`/api/statistics/ranking/country/0/${want}/raw?year=${y}&monthStart=${M}&monthEnd=${M}`)));
-  D.ufAnos = porAno('state');
-  D.bioAnos = porAno('biome');
   Object.values(D).forEach(p => p.catch(() => {}));
 
   await Promise.all([
@@ -1289,11 +1291,7 @@ async function initBoletim() {
     secao('d4-rank', () => d4Rank(D)),
     secao('d5-mapa', () => d5Mapa(D)),
     secao('d5-mes', async () => colunaMx('d5-mes', 'mes', await D.dUF, await totaisBR(D))),
-    secao('d5-acum', async () => colunaMx('d5-acum', 'acum', await D.dUF, await totaisBR(D))),
-    // Destaque dinâmico: "Fora do normal?" (fixo no mês de referência).
-    secao('x-fn-z', () => xForaNormal(D)),
-    secao('x-fn-bio', () => xForaTabela(D.bioAnos, 'x-fn-biot', 'Bioma', false)),
-    secao('x-fn-uf', () => xForaTabela(D.ufAnos, 'x-fn-uft', 'Estado', true))
+    secao('d5-acum', async () => colunaMx('d5-acum', 'acum', await D.dUF, await totaisBR(D)))
   ]);
 }
 
@@ -1454,14 +1452,17 @@ function agruparMiudas(arr) {
   return [...grandes, { ...LULC_OUTRAS, outras: true, inclui: miudas.map(c => c.nome),
     ha: miudas.reduce((s, c) => s + c.ha, 0), p: miudas.reduce((s, c) => s + c.p, 0) }];
 }
-function lulcHTML(lc, titulo) {
+// min: largura mínima (em % da barra) para o texto caber dentro da fatia. Nas colunas largas, 6%
+// dá ~30 px, o bastante para "89%"; nas estreitas (folhas 3 e 5) o colunaMx passa um valor maior.
+function lulcHTML(lc, titulo, min = 6) {
   const { nat, antr, tot, pNat } = lulcResumo(lc);
   const cab = `<p class="ct">${titulo}</p>`;
   if (!tot) return `<div class="lulc-h">${cab}</div><p class="fn">Sem área queimada nas classes naturais e antrópicas no período.</p>`;
   const soma = (a, k) => a.reduce((s, c) => s + c[k], 0);
-  // Rótulo dentro do segmento só quando há espaço para ele.
-  const seg = (nome, cor, borda, p, ha, min) => p > 0
-    ? `<span style="width:${p}%;background:${cor};color:${corTexto(cor)}${borda ? `;box-shadow:inset 0 0 0 1px ${borda}` : ''}" title="${esc(nome)}: ${pct1(p)} (${haC(ha)})">${p >= min ? pct1(p) : ''}</span>`
+  // Dentro da fatia, % sem casa decimal e só quando cabe; o title (tooltip nativo) traz a classe,
+  // a % com uma casa e a área em ha, inclusive nas fatias finas sem texto.
+  const seg = (nome, cor, borda, p, ha) => p > 0
+    ? `<span style="width:${p}%;background:${cor};color:${corTexto(cor)}${borda ? `;box-shadow:inset 0 0 0 1px ${borda}` : ''}" title="${esc(nome)}: ${pct1(p)} · ${nf0(ha)} ha">${p >= min ? `${Math.round(p)}%` : ''}</span>`
     : '';
   const { nat: mN, antr: mA } = LULC_MACRO;
   const gNat = agruparMiudas(nat), gAntr = agruparMiudas(antr), micro = [...gNat, ...gAntr];
@@ -1473,8 +1474,8 @@ function lulcHTML(lc, titulo) {
   return `<div class="lulc-h">${cab}<ul class="lulc-leg">`
       + [mN, mA].map(m => `<li><i style="background:${m.cor}${claro(m.cor) ? `;box-shadow:inset 0 0 0 1px ${BORDA_CLARA}` : ''}"></i>${m.nome}</li>`).join('') + `</ul></div>
     <div class="lulc" role="img" aria-label="${mN.nome} ${pct1(pNat)}, ${mA.nome} ${pct1(100 - pNat)}">
-      <div class="lulc-r macro">${seg(mN.nome, mN.cor, '', pNat, soma(nat, 'ha'), 5)}${seg(mA.nome, mA.cor, BORDA_CLARA, 100 - pNat, soma(antr, 'ha'), 5)}</div>
-      <div class="lulc-r">${micro.map(c => seg(nomeSeg(c), c.cor, c.borda, c.p, c.ha, 5)).join('')}</div>
+      <div class="lulc-r macro">${seg(mN.nome, mN.cor, '', pNat, soma(nat, 'ha'))}${seg(mA.nome, mA.cor, BORDA_CLARA, 100 - pNat, soma(antr, 'ha'))}</div>
+      <div class="lulc-r">${micro.map(c => seg(nomeSeg(c), c.cor, c.borda, c.p, c.ha)).join('')}</div>
       <i class="lulc-div" style="left:${pNat}%"></i>
     </div>
     <ul class="lulc-leg">${leg.map(c => `<li title="${esc(c.outras ? `${pct1(c.p)}: ${c.inclui.join(', ')}` : pct1(c.p))}"><i style="${swatch(c)}"></i>${c.outras ? 'Outras (&lt;0,5% cada)' : c.nome}</li>`).join('')}</ul>`;
@@ -1534,7 +1535,7 @@ const colunaHTML = id => `<div class="st"></div>
     <p class="cvar" id="${id}-a-s"></p>
     <div class="cv cv-sl"><canvas id="${id}-a"></canvas></div>
   </div>
-  <div id="${id}-lulc"></div>`;
+  <div class="mx-lulc" id="${id}-lulc"></div>`;
 // Dados no formato de dadosTerritorio() para o Brasil, e os totais nacionais para as participações.
 const dadosBR = D => Promise.all([D.mes, D.acum, D.ts, D.lcMes, D.lcAcum])
   .then(([mes, acum, ts, lcMes, lcAcum]) => ({ mes, acum, ts, lcMes, lcAcum }));
@@ -1551,7 +1552,8 @@ function colunaMx(id, tipo, d, br, tile = null) {
   anosSlide(`${id}-a`, d.ts, acum);
   // Nas colunas estreitas (folha 5, com o mapa ao lado) o título encurta para caber em uma linha.
   const estreita = !!$(id).closest('.c3');
-  $(`${id}-lulc`).innerHTML = lulcHTML(acum ? d.lcAcum : d.lcMes, `Uso e cobertura${estreita ? '' : ' da área queimada'} (${per} de ${Y})`);
+  // Coluna estreita (~330 px): 9% dá ~30 px, o mínimo para "89%" caber na fatia.
+  $(`${id}-lulc`).innerHTML = lulcHTML(acum ? d.lcAcum : d.lcMes, `Uso e cobertura${estreita ? '' : ' da área queimada'} (${per} de ${Y})`, estreita ? 9 : 6);
 }
 
 /* ----- 2: Ranking de biomas ----- */
@@ -1749,6 +1751,8 @@ function lerHash() {
     // Referência dos rankings e da variação no mapa: '' = ano anterior, 'media' = média dos anos anteriores.
     ref: (anom || h.get('ref') === 'media') ? 'media' : '',
     anom,
+    // Ordem do Top 15: 'area' (maior área queimada) ou 'alta' (maior aumento em ha contra a referência).
+    ordem: h.get('o') === 'alta' ? 'alta' : 'area',
     modo: ['sub', 'fogo', 'calor'].includes(h.get('mp')) ? h.get('mp') : '',
     metrica: h.get('m') === 'var' ? 'var' : 'area',
     nivel: [1, 2, 3, 4].includes(int('nv')) ? int('nv') : 2
@@ -1761,6 +1765,7 @@ function salvarHash() {
   p.set('anos', f.anosCmp.join(','));
   if (f.ref) p.set('ref', f.ref);
   if (f.anom) p.set('anom', '1');
+  if (f.ordem === 'alta') p.set('o', 'alta');
   if (f.modo) p.set('mp', f.modo);
   if (f.metrica === 'var') p.set('m', 'var');
   if (f.nivel !== 2) p.set('nv', f.nivel);
@@ -1881,6 +1886,24 @@ function ligarEventos() {
     // A base de comparação entra no rankP: mudar para a média exige recalcular o ranking.
     if (mudouBase) xRun(); else refazer('x-rank');
   });
+  $('x-ordem').addEventListener('click', e => {
+    const b = e.target.closest('[data-ordem]');
+    if (!b || f().ordem === b.dataset.ordem) return;
+    f().ordem = b.dataset.ordem;
+    sincronizarOrdem();
+    refazer('x-rank');
+  });
+  // Clicar (ou Enter/espaço) numa linha do Top 15 abre aquele território, como o clique no mapa.
+  const abrirLinha = li => {
+    const c = li.dataset.code;
+    X.f.modo = '';
+    definirTerritorio(X.f.div, /^\d+$/.test(c) ? +c : c);
+  };
+  $('x-rank-l').addEventListener('click', e => { const li = e.target.closest('li[data-code]'); if (li) abrirLinha(li); });
+  $('x-rank-l').addEventListener('keydown', e => {
+    const li = e.target.closest('li[data-code]');
+    if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); abrirLinha(li); }
+  });
   $('x-link').addEventListener('click', copiarLink);
   $('tab-explorer').addEventListener('click', e => {
     const p = e.target.closest('[data-png]'), c = e.target.closest('[data-csv]');
@@ -1952,6 +1975,13 @@ function sincronizarCmp() {
 }
 
 // Estado visual do filtro do ranking e do seletor de nível da legenda.
+function sincronizarOrdem() {
+  document.querySelectorAll('#x-ordem [data-ordem]').forEach(b => {
+    const ativo = b.dataset.ordem === X.f.ordem;
+    b.classList.toggle('on', ativo);
+    b.setAttribute('aria-pressed', String(ativo));
+  });
+}
 function sincronizarAnom() {
   const on = !!X.f.anom;
   document.querySelectorAll('#x-anom [data-anom]').forEach(b => {
@@ -1987,6 +2017,7 @@ function atualizarControles() {
   document.querySelectorAll('[data-x-nome]').forEach(s => { s.textContent = f.label; });
   sincronizarCmp();
   sincronizarAnom();
+  sincronizarOrdem();
   const div = (TIPO_NOME[f.div] || '').toLowerCase();
   const ri = refInfo(f);
   $('x-ter-ctx').innerHTML = `Mostrando <b>${esc(f.label)}</b>${f.tipo === 'country' ? '' : ` (${esc(TIPO_NOME[f.tipo].toLowerCase())})`}`
@@ -2072,6 +2103,17 @@ function xRun() {
         lcTrans()
       ]);
       if (vivo()) xUsoAno(lcs, tr, f);
+    }),
+    // Fora do normal?: a série do território (MP) e os rankings de cada ano até o escolhido.
+    // As URLs são as mesmas do Top 15 e da média histórica, então o cache (gj) reaproveita as consultas.
+    'x-fn-z': job('x-fn-z', async () => { const M = await MP; return vivo() ? xForaNormal(M, f) : 'manter'; }),
+    'x-fn-sub': job('x-fn-sub', async () => {
+      if (!temSub(f)) return semSub('x-fn-sub');
+      const aviso = foraNormalAviso(f);
+      if (aviso) { setDl('x-fn-sub', null); status('x-fn-sub', aviso, 'info'); return 'manter'; }
+      const anos = P.anos.filter(y => y <= f.ano);
+      const porAno = await Promise.all(anos.map(y => gj(`/api/statistics/ranking/${sub}/raw${qs({ ...per, year: y })}`)));
+      if (vivo()) xForaTabela(porAno, anos, f);
     })
   };
   Object.values(X.jobs).forEach(j => j());
@@ -2470,24 +2512,35 @@ function xRank(cur, ref, f) {
   const vp = ref.v, rot = ref.rot;
   const div = (TIPO_NOME[f.div] || f.div).toLowerCase();
   const comArea = cur.filter(i => i.value > 0);
+  // "Maior aumento": diferença em ha contra a referência (ano anterior ou média), que não favorece
+  // territórios pequenos com variação percentual enorme. Só entram os que aumentaram.
+  const alta = f.ordem === 'alta' && !!rot;
+  const aum = i => (i.value || 0) - (vp[i.code] || 0);
   // "Apenas acima da média": só quem queimou mais do que a média histórica dos mesmos meses.
   const it = (f.anom ? comArea.filter(i => vp[i.code] > 0 && i.value > vp[i.code]) : comArea)
-    .sort((a, b) => b.value - a.value).slice(0, 15);
+    .filter(i => !alta || aum(i) > 0)
+    .sort(alta ? (a, b) => aum(b) - aum(a) : (a, b) => b.value - a.value).slice(0, 15);
   const max = Math.max(1, ...it.map(i => i.value || 0));
-  $('x-rank-t').textContent = f.anom ? `Acima da média por ${div}` : `Top 15 por ${div}`;
+  // As linhas abrem o território quando a subdivisão é um tipo navegável (mesma regra do mapa).
+  const nav = !!TIPO_NOME[f.div] && f.div !== f.tipo;
+  $('x-rank-t').textContent = f.anom ? `Acima da média por ${div}` : alta ? `Maior aumento por ${div}` : `Top 15 por ${div}`;
   const base = rot
     ? (rot.startsWith('média') ? `à ${rot} dos mesmos meses` : `aos mesmos meses de ${rot}`)
     : '';
-  $('x-rank-s').textContent = f.anom
+  const crit = alta ? 'maior aumento de área queimada (em ha)' : 'mais área queimada';
+  $('x-rank-s').textContent = (f.anom
     ? (it.length
-      ? `Os ${it.length} territórios com mais área queimada em ${mesesTxt(f)} que ficaram acima da ${rot} dos mesmos meses.`
+      ? `Os ${it.length} territórios com ${crit} em ${mesesTxt(f)} que ficaram acima da ${rot} dos mesmos meses.`
       : `Comparação com a ${rot || 'média histórica'} dos mesmos meses.`)
     : it.length
-      ? `Os ${it.length} territórios com mais área queimada em ${mesesTxt(f)}${base ? `, comparados ${base}` : ''}.`
-      : 'Nenhuma área queimada no período.';
+      ? `Os ${it.length} territórios com ${crit} em ${mesesTxt(f)}${base ? `, comparados ${base}` : ''}.`
+      : 'Nenhuma área queimada no período.')
+    + (nav && it.length ? ' Clique num território para abri-lo.' : '')
+    + (f.ordem === 'alta' && !rot ? ` Sem ano anterior para comparar: ordenado por área.` : '');
   const vazio = f.anom
     ? 'Nenhum território registrou queima acima da média histórica no período selecionado.'
-    : 'Nenhum território com área queimada no período.';
+    : alta ? `Nenhum território queimou mais do que ${rot.startsWith('média') ? `a ${rot}` : `em ${rot}`} nos mesmos meses.`
+      : 'Nenhum território com área queimada no período.';
   $('x-rank-l').innerHTML = it.length ? it.map((i, k) => {
     const v = i.value || 0, p = vp[i.code] || 0;
     const d = p > 0 ? pct(v, p) : null;
@@ -2495,16 +2548,17 @@ function xRank(cur, ref, f) {
     const uf = i.uf ? `<small>${esc(i.uf)}</small>` : '';
     const cls = d == null ? 'zero' : d > 0 ? 'up' : d < 0 ? 'down' : 'zero';
     const tag = d == null ? 'sem fogo na base' : `${d > 0 ? '▲ +' : d < 0 ? '▼ -' : ''}${Math.abs(Math.round(d))}%`;
-    return `<li>
+    const dica = `${nome}${i.uf ? ` (${i.uf})` : ''}: ${haC(v)}${rot ? ` · ${sinal(v - p)} vs. ${rot}` : ''}${nav ? ' · clique para abrir' : ''}`;
+    return `<li${nav ? ` class="nav" data-code="${esc(i.code)}" tabindex="0" role="button"` : ''} title="${esc(dica)}">
       <span class="p">${k + 1}</span>
-      <span class="n" title="${esc(nome)}">${esc(nome)}${uf}</span>
+      <span class="n">${esc(nome)}${uf}</span>
       <span class="b" aria-hidden="true"><i style="width:${(v / max * 100).toFixed(1)}%"></i></span>
       <span class="v">${haC(v)}</span>
       <span class="d ${cls}">${tag}</span>
     </li>`;
   }).join('') : `<li class="vazio-l"><span class="vazio">${vazio}</span></li>`;
   setDl('x-rank', {
-    nome: `${f.anom ? 'acima-da-media' : 'top15'}-por-${slug(TIPO_NOME[f.div] || f.div)}`,
+    nome: `${f.anom ? 'acima-da-media' : alta ? 'maior-aumento' : 'top15'}-por-${slug(TIPO_NOME[f.div] || f.div)}`,
     cols: ['posicao', 'codigo', 'territorio', 'uf', `area_${f.ano}_ha`, `area_${ref.col || 'referencia'}_ha`, 'variacao_pct'],
     rows: it.map((i, k) => [k + 1, i.code, i.uf ? i.name : nomeT(i), i.uf || '', i.value || 0, vp[i.code] ?? '', vp[i.code] ? pct(i.value || 0, vp[i.code]) : ''])
   });
@@ -2637,81 +2691,105 @@ const faixasNormal = {
   }
 };
 
-// Uma linha por território: valor do ano, média e variação dos anos anteriores e o ano anterior.
-function linhasZ(porAno) {
-  const { Y, anos } = P, iY = anos.indexOf(Y), iP = anos.indexOf(Y - 1);
+// Meses do período sem o ano ("setembro" ou "janeiro a setembro").
+const perTxt = f => f.ini === f.fim ? MES_L[f.ini - 1] : `${MES_L[f.ini - 1]} a ${MES_L[f.fim - 1]}`;
+// O "normal" exige o período completo no ano escolhido e pelo menos três anos anteriores.
+function foraNormalAviso(f) {
+  if (f.ano === P.Y && f.fim > P.M) return `O período escolhido passa de ${MES_L[P.M - 1]} de ${P.Y}, o último mês com dados. Termine o período em ${MES_L[P.M - 1]} para ver se ele ficou fora do normal.`;
+  if (P.anos.filter(y => y < f.ano).length < 3) return `Para calcular o normal são precisos pelo menos três anos anteriores. Escolha ${P.anos[3]} ou um ano depois.`;
+  return '';
+}
+
+// Uma linha por território: valor no ano escolhido e média e variação típica dos anos anteriores.
+// porAno vem alinhado com anos (anos ≤ Y).
+function linhasZ(porAno, anos, Y) {
   const mapas = porAno.map(r => Object.fromEntries(r.map(i => [i.code, i])));
-  return porAno[iY].map(i => {
-    const hist = anos.map((y, k) => y < Y ? (mapas[k][i.code]?.value || 0) : null).filter(v => v != null);
-    const v = i.value || 0, zi = zInfo(v, hist), pv = iP >= 0 ? (mapas[iP][i.code]?.value || 0) : null;
-    return { nome: i.name, v, m: zi?.m ?? null, z: zi?.z ?? null, pv };
+  const iAnt = anos.map((y, k) => (y < Y ? k : -1)).filter(k => k >= 0);
+  return porAno[anos.indexOf(Y)].map(i => {
+    const v = i.value || 0, zi = zInfo(v, iAnt.map(k => mapas[k][i.code]?.value || 0));
+    return { code: i.code, nome: nomeT(i), v, m: zi?.m ?? null, z: zi?.z ?? null };
   });
 }
 
-async function xForaNormal(D) {
-  const [ts, ufAnos] = await Promise.all([D.ts, D.ufAnos]);
-  const { Y, M, anos } = P, mes = MES_L[M - 1], iY = anos.indexOf(Y);
-  const ant = anos.filter(y => y < Y), a0 = ant[0], a1 = ant[ant.length - 1];
-  const vals = anos.map(y => sumTs(ts, y, M, M));
-  const base = zInfo(vals[iY], vals.filter((_, i) => anos[i] < Y));
-  if (!base) throw new Error('histórico insuficiente');
-  const difs = vals.map(v => base.m ? (v - base.m) / base.m * 100 : null);
-  const passo = base.m ? base.sd / base.m * 100 : null;
-  const cl = zClasse(base.z);
-  const uf = linhasZ(ufAnos).filter(r => r.z != null);
-  const acima = uf.filter(r => r.z > 1).length, abaixo = uf.filter(r => r.z < -1).length;
+// Território escolhido: cada ano do período comparado à média e à variação típica dos anos anteriores.
+function xForaNormal(M, f) {
+  const aviso = foraNormalAviso(f);
+  const semNormal = msg => {
+    $('x-fn-t').textContent = 'O período ficou dentro do normal?';
+    $('x-fn-lead').textContent = '';
+    setDl('x-fn-z', null);
+    status('x-fn-z', msg, 'info');
+    return 'manter';
+  };
+  if (aviso) return semNormal(aviso);
+  const anos = P.anos.filter(y => y <= f.ano), ant = anos.slice(0, -1), a0 = ant[0], a1 = ant[ant.length - 1];
+  const vals = anos.map(y => somaP(M[y], f.ini, f.fim)), v = vals[vals.length - 1];
+  const base = zInfo(v, vals.slice(0, -1));
+  if (!base?.m) return semNormal(`${f.label} não teve área queimada em ${perTxt(f)} entre ${a0} e ${a1}: não há um normal para comparar.`);
+  const difs = vals.map(x => (x - base.m) / base.m * 100);
+  const passo = base.sd / base.m * 100;
+  const cl = zClasse(base.z), per = perTxt(f);
 
-  $('x-fn-t').textContent = `${cap(mes)} de ${Y} ficou ${cl.t.toLowerCase()}`;
-  const normais = uf.length - acima - abaixo;
-  $('x-fn-lead').textContent = `Brasil: ${haC(vals[iY])} em ${mes} (${pctTxt(difs[iY])} vs. média ${a0}–${a1}, ${haC(base.m)}). `
-    + `Estados: ${acima} acima, ${abaixo} abaixo, ${normais} no normal.`;
-  $('x-fn-z-t').textContent = `Área queimada em ${mes}: quanto cada ano ficou acima ou abaixo da média (Brasil)`;
+  $('x-fn-t').textContent = `${cap(per)} de ${f.ano} ficou ${cl.t.toLowerCase()}`;
+  $('x-fn-lead').textContent = `${haC(v)} em ${mesesTxt(f)} (${pctTxt(difs[difs.length - 1])} vs. média ${a0}–${a1}, ${haC(base.m)}).`;
+  $('x-fn-z-t').textContent = `Área queimada em ${per}: quanto cada ano ficou acima ou abaixo da média`;
   $('x-fn-z-s').textContent = `Faixa branca: variação típica de ±${Math.round(passo)}% em torno da média ${a0}–${a1}.`;
   const lim = Math.max(3.3 * passo, ...difs.map(d => Math.abs(d) + 15));
   mkChart('x-fn', 'xc-fn', {
     type: 'bar',
-    data: { labels: anos.map(String), datasets: [{ data: difs, backgroundColor: anos.map(y => y === Y ? C.fire : C.gray), borderRadius: 2, barPercentage: .55 }] },
+    data: { labels: anos.map(String), datasets: [{ data: difs, backgroundColor: anos.map(y => y === f.ano ? C.fire : C.gray), borderRadius: 2, barPercentage: .55 }] },
     plugins: [faixasNormal],
     options: {
       maintainAspectRatio: false,
       layout: { padding: { top: 6 } },
       plugins: { legend: { display: false }, faixasNormal: { passo }, tooltip: { callbacks: { label: c => ` ${pctTxt(c.raw)} da média · ${haC(vals[c.dataIndex])}` } } },
       scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 9.5 }, color: c => anos[c.index] === Y ? C.redD : C.ink2 }, title: axTitle('Ano') },
+        x: { grid: { display: false }, ticks: { font: { size: 9.5 }, color: c => anos[c.index] === f.ano ? C.redD : C.ink2 }, title: axTitle('Ano') },
         y: { min: -Math.min(lim, 100), max: lim, grid: { color: 'rgba(0,0,0,.06)' }, border: { display: false },
-          ticks: { font: { size: 9 }, maxTicksLimit: 7, callback: v => `${v > 0 ? '+' : ''}${Math.round(v)}%` }, title: axTitle('Diferença da média') }
+          ticks: { font: { size: 9 }, maxTicksLimit: 7, callback: x => `${x > 0 ? '+' : ''}${Math.round(x)}%` }, title: axTitle('Diferença da média') }
       }
     }
   });
   const leg = [['a2', 'Muito acima do normal'], ['a1', 'Acima do normal'], ['', 'Dentro do normal'], ['b1', 'Abaixo do normal'], ['b2', 'Muito abaixo do normal']];
   $('x-fn-leg').innerHTML = leg.map(([k, t]) => `<span><i style="background:${k ? Z_CORES[k] : '#FFFFFF'};box-shadow:inset 0 0 0 1px #D0D0D0"></i>${t}</span>`).join('');
+  setDl('x-fn-z', {
+    nome: 'fora-do-normal', cols: ['ano', 'area_ha', `media_${a0}_${a1}_ha`, 'diferenca_da_media_pct'],
+    rows: anos.map((y, i) => [y, vals[i], base.m, difs[i]])
+  });
   $('x-fn-como').innerHTML = `<b>Como calculamos o “normal”</b><ol>`
-    + `<li>Para cada território, pegamos a área queimada em ${mes} de cada ano de ${a0} a ${a1} e calculamos a média.</li>`
+    + `<li>Para cada território, pegamos a área queimada em ${per} de cada ano de ${a0} a ${a1} e calculamos a média.</li>`
     + `<li>Medimos o quanto esses anos costumam se afastar da média (o desvio-padrão). Essa é a <b>variação típica</b>.</li>`
-    + `<li>Se ${mes} de ${Y} ficou a menos de uma variação típica da média, está <b>dentro do normal</b>. De uma a duas, <b>acima ou abaixo do normal</b>; mais de duas, <b>muito acima ou muito abaixo</b>.</li>`
-    + `<li>A diferença em % é (área de ${Y} − média) ÷ média.</li></ol>`
-    + `É a mesma lógica do índice de anomalia usado pelo INPE nos boletins de queimadas, contada em linguagem simples. Como a série do Monitor do Fogo começa em 2019, a média se apoia em ${ant.length} anos: leia como indicação.`;
+    + `<li>Se ${per} de ${f.ano} ficou a menos de uma variação típica da média, está <b>dentro do normal</b>. De uma a duas, <b>acima ou abaixo do normal</b>; mais de duas, <b>muito acima ou muito abaixo</b>.</li>`
+    + `<li>A diferença em % é (área de ${f.ano} − média) ÷ média.</li></ol>`
+    + `É a mesma lógica do índice de anomalia usado pelo INPE nos boletins de queimadas, contada em linguagem simples. A série do Monitor do Fogo começa em 2019, então a média de ${f.ano} se apoia em ${ant.length} anos: leia como indicação.`;
 }
 
-// Biomas: todos. Estados: só os que mais fugiram do normal, para cima e para baixo.
-async function xForaTabela(prom, el, rotulo, soDestaques) {
-  const linhas = linhasZ(await prom);
-  const { Y, M, anos } = P, mes = MES_L[M - 1], ab = cap(MES[M - 1]);
-  const ant = anos.filter(y => y < Y);
+// Subdivisões do território: todas (até 12) ou as que mais fugiram do normal, para cima e para baixo.
+function xForaTabela(porAno, anos, f) {
+  const linhas = linhasZ(porAno, anos, f.ano).filter(r => r.v > 0 || r.m > 0);
+  const ant = anos.slice(0, -1), div = TIPO_NOME[f.div] || f.div, per = perTxt(f);
   const dif = (a, b) => b > 0 ? pctTxt(pct(a, b)) : '—';
-  const cab = `<thead><tr><th class="l">${rotulo}</th><th>${ab}/${Y}</th><th>Média ${ant[0]}–${ant[ant.length - 1]}</th><th>Diferença</th><th class="l">Situação</th></tr></thead>`;
+  const cab = `<thead><tr><th class="l">${esc(div)}</th><th>${abrevP(f)}/${f.ano}</th><th>Média ${ant[0]}–${ant[ant.length - 1]}</th><th>Diferença</th><th class="l">Situação</th></tr></thead>`;
   const tr = r => { const c = zClasse(r.z); return `<tr class="${c.k ? `z${c.k}` : ''}"><td class="l">${esc(r.nome)}</td><td>${haC(r.v)}</td><td>${r.m == null ? '—' : haC(r.m)}</td><td><b>${dif(r.v, r.m)}</b></td><td class="zs">${c.t}</td></tr>`; };
-  if (!soDestaques) {
-    $(el).innerHTML = cab + '<tbody>' + linhas.sort((a, b) => (b.z ?? -99) - (a.z ?? -99)).map(tr).join('') + '</tbody>';
-    $('x-fn-bio-s').textContent = `${cap(mes)} de ${Y} comparado à média de ${mes}.`;
-    return;
-  }
-  const acima = linhas.filter(r => r.z > 1).sort((a, b) => b.z - a.z).slice(0, 5);
-  const abaixo = linhas.filter(r => r.z < -1).sort((a, b) => a.z - b.z).slice(0, 5);
+  const acima = linhas.filter(r => r.z > 1).sort((a, b) => b.z - a.z), abaixo = linhas.filter(r => r.z < -1).sort((a, b) => a.z - b.z);
   const normais = linhas.filter(r => r.z != null && Math.abs(r.z) <= 1).length;
-  const bloco = (t, l) => `<tr class="sep"><td colspan="5">${t}</td></tr>` + (l.length ? l.map(tr).join('') : '<tr><td class="l" colspan="5">Nenhum estado.</td></tr>');
-  $(el).innerHTML = cab + '<tbody>' + bloco('Mais acima do normal', acima) + bloco('Mais abaixo do normal', abaixo) + '</tbody>';
-  $('x-fn-uf-s').textContent = `Até 5 estados em cada sentido, ordenados por quanto fugiram da própria variação típica. ${normais} estados ficaram dentro do normal.`;
+  const resumo = `${acima.length} acima, ${abaixo.length} abaixo e ${normais} dentro do normal.`;
+  $('x-fn-sub-t').textContent = `Cada ${div.toLowerCase()} contra o próprio normal`;
+  if (!linhas.length) {
+    $('x-fn-subt').innerHTML = `<tbody><tr><td class="l">Nenhuma subdivisão com área queimada em ${esc(per)} de ${f.ano} nem nos anos anteriores.</td></tr></tbody>`;
+    $('x-fn-sub-s').textContent = '';
+  } else if (linhas.length <= 12) {
+    $('x-fn-subt').innerHTML = cab + '<tbody>' + [...linhas].sort((a, b) => (b.z ?? -99) - (a.z ?? -99)).map(tr).join('') + '</tbody>';
+    $('x-fn-sub-s').textContent = `${cap(per)} de ${f.ano} comparado à média de ${per} de ${ant[0]} a ${ant[ant.length - 1]}. ${resumo}`;
+  } else {
+    const bloco = (t, l) => `<tr class="sep"><td colspan="5">${t}</td></tr>` + (l.length ? l.slice(0, 5).map(tr).join('') : '<tr><td class="l" colspan="5">Nenhum território.</td></tr>');
+    $('x-fn-subt').innerHTML = cab + '<tbody>' + bloco('Mais acima do normal', acima) + bloco('Mais abaixo do normal', abaixo) + '</tbody>';
+    $('x-fn-sub-s').textContent = `Até 5 em cada sentido, ordenados por quanto fugiram da própria variação típica. ${resumo} A lista completa está no CSV.`;
+  }
+  setDl('x-fn-sub', {
+    nome: `fora-do-normal-por-${slug(div)}`, cols: ['codigo', 'territorio', `area_${f.ano}_ha`, `media_${ant[0]}_${ant[ant.length - 1]}_ha`, 'diferenca_pct', 'z', 'situacao'],
+    rows: linhas.map(r => [r.code, r.nome, r.v, r.m ?? '', r.m > 0 ? pct(r.v, r.m) : '', r.z ?? '', zClasse(r.z).t])
+  });
 }
 
 /* ---------- tabela ---------- */

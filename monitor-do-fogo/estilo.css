@@ -208,3 +208,6 @@ aside{padding:16px 14px}
 /* Ajuste: rótulos abaixo das alças */
 .tempoctrl #meses button:before{margin-top:10px;margin-bottom:11px}
 .tempoctrl #meses .sel:before{margin-top:8px;margin-bottom:10px}
+/* Ajuste: alternância Só no mês / Acumulado ocupa a linha toda */
+.linha-toggle .modo-fogo{width:100%;margin:8px 0 10px}
+.linha-toggle .modo-fogo button{flex:1;text-align:center;white-space:nowrap}

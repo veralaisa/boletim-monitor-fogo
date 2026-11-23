@@ -19,8 +19,8 @@ const totais=[190643,130100,112902,162876,345300,586211,1140922,2105251,2589608,
 const nf=n=>Math.round(n).toLocaleString('pt-BR'), cap=s=>s[0].toUpperCase()+s.slice(1), dec=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:2});
 const estados=geografia.states.slice().sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
 const selectOpts=(items)=>items.map(([v,n])=>'<option value="'+v+'">'+n+'</option>').join('');
-const ordemProdutos=[0,2,1,3,5,4];
-$('uf').innerHTML=selectOpts([['','Brasil'],...estados.map(s=>[s.id,s.name])]);$('classe').innerHTML=selectOpts(classes.map((n,i)=>[i,n]));$('produto').innerHTML=selectOpts(ordemProdutos.map(i=>[i,prod[i][0]]));$('bioma').innerHTML=selectOpts(biomas.map((n,i)=>[i,n]));$('relMes').innerHTML=selectOpts(meses.slice(0,MAXM).map((n,i)=>[i,cap(n)+' de '+ANO]));
+const ordemProdutos=[0,2,1,3,4];
+$('uf').innerHTML=selectOpts([['','Brasil'],...estados.map(s=>[s.id,s.name])]);$('classe').innerHTML=selectOpts(classes.map((n,i)=>[i,n]));$('produto').innerHTML=ordemProdutos.map(i=>'<option value="'+i+'"'+(i===4?' disabled':'')+'>'+prod[i][0]+'</option>').join('');$('bioma').innerHTML=selectOpts(biomas.map((n,i)=>[i,n]));$('relMes').innerHTML=selectOpts(meses.slice(0,MAXM).map((n,i)=>[i,cap(n)+' de '+ANO]));
 let p=0,m=9,uf='',cl=0,bio=0,zoom=1,step=1,hour=12,loop=null,anim=null,rel=false,legendOff=new Set(),emissaoModo='mensal',origemNivel=1,origemModo='mensal',fumacaModo='intensidade';
 fumacaModo='trajetoria';
 const dados=[];

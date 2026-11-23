@@ -118,3 +118,69 @@ h1,h2,h3{font-weight:700;color:#2b2b2b}
 .tabla th{color:#5b5b5b;font-weight:600;font-size:13px}
 .tabla tr:hover td{background:#fbfaf9}
 .eixo-fogo,.emissao-axis{font-weight:500}
+/* ===== Aproximação ao layout da plataforma do Monitor (aba Mapa) ===== */
+.kicker{display:none}
+.maphead{padding:12px 18px;align-items:center;justify-content:flex-start}
+.maphead h1{font-size:19px;letter-spacing:-.2px;font-weight:700;margin:0}
+.maphead p{font-size:12px;color:#6b716d;margin-top:2px}
+.maphead .quadrado{margin-left:auto}
+.dica-mapa{margin-left:auto;margin-right:12px;font-size:12px;color:#6b716d;white-space:nowrap}
+header{border-bottom:1px solid #e6e8e5}
+nav{background:#f1f2f0;border-radius:999px}
+nav button{color:#5b6160}
+nav .ativo,nav button.ativo{background:#fff;color:#2b2b2b;border:0;box-shadow:0 1px 3px #0002}
+nav .ativo svg,nav button.ativo svg{stroke:#2b2b2b}
+#download{background:#fff;color:#2b2b2b;border:1px solid #d6dbd8;border-radius:999px}
+#download:hover{background:#f7f7f5}
+#download svg{stroke:#2b2b2b}
+.filtros{padding:10px 18px;gap:12px}
+.filtro-btn{border:0;background:transparent;padding:6px 8px;color:#4f5653}
+.filtro-btn:first-child{border:1px solid #d6dbd8;background:#fff;border-radius:10px;padding:8px 12px}
+.filtros-fogo{gap:10px}
+.filtros label.produto{background:#e4f4f6;border:0;color:#1f4d58;border-radius:10px;padding:8px 12px;font-weight:600}
+.mapbox{left:12px;top:12px;border-radius:12px;padding:12px 14px;min-width:200px;max-width:250px}
+.mapbox strong{font-size:14px;font-weight:700;color:#2b2b2b;margin-bottom:6px}
+.legrow{font-size:12px;color:#2b2b2b;padding:4px 0}
+.legrow .swatch{width:16px;height:14px;border-radius:3px}
+.legdica{display:block;font-size:11px;color:#6b716d;margin-top:8px;line-height:1.35}
+.maptools{top:14px;right:14px;gap:8px}
+.maptools button,.maptools>span{width:34px;height:34px;border-radius:50%;border:1px solid #d6dbd8;background:#fff;box-shadow:0 1px 4px #0002;font-size:18px;color:#2b2b2b;padding:0}
+.maptools>span{font-size:10px;line-height:1.05;padding-top:7px;font-weight:700;color:#2b2b2b;margin-bottom:0}
+.credito{color:#55605e;font-size:10px}
+/* Linha do tempo: barra compacta com meses em pílulas */
+.tempo{left:12px;right:12px;bottom:12px;max-width:none;height:auto;padding:8px 10px;border-radius:12px;border:1px solid #e0e3e0;box-shadow:0 2px 10px #00000018;overflow:visible}
+.tempoctrl{position:static;height:auto;display:flex;align-items:center;gap:8px;margin:0;border:0;padding:0}
+.tempoctrl>#play{position:static;width:30px;height:30px;border:1px solid #d6dbd8;border-radius:50%;background:#fff;color:#2b2b2b;font-size:11px;line-height:1;padding:0;display:grid;place-items:center;flex:none}
+.timeline-year,.timeline-year:before,.timeline-year:after{content:none}
+.timeline-year{position:static;height:32px;min-width:0;border:1px solid #d6dbd8;border-radius:8px;color:#2b2b2b;padding:0 10px;font-weight:600;font-size:13px;background:#fff;flex:none}
+.tempoctrl .timeline-range{display:none}
+.tempoctrl #meses{display:flex;position:static;left:auto;right:auto;bottom:auto;height:auto;flex:1;gap:4px;justify-content:flex-start}
+.tempoctrl #meses button,.tempoctrl #meses button:before,.tempoctrl #meses button:after{content:none;display:block}
+.tempoctrl #meses button{font-size:12px;line-height:1.2;padding:6px 8px;border-radius:8px;background:#f2f3f1;color:#3d4440;font-weight:500}
+.tempoctrl #meses .sel{background:#cdeef5;color:#1d4f5e;font-weight:700}
+.tempoctrl #meses :disabled{background:#f7f7f6;color:#b4b9b6}
+.tempoctrl #meses .fora-periodo{color:#3d4440}
+.valor-mes{margin-left:auto;background:#fde6e1;color:#c0392b;border-radius:8px;padding:7px 12px;font-weight:700;font-size:14px;white-space:nowrap;flex:none}
+.valor-mes[hidden]{display:none}
+/* Painel lateral */
+aside{padding:16px 14px}
+.painel-titulo{font-size:22px;letter-spacing:-.5px;font-weight:700;color:#2b2b2b;margin:0 0 6px}
+.area-desc{font-size:13px;line-height:1.45;color:#6b716d}
+.fogo-card,.fogo-chart-card{padding:15px 15px 14px;border-radius:12px;border-color:#e0e3e0}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-share{padding:4px;color:#6b716d;background:transparent;border:0;cursor:pointer}
+.card-share svg{width:16px;height:16px}
+.fogo-big{font-size:28px;font-weight:700;letter-spacing:-.5px;margin:6px 0 2px;color:#2b2b2b}
+.fogo-big small{font-size:14px;font-weight:600}
+.fogo-card p{font-size:12px;color:#6b716d}
+.compare{font-size:12px;font-weight:700;margin-top:6px;line-height:1.35}
+.compare span{font-weight:400;color:#6b716d;margin-left:4px}
+.fogo-highlights{border-radius:12px;border-color:#e0e3e0}
+.fogo-highlights strong{font-size:17px}
+.linha-toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+.linha-toggle .modo-fogo{margin:8px 0 10px}
+.modo-fogo button{border-radius:999px;padding:6px 12px;color:#4a4f4c;font-weight:500;background:transparent}
+.modo-fogo button.sel{background:#ececea;color:#2b2b2b;font-weight:700}
+.fogo-chart-card strong{font-size:14px;color:#2b2b2b}
+.periodo-inline{color:#1f4d58;font-weight:600;font-size:13px}
+.area-head{display:none}

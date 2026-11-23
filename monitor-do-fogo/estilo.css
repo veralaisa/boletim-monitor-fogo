@@ -184,3 +184,27 @@ aside{padding:16px 14px}
 .fogo-chart-card strong{font-size:14px;color:#2b2b2b}
 .periodo-inline{color:#1f4d58;font-weight:600;font-size:13px}
 .area-head{display:none}
+/* ===== Barra de período: ano, play, trilha com alças e meses em bolinhas ===== */
+.tempo{padding:10px 16px 6px}
+.tempoctrl{display:flex;align-items:center;gap:14px;height:auto}
+.tempoctrl>#timelineAno{order:1}
+.tempoctrl>#play{order:2;position:static;width:auto;height:auto;border:0;background:none;color:#e0463a;font-size:15px;line-height:1;padding:0 2px}
+.trilha{order:3;position:relative;flex:1;min-width:0;height:52px}
+.trilha .timeline-range{position:absolute;left:0;right:0;top:2px;height:24px;margin:0;min-width:0}
+.trilha .timeline-range:before{left:9px;right:9px;top:9px;height:4px;background:linear-gradient(to right,#e4e6e5 0 var(--start),#ef645f var(--start) var(--end),#e4e6e5 var(--end) 100%)}
+.tempoctrl #meses{position:absolute;left:0;right:0;top:0;bottom:auto;height:52px;display:block;gap:0;padding:0}
+.tempoctrl #meses button{position:absolute;top:0;left:calc(9px + (100% - 18px) * var(--i) / 11);transform:translateX(-50%);height:52px;width:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;margin:0;background:none;font-size:11px;font-weight:500;line-height:1;color:#4a5150;border-radius:0}
+.tempoctrl #meses button:before{content:'';display:block;width:6px;height:6px;border-radius:50%;background:#f0877f;margin:12px auto 0}
+.tempoctrl #meses button:after{content:none}
+.tempoctrl #meses .sel{background:none;color:#c8382c;font-weight:700}
+.tempoctrl #meses .sel:before{width:9px;height:9px;margin-top:10px;background:#e0463a}
+.tempoctrl #meses .fora-periodo{color:#4a5150}
+.tempoctrl #meses :disabled{color:#b4b9b6;background:none;cursor:default}
+.tempoctrl #meses :disabled:before{background:#d9dcda}
+/* Ajuste: trilha visível com alças, bolinhas centradas na linha */
+.tempoctrl .trilha .timeline-range{display:block}
+.tempoctrl #meses button:before{margin-top:10px}
+.tempoctrl #meses .sel:before{margin-top:8px}
+/* Ajuste: rótulos abaixo das alças */
+.tempoctrl #meses button:before{margin-top:10px;margin-bottom:11px}
+.tempoctrl #meses .sel:before{margin-top:8px;margin-bottom:10px}
